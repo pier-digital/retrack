@@ -7,7 +7,7 @@ def test_input_model():
         "data": {"name": "Example", "default": "Hello World"},
         "inputs": {},
         "outputs": {
-            "output_0": {
+            "output_value": {
                 "connections": [{"node": 0, "input": "input_void", "data": {}}]
             }
         },
@@ -22,6 +22,6 @@ def test_input_model():
         "data": {"name": "Example", "default": "Hello World"},
         "inputs": {"input_void": None},
         "outputs": {
-            "output_0": {"connections": [{"node": "0", "input": "input_void"}]}
+            "output_value": {"connections": [{"node": "0", "input": "input_void"}]}
         },
     }

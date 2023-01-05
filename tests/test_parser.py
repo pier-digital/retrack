@@ -20,9 +20,9 @@ from retack.parser import Parser
                             }
                         },
                         "outputs": {
-                            "output_0": {
+                            "output_value": {
                                 "connections": [
-                                    {"node": 5, "input": "input_0", "data": {}}
+                                    {"node": 5, "input": "input_value", "data": {}}
                                 ]
                             }
                         },
@@ -40,7 +40,9 @@ from retack.parser import Parser
                         }
                     },
                     "outputs": {
-                        "output_0": {"connections": [{"node": "5", "input": "input_0"}]}
+                        "output_value": {
+                            "connections": [{"node": "5", "input": "input_value"}]
+                        }
                     },
                 }
             },

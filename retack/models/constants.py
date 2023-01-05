@@ -14,7 +14,7 @@ class ConstantInputsModel(pydantic.BaseModel):
 
 
 class ConstantOutputsModel(pydantic.BaseModel):
-    output_0: OutputConnectionModel
+    output_value: OutputConnectionModel
 
 
 class ConstantModel(pydantic.BaseModel):
@@ -28,8 +28,12 @@ class ListMetadataModel(pydantic.BaseModel):
     value: typing.List[str]
 
 
+class ListOutputsModel(pydantic.BaseModel):
+    output_list: OutputConnectionModel
+
+
 class ListModel(pydantic.BaseModel):
     id: str
     data: ListMetadataModel
     inputs: typing.Optional[ConstantInputsModel] = None
-    outputs: ConstantOutputsModel
+    outputs: ListOutputsModel

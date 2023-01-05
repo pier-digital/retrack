@@ -15,7 +15,7 @@ class InputInputsModel(pydantic.BaseModel):
 
 
 class InputOutputsModel(pydantic.BaseModel):
-    output_0: OutputConnectionModel
+    output_value: OutputConnectionModel
 
 
 class InputModel(pydantic.BaseModel):
