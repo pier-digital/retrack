@@ -6,6 +6,8 @@ authors = ["Gabriel Guarisa <gabrielguarisa@gmail.com>", "Nathalia Trotte <natha
 
 [tool.poetry.dependencies]
 python = "^3.8.16"
+pydantic = "^1.10.4"
+pandas = "^1.5.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
