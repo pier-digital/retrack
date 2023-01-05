@@ -20,6 +20,14 @@ def test_start_model():
 
     start_model = StartModel(**input_data)
 
-    assert start_model.id == "0"
-    assert start_model.outputs.output_void.connections[0].node == "3"
-    assert start_model.outputs.output_void.connections[1].node == "4"
+    assert start_model.dict(by_alias=True) == {
+        "id": "0",
+        "outputs": {
+            "output_void": {
+                "connections": [
+                    {"node": "3", "input": "input_void"},
+                    {"node": "4", "input": "input_void"},
+                ]
+            }
+        },
+    }
