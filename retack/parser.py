@@ -7,10 +7,12 @@ class Parser:
         self,
         data: dict,
         model_registry: ModelRegistry = GLOBAL_MODEL_REGISTRY,
+        unknown_node_error: bool = False,
     ):
         Parser._check_input_data(data)
 
         output_data = {}
+        tokens = {}
 
         for node_id, node_data in data["nodes"].items():
             node_name = node_data.get("name", None)
@@ -19,10 +21,18 @@ class Parser:
 
             validation_model = model_registry.get(node_name)
             if validation_model is not None:
+                if node_name not in tokens:
+                    tokens[node_name] = []
+
+                tokens[node_name].append(node_id)
+
                 node_data["id"] = node_id
                 output_data[node_id] = validation_model(**node_data).dict(by_alias=True)
+            elif unknown_node_error:
+                raise ValueError(f"Unknown node name: {node_name}")
 
         self._data = output_data
+        self._tokens = tokens
 
     @staticmethod
     def _check_node_name(node_name: str, node_id: str):
@@ -47,3 +57,7 @@ class Parser:
     @property
     def data(self) -> dict:
         return self._data
+
+    @property
+    def tokens(self) -> dict:
+        return self._tokens
