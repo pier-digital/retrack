@@ -50,6 +50,12 @@ from retack.parser import Parser
 def test_parser_extract(input_data, expected_output_data):
     parser = Parser(input_data)
     assert parser.data == expected_output_data
+    assert parser.tokens == {"Input": ["1"]}
+
+
+def test_parser_with_unknown_node():
+    with pytest.raises(ValueError):
+        Parser({"nodes": {"1": {"name": "Unknown"}}}, unknown_node_error=True)
 
 
 def test_parser_invalid_input_data():
