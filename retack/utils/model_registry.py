@@ -10,8 +10,9 @@ class ModelRegistry:
     It is used to provide a mapping from model names to model classes.
     """
 
-    def __init__(self):
+    def __init__(self, case_sensitive: bool = False):
         self._registry = {}
+        self._case_sensitive = case_sensitive
 
     def register(self, name: str, model_cls: typing.Type[pydantic.BaseModel]):
         """Register a model.
@@ -20,7 +21,9 @@ class ModelRegistry:
             name: The name of the model.
             model_cls: The model class.
         """
-        name = name.lower()
+        if not self._case_sensitive:
+            name = name.lower()
+
         if name in self._registry:
             raise ValueError(f"Model {name} is already registered.")
 
@@ -38,8 +41,14 @@ class ModelRegistry:
         Returns:
             The model class.
         """
-        return self._registry.get(name.lower(), default)
+        if not self._case_sensitive:
+            name = name.lower()
+
+        return self._registry.get(name, default)
 
     def __contains__(self, name: str) -> bool:
         """Check if a model is registered."""
-        return name.lower() in self._registry
+        if not self._case_sensitive:
+            name = name.lower()
+
+        return name in self._registry
