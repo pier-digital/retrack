@@ -1,4 +1,8 @@
-from retack.models import ModelRegistry
+import typing
+
+import pydantic
+
+from retack.models import Registry
 from retack.models import model_registry as GLOBAL_MODEL_REGISTRY
 
 
@@ -6,18 +10,20 @@ class Parser:
     def __init__(
         self,
         data: dict,
-        model_registry: ModelRegistry = GLOBAL_MODEL_REGISTRY,
+        model_registry: Registry = GLOBAL_MODEL_REGISTRY,
         unknown_node_error: bool = False,
     ):
         Parser._check_input_data(data)
 
-        output_data = {}
+        element_registry = Registry()
         tokens = {}
 
         for node_id, node_data in data["nodes"].items():
             node_name = node_data.get("name", None)
 
             Parser._check_node_name(node_name, node_id)
+
+            node_name = node_name.lower()
 
             validation_model = model_registry.get(node_name)
             if validation_model is not None:
@@ -27,11 +33,12 @@ class Parser:
                 tokens[node_name].append(node_id)
 
                 node_data["id"] = node_id
-                output_data[node_id] = validation_model(**node_data).dict(by_alias=True)
+                if node_id not in element_registry:
+                    element_registry.register(node_id, validation_model(**node_data))
             elif unknown_node_error:
                 raise ValueError(f"Unknown node name: {node_name}")
 
-        self._data = output_data
+        self._element_registry = element_registry
         self._tokens = tokens
 
     @staticmethod
@@ -55,9 +62,20 @@ class Parser:
             )
 
     @property
+    def elements(self) -> typing.Dict[str, pydantic.BaseModel]:
+        return self._element_registry.data
+
+    @property
     def data(self) -> dict:
-        return self._data
+        return {i: j.dict(by_alias=True) for i, j in self.elements.items()}
 
     @property
     def tokens(self) -> dict:
         return self._tokens
+
+    def get_element_by_id(self, element_id: str) -> pydantic.BaseModel:
+        return self._element_registry.get(element_id)
+
+    def get_element_by_name(self, element_name: str) -> typing.List[pydantic.BaseModel]:
+        element_name = element_name.lower()
+        return [self.get_element_by_id(i) for i in self.tokens.get(element_name, [])]

@@ -3,9 +3,9 @@ from retack.models.constants import ConstantModel, ListModel
 from retack.models.inputs import InputModel
 from retack.models.outputs import BoolOutputModel
 from retack.models.start import StartModel
-from retack.utils.model_registry import ModelRegistry
+from retack.utils.registry import Registry
 
-model_registry = ModelRegistry()
+model_registry = Registry()
 
 model_registry.register("Input", InputModel)
 model_registry.register("Start", StartModel)

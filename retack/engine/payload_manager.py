@@ -36,7 +36,7 @@ class PayloadManager:
 
         self._inputs = formated_inputs
 
-        if len(self.inputs):
+        if len(self.inputs) > 0:
             self._model = self._create_model()
 
     @property
@@ -49,7 +49,7 @@ class PayloadManager:
             **{
                 input_.data.name: (
                     str,
-                    ... if input_.data.default is None else input_.data.default,
+                    ...,
                 )
                 for input_ in self.inputs
             },
@@ -61,6 +61,9 @@ class PayloadManager:
             typing.Dict[str, str], typing.List[typing.Dict[str, str]]
         ],
     ) -> typing.List[pydantic.BaseModel]:
+        if self.model is None:
+            raise ValueError("No inputs found")
+
         if not isinstance(payload, list):
             payload = [payload]
 
