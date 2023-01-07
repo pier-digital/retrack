@@ -39,5 +39,7 @@ def get_execution_order(parser):
     start_elements = parser.get_elements_by_name("start")
     if len(start_elements) == 0:
         raise ValueError("No start element found")
+    elif len(start_elements) > 1:
+        raise ValueError("Multiple start elements found")
 
     return walk(parser, start_elements[0].id)

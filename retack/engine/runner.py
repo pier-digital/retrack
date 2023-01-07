@@ -3,6 +3,7 @@ import typing
 import numpy as np
 import pandas as pd
 
+from retack.engine import constants
 from retack.engine.nodes import node_registry
 from retack.engine.payload_manager import PayloadManager
 from retack.parser import Parser
@@ -26,16 +27,9 @@ class Runner:
             for element in constant_elements
         }
 
-        # self._execution_order = graph.get_execution_order(self._parser)
+        self._execution_order = graph.get_execution_order(self._parser)
         self._state_df = None
 
-        start_elements = self._parser.get_elements_by_name("start")
-        if len(start_elements) == 0:
-            raise ValueError("No start element found")
-        elif len(start_elements) > 1:
-            raise ValueError("Multiple start elements found")
-
-        self._start_element_id = start_elements[0].id
         self._filters = {}
 
     def _payload_to_dataframe(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
@@ -48,10 +42,9 @@ class Runner:
     def payload_manager(self) -> PayloadManager:
         return self._payload_manager
 
-    def run_element(self, element_id: str):
+    def __run_element(self, element_id: str):
         element = self._parser.get_element_by_id(element_id).dict(by_alias=True)
         element_name = self._parser.get_name_by_id(element_id)
-        # print(element_id, self._parser.get_name_by_id(element_id))
         input_params = element.get("data", {})
 
         for connector_name, connections in element.get("inputs", {}).items():
@@ -66,15 +59,15 @@ class Runner:
 
         node_executor = node_registry.get(element_name)
 
-        # print(element_id, input_params)
         if node_executor:
             output = node_executor(**input_params)
             for output_name, output_value in output.items():
-                if output_name == "OUTPUT":
+                if output_name == constants.OUTPUT_REFERENCE_COLUMN:
                     self._state_df.loc[
-                        self._filters.get(element_id, None) :, "OUTPUT"
+                        self._filters.get(element_id, None) :,
+                        constants.OUTPUT_REFERENCE_COLUMN,
                     ] = output_value
-                elif output_name == "FILTER":
+                elif output_name == constants.FILTER_REFERENCE_COLUMN:
                     output_connections = graph.get_element_connections(
                         element, is_input=False
                     )
@@ -98,8 +91,12 @@ class Runner:
         for constant_name, constant_value in self._constants.items():
             self._state_df[constant_name] = constant_value
 
-        self._state_df["OUTPUT"] = np.nan
+        self._state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
 
-        graph.walk(self._parser, self._start_element_id, callback=self.run_element)
+        for element_id in self._execution_order:
+            self.__run_element(element_id)
 
-        return self._state_df["OUTPUT"].to_list()
+            if self._state_df[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
+                break
+
+        return self._state_df[constants.OUTPUT_REFERENCE_COLUMN].to_list()
