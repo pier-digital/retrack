@@ -42,10 +42,21 @@ class Runner:
     def payload_manager(self) -> PayloadManager:
         return self._payload_manager
 
+    def __set_output_connection_filters(self, element: str, value):
+        output_connections = graph.get_element_connections(element, is_input=False)
+        for output_connection_id in output_connections:
+            if self._filters.get(output_connection_id, None) is None:
+                self._filters[output_connection_id] = value
+            else:
+                self._filters[output_connection_id] = (
+                    self._filters[output_connection_id] & value
+                )
+
     def __run_element(self, element_id: str):
         element = self._parser.get_element_by_id(element_id).dict(by_alias=True)
         element_name = self._parser.get_name_by_id(element_id)
         input_params = element.get("data", {})
+        current_element_filter = self._filters.get(element_id, None)
 
         for connector_name, connections in element.get("inputs", {}).items():
             if connector_name.endswith("void"):
@@ -53,39 +64,31 @@ class Runner:
 
             for connection in connections["connections"]:
                 input_params[connector_name] = self._state_df.loc[
-                    self._filters.get(element_id, None) :,
+                    current_element_filter:,
                     f"{connection['node']}@{connection['output']}",
                 ]
 
         node_executor = node_registry.get(element_name)
 
+        if current_element_filter is not None:
+            self.__set_output_connection_filters(element, current_element_filter)
+
         if node_executor:
             output = node_executor(**input_params)
             for output_name, output_value in output.items():
-                if output_name == constants.OUTPUT_REFERENCE_COLUMN:
+                if (
+                    output_name == constants.OUTPUT_REFERENCE_COLUMN
+                    or output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN
+                ):
                     self._state_df.loc[
-                        self._filters.get(element_id, None) :,
-                        constants.OUTPUT_REFERENCE_COLUMN,
-                    ] = output_value
-                elif output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN:
-                    self._state_df.loc[
-                        self._filters.get(element_id, None) :,
-                        constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+                        current_element_filter:,
+                        output_name,
                     ] = output_value
                 elif output_name == constants.FILTER_REFERENCE_COLUMN:
-                    output_connections = graph.get_element_connections(
-                        element, is_input=False
-                    )
-                    for output_connection in output_connections:
-                        if self._filters.get(output_connection, None) is None:
-                            self._filters[output_connection] = output_value
-                        else:
-                            self._filters[output_connection] = (
-                                self._filters[output_connection] & output_value
-                            )
+                    self.__set_output_connection_filters(element, output_value)
                 else:
                     self._state_df.loc[
-                        self._filters.get(element_id, None) :,
+                        current_element_filter:,
                         f"{element_id}@{output_name}",
                     ] = output_value
 
