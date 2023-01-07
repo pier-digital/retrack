@@ -1,9 +1,15 @@
-def get_element_connections(element, is_input: bool = True):
-    element_dict = element.dict(by_alias=True)
+def get_element_connections(element, is_input: bool = True, filter_by_connector=None):
+    if isinstance(element, dict):
+        element_dict = element
+    else:
+        element_dict = element.dict(by_alias=True)
     connectors = element_dict.get("inputs" if is_input else "outputs", {})
     result = []
 
-    for _, value in connectors.items():
+    for connector_name, value in connectors.items():
+        if filter_by_connector is not None and connector_name != filter_by_connector:
+            continue
+
         for connection in value["connections"]:
             result.append(connection["node"])
     return result
@@ -20,6 +26,7 @@ def walk(parser, actual_id: str, skiped_ids=[], callback=None):
     for next_id in output_ids:
         if next_id not in skiped_ids:
             next_element = parser.get_element_by_id(next_id)
+
             next_element_input_ids = get_element_connections(
                 next_element, is_input=True
             )

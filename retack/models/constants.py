@@ -2,7 +2,11 @@ import typing
 
 import pydantic
 
-from retack.models.base import InputConnectionModel, OutputConnectionModel
+from retack.models.base import (
+    ComponentModel,
+    InputConnectionModel,
+    OutputConnectionModel,
+)
 
 
 class ConstantMetadataModel(pydantic.BaseModel):
@@ -17,8 +21,7 @@ class ConstantOutputsModel(pydantic.BaseModel):
     output_value: OutputConnectionModel
 
 
-class ConstantModel(pydantic.BaseModel):
-    id: str
+class ConstantModel(ComponentModel):
     data: ConstantMetadataModel
     inputs: typing.Optional[ConstantInputsModel] = None
     outputs: ConstantOutputsModel
@@ -32,8 +35,27 @@ class ListOutputsModel(pydantic.BaseModel):
     output_list: OutputConnectionModel
 
 
-class ListModel(pydantic.BaseModel):
-    id: str
+class ListModel(ComponentModel):
     data: ListMetadataModel
     inputs: typing.Optional[ConstantInputsModel] = None
     outputs: ListOutputsModel
+
+
+class BoolMetadataModel(pydantic.BaseModel):
+    value: typing.Optional[bool] = pydantic.Field(False, alias="value")
+
+    @pydantic.validator("value")
+    def validate_value(cls, value):
+        if value is None:
+            return False
+        return value
+
+
+class BoolOutputsModel(pydantic.BaseModel):
+    output_bool: OutputConnectionModel
+
+
+class BoolModel(ComponentModel):
+    data: BoolMetadataModel = BoolMetadataModel(value=False)
+    inputs: typing.Optional[ConstantInputsModel] = None
+    outputs: BoolOutputsModel

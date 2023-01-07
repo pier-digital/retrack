@@ -19,3 +19,7 @@ class OutputConnectionModel(pydantic.BaseModel):
 
 class InputConnectionModel(pydantic.BaseModel):
     connections: typing.List[InputConnectionItemModel]
+
+
+class ComponentModel(pydantic.BaseModel):
+    id: str

@@ -2,7 +2,7 @@ import typing
 
 import pydantic
 
-from retack.models.base import InputConnectionModel
+from retack.models.base import ComponentModel, InputConnectionModel
 
 
 class BoolOutputInputsModel(pydantic.BaseModel):
@@ -13,7 +13,6 @@ class OutputMetadataModel(pydantic.BaseModel):
     message: str = None
 
 
-class BoolOutputModel(pydantic.BaseModel):
-    id: str
+class BoolOutputModel(ComponentModel):
     inputs: typing.Optional[BoolOutputInputsModel]
     data: OutputMetadataModel

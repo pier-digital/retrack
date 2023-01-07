@@ -4,7 +4,11 @@ import enum
 
 import pydantic
 
-from retack.models.base import InputConnectionModel, OutputConnectionModel
+from retack.models.base import (
+    ComponentModel,
+    InputConnectionModel,
+    OutputConnectionModel,
+)
 
 
 class CheckOperator(str, enum.Enum):
@@ -29,8 +33,7 @@ class CheckOutputsModel(pydantic.BaseModel):
     output_bool: OutputConnectionModel
 
 
-class CheckModel(pydantic.BaseModel):
-    id: str
+class CheckModel(ComponentModel):
     data: CheckMetadataModel
     inputs: CheckInputsModel
     outputs: CheckOutputsModel

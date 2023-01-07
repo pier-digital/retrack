@@ -22,10 +22,17 @@ class Runner:
         self._payload_manager = PayloadManager(input_elements)
 
         constant_elements = self._parser.get_elements_by_kind("constant")
-        self._constants = {
-            f"{element.id}@output_value": element.data.value
-            for element in constant_elements
-        }
+        self._constants = {}
+
+        for element in constant_elements:
+            element_name = self._parser.get_name_by_id(element.id)
+            if element_name is None:
+                raise ValueError(f"Constant {element.id} has no name")
+
+            element_name = (
+                "value" if element_name.lower() == "constant" else element_name.lower()
+            )
+            self._constants[f"{element.id}@output_{element_name}"] = element.data.value
 
         self._execution_order = graph.get_execution_order(self._parser)
         self._state_df = None
@@ -42,8 +49,12 @@ class Runner:
     def payload_manager(self) -> PayloadManager:
         return self._payload_manager
 
-    def __set_output_connection_filters(self, element: str, value):
-        output_connections = graph.get_element_connections(element, is_input=False)
+    def __set_output_connection_filters(
+        self, element, value: typing.Any, filter_by_connector=None
+    ):
+        output_connections = graph.get_element_connections(
+            element, is_input=False, filter_by_connector=filter_by_connector
+        )
         for output_connection_id in output_connections:
             if self._filters.get(output_connection_id, None) is None:
                 self._filters[output_connection_id] = value
@@ -63,10 +74,15 @@ class Runner:
                 continue
 
             for connection in connections["connections"]:
-                input_params[connector_name] = self._state_df.loc[
-                    current_element_filter:,
-                    f"{connection['node']}@{connection['output']}",
-                ]
+                if current_element_filter is not None:
+                    input_params[connector_name] = self._state_df.loc[
+                        current_element_filter,
+                        f"{connection['node']}@{connection['output']}",
+                    ]
+                else:
+                    input_params[connector_name] = self._state_df[
+                        f"{connection['node']}@{connection['output']}"
+                    ]
 
         node_executor = node_registry.get(element_name)
 
@@ -80,17 +96,27 @@ class Runner:
                     output_name == constants.OUTPUT_REFERENCE_COLUMN
                     or output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN
                 ):
-                    self._state_df.loc[
-                        current_element_filter:,
-                        output_name,
-                    ] = output_value
-                elif output_name == constants.FILTER_REFERENCE_COLUMN:
-                    self.__set_output_connection_filters(element, output_value)
+                    if current_element_filter is None:
+                        self._state_df[output_name] = output_value
+                    else:
+                        self._state_df.loc[
+                            current_element_filter, output_name
+                        ] = output_value
+                elif output_name.startswith(constants.FILTER_REFERENCE_COLUMN):
+                    filter_by_connector = None
+                    if len(output_name.split("@")) > 1:
+                        filter_by_connector = output_name.split("@")[-1]
+
+                    self.__set_output_connection_filters(
+                        element, output_value, filter_by_connector
+                    )
                 else:
-                    self._state_df.loc[
-                        current_element_filter:,
-                        f"{element_id}@{output_name}",
-                    ] = output_value
+                    if current_element_filter is None:
+                        self._state_df[f"{element_id}@{output_name}"] = output_value
+                    else:
+                        self._state_df.loc[
+                            current_element_filter, f"{element_id}@{output_name}"
+                        ] = output_value
 
     def __call__(self, payload: typing.Union[dict, list]):
         self._state_df = self._payload_to_dataframe(payload)
@@ -103,8 +129,10 @@ class Runner:
         self._state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
 
         for element_id in self._execution_order:
-            self.__run_element(element_id)
-
+            try:
+                self.__run_element(element_id)
+            except Exception as e:
+                raise e
             if self._state_df[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 

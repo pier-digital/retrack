@@ -9,7 +9,7 @@ INPUT_TOKENS = ["input"]
 
 OUTPUT_TOKENS = ["booloutput"]
 
-CONSTANT_TOKENS = ["constant"]
+CONSTANT_TOKENS = ["constant", "list", "bool"]
 
 
 class Parser:

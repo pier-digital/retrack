@@ -17,12 +17,22 @@ class CheckNode:
         elif operator == CheckOperator.NOT_EQUAL:
             return {"output_bool": input_value_0 != input_value_1}
         elif operator == CheckOperator.GREATER_THAN:
-            return {"output_bool": input_value_0 > input_value_1}
+            return {
+                "output_bool": input_value_0.astype(float) > input_value_1.astype(float)
+            }
         elif operator == CheckOperator.LESS_THAN:
-            return {"output_bool": input_value_0 < input_value_1}
+            return {
+                "output_bool": input_value_0.astype(float) < input_value_1.astype(float)
+            }
         elif operator == CheckOperator.GREATER_THAN_OR_EQUAL:
-            return {"output_bool": input_value_0 >= input_value_1}
+            return {
+                "output_bool": input_value_0.astype(float)
+                >= input_value_1.astype(float)
+            }
         elif operator == CheckOperator.LESS_THAN_OR_EQUAL:
-            return {"output_bool": input_value_0 <= input_value_1}
+            return {
+                "output_bool": input_value_0.astype(float)
+                <= input_value_1.astype(float)
+            }
         else:
             raise ValueError("Unknown operator")

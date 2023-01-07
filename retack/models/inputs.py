@@ -2,7 +2,11 @@ import typing
 
 import pydantic
 
-from retack.models.base import InputConnectionModel, OutputConnectionModel
+from retack.models.base import (
+    ComponentModel,
+    InputConnectionModel,
+    OutputConnectionModel,
+)
 
 
 class InputMetadataModel(pydantic.BaseModel):
@@ -18,8 +22,7 @@ class InputOutputsModel(pydantic.BaseModel):
     output_value: OutputConnectionModel
 
 
-class InputModel(pydantic.BaseModel):
-    id: str
+class InputModel(ComponentModel):
     data: InputMetadataModel
     inputs: typing.Optional[InputInputsModel] = None
     outputs: InputOutputsModel
