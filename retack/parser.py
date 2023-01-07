@@ -6,6 +6,19 @@ from retack.models import Registry
 from retack.models import model_registry as GLOBAL_MODEL_REGISTRY
 
 
+INPUT_TOKENS = [
+    "input"
+]
+
+OUTPUT_TOKENS = [
+    "booloutput"
+]
+
+CONSTANT_TOKENS = [
+    "constant"
+]
+
+
 class Parser:
     def __init__(
         self,
@@ -76,6 +89,35 @@ class Parser:
     def get_element_by_id(self, element_id: str) -> pydantic.BaseModel:
         return self._element_registry.get(element_id)
 
-    def get_element_by_name(self, element_name: str) -> typing.List[pydantic.BaseModel]:
+    def get_elements_by_name(self, element_name: str) -> typing.List[pydantic.BaseModel]:
         element_name = element_name.lower()
         return [self.get_element_by_id(i) for i in self.tokens.get(element_name, [])]
+
+    def get_elements_by_multiple_names(self, element_names: list) -> typing.List[pydantic.BaseModel]:
+        all_elements = []
+        for node_name in element_names:
+            elements = self.get_elements_by_name(node_name)
+            if elements is not None:
+                all_elements.extend(elements)
+
+        return all_elements
+
+    def get_elements_by_kind(self, kind: str) -> typing.List[pydantic.BaseModel]:
+        if kind == "input":
+            return self.get_elements_by_multiple_names(INPUT_TOKENS)
+        if kind == "output":
+            return self.get_elements_by_multiple_names(OUTPUT_TOKENS)
+        if kind == "constant":
+            return self.get_elements_by_multiple_names(CONSTANT_TOKENS)
+
+        return []
+
+    def get_name_by_id(self, element_id: str) -> str:
+        for name, ids in self.tokens.items():
+            if element_id in ids:
+                return name
+
+        raise ValueError(f"Element {element_id} not found")
+
+
+ 
