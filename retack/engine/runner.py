@@ -71,7 +71,9 @@ class Runner:
             output = node_executor(**input_params)
             for output_name, output_value in output.items():
                 if output_name == "OUTPUT":
-                    self._state_df.loc[self._filters.get(element_id, None):, "OUTPUT"] = output_value
+                    self._state_df.loc[
+                        self._filters.get(element_id, None) :, "OUTPUT"
+                    ] = output_value
                 elif output_name == "FILTER":
                     output_connections = graph.get_element_connections(
                         element, is_input=False
@@ -84,7 +86,10 @@ class Runner:
                                 self._filters[output_connection] & output_value
                             )
                 else:
-                    self._state_df.loc[self._filters.get(element_id, None):, f"{element_id}@{output_name}"] = output_value
+                    self._state_df.loc[
+                        self._filters.get(element_id, None) :,
+                        f"{element_id}@{output_name}",
+                    ] = output_value
 
     def __call__(self, payload: typing.Union[dict, list]):
         self._state_df = self._payload_to_dataframe(payload)
