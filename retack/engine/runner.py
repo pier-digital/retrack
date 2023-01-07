@@ -67,6 +67,11 @@ class Runner:
                         self._filters.get(element_id, None) :,
                         constants.OUTPUT_REFERENCE_COLUMN,
                     ] = output_value
+                elif output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN:
+                    self._state_df.loc[
+                        self._filters.get(element_id, None) :,
+                        constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+                    ] = output_value
                 elif output_name == constants.FILTER_REFERENCE_COLUMN:
                     output_connections = graph.get_element_connections(
                         element, is_input=False
@@ -92,6 +97,7 @@ class Runner:
             self._state_df[constant_name] = constant_value
 
         self._state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
+        self._state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
 
         for element_id in self._execution_order:
             self.__run_element(element_id)
@@ -99,4 +105,18 @@ class Runner:
             if self._state_df[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 
-        return self._state_df[constants.OUTPUT_REFERENCE_COLUMN].to_list()
+        return (
+            self._state_df[
+                [
+                    constants.OUTPUT_REFERENCE_COLUMN,
+                    constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+                ]
+            ]
+            .rename(
+                columns={
+                    constants.OUTPUT_REFERENCE_COLUMN: "output",
+                    constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: "message",
+                }
+            )
+            .to_dict(orient="records")
+        )
