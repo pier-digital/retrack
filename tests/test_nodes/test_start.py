@@ -1,4 +1,4 @@
-from retack.models.start import StartModel
+from retack.nodes.start import Start
 
 
 def test_start_model():
@@ -22,7 +22,7 @@ def test_start_model():
         "name": "Start",
     }
 
-    start_model = StartModel(**input_data)
+    start_model = Start(**input_data)
 
     assert start_model.dict(by_alias=True) == {
         "id": "0",

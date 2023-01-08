@@ -2,7 +2,7 @@ import typing
 
 import pandas as pd
 
-from retack.models.check import CheckOperator
+from retack.nodes.check import CheckOperator
 
 
 class CheckNode:

@@ -2,8 +2,8 @@ import typing
 
 import pydantic
 
-from retack.models import Registry
-from retack.models import model_registry as GLOBAL_MODEL_REGISTRY
+from retack.nodes import Registry
+from retack.nodes import model_registry as GLOBAL_MODEL_REGISTRY
 
 INPUT_TOKENS = ["input"]
 

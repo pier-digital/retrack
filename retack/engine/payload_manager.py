@@ -2,20 +2,20 @@ import typing
 
 import pydantic
 
-from retack.models.inputs import InputModel
+from retack.nodes.inputs import Input
 
 
 class PayloadManager:
-    def __init__(self, inputs: typing.List[InputModel]):
+    def __init__(self, inputs: typing.List[Input]):
         self._model = None
         self.inputs = inputs
 
     @property
-    def inputs(self) -> typing.List[InputModel]:
+    def inputs(self) -> typing.List[Input]:
         return self._inputs
 
     @inputs.setter
-    def inputs(self, inputs: typing.List[InputModel]):
+    def inputs(self, inputs: typing.List[Input]):
         if not isinstance(inputs, list):
             raise TypeError(f"inputs must be a list, not {type(inputs)}")
 
@@ -24,8 +24,8 @@ class PayloadManager:
 
         for i in range(len(inputs)):
             if isinstance(inputs[i], dict):
-                inputs[i] = InputModel(**inputs[i])
-            elif not isinstance(inputs[i], InputModel):
+                inputs[i] = Input(**inputs[i])
+            elif not isinstance(inputs[i], Input):
                 raise TypeError(
                     f"inputs[{i}] must be a dict or an InputModel, not {type(inputs[i])}"
                 )

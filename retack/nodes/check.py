@@ -4,11 +4,11 @@ import enum
 
 import pydantic
 
-from retack.models.base import (
-    ComponentModel,
-    InputConnectionModel,
-    OutputConnectionModel,
-)
+from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+
+###############################################################
+# Check Metadata Models
+###############################################################
 
 
 class CheckOperator(str, enum.Enum):
@@ -24,6 +24,11 @@ class CheckMetadataModel(pydantic.BaseModel):
     operator: typing.Optional[CheckOperator] = CheckOperator.EQUAL
 
 
+###############################################################
+# Check Inputs and Outputs
+###############################################################
+
+
 class CheckInputsModel(pydantic.BaseModel):
     input_value_0: InputConnectionModel
     input_value_1: InputConnectionModel
@@ -33,7 +38,12 @@ class CheckOutputsModel(pydantic.BaseModel):
     output_bool: OutputConnectionModel
 
 
-class CheckModel(ComponentModel):
+###############################################################
+# Check Node
+###############################################################
+
+
+class Check(BaseNode):
     data: CheckMetadataModel
     inputs: CheckInputsModel
     outputs: CheckOutputsModel
