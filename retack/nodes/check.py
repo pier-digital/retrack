@@ -2,6 +2,7 @@ import typing
 
 import enum
 
+import pandas as pd
 import pydantic
 
 from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
@@ -47,3 +48,37 @@ class Check(BaseNode):
     data: CheckMetadataModel
     inputs: CheckInputsModel
     outputs: CheckOutputsModel
+
+    @property
+    def node_type(self) -> str:
+        return "logic.check"
+
+    def run(
+        self,
+        input_value_0: pd.Series,
+        input_value_1: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        if self.data.operator == CheckOperator.EQUAL:
+            return {"output_bool": input_value_0 == input_value_1}
+        elif self.data.operator == CheckOperator.NOT_EQUAL:
+            return {"output_bool": input_value_0 != input_value_1}
+        elif self.data.operator == CheckOperator.GREATER_THAN:
+            return {
+                "output_bool": input_value_0.astype(float) > input_value_1.astype(float)
+            }
+        elif self.data.operator == CheckOperator.LESS_THAN:
+            return {
+                "output_bool": input_value_0.astype(float) < input_value_1.astype(float)
+            }
+        elif self.data.operator == CheckOperator.GREATER_THAN_OR_EQUAL:
+            return {
+                "output_bool": input_value_0.astype(float)
+                >= input_value_1.astype(float)
+            }
+        elif self.data.operator == CheckOperator.LESS_THAN_OR_EQUAL:
+            return {
+                "output_bool": input_value_0.astype(float)
+                <= input_value_1.astype(float)
+            }
+        else:
+            raise ValueError("Unknown operator")

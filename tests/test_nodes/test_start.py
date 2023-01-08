@@ -38,4 +38,5 @@ def test_start_model():
                 ]
             },
         },
+        "inputs": {},
     }

@@ -53,19 +53,33 @@ class BoolOutputsModel(pydantic.BaseModel):
 #######################################################
 
 
-class Constant(BaseNode):
-    data: ConstantMetadataModel
+class BaseConstant(BaseNode):
     inputs: typing.Optional[ConstantInputsModel] = None
+
+    @property
+    def node_type(self) -> str:
+        return "variable.constant"
+
+
+class Constant(BaseConstant):
+    data: ConstantMetadataModel
     outputs: ConstantOutputsModel
 
+    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+        return {"output_value": self.data.value}
 
-class List(BaseNode):
+
+class List(BaseConstant):
     data: ListMetadataModel
-    inputs: typing.Optional[ConstantInputsModel] = None
     outputs: ListOutputsModel
 
+    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+        return {"output_list": self.data.value}
 
-class Bool(BaseNode):
+
+class Bool(BaseConstant):
     data: BoolMetadataModel = BoolMetadataModel(value=False)
-    inputs: typing.Optional[ConstantInputsModel] = None
     outputs: BoolOutputsModel
+
+    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+        return {"output_bool": self.data.value}

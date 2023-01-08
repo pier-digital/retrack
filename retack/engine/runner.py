@@ -3,57 +3,69 @@ import typing
 import numpy as np
 import pandas as pd
 
-from retack.engine import constants
-from retack.engine.nodes import node_registry
+from retack.engine.parser import Parser
 from retack.engine.payload_manager import PayloadManager
-from retack.parser import Parser
-from retack.utils import graph
+from retack.utils import constants, graph
 
 
 class Runner:
     def __init__(self, parser: Parser):
         self._parser = parser
 
-        input_elements = self._parser.get_elements_by_kind("input")
+        input_nodes = self._parser.get_nodes_by_kind("input")
         self._input_new_columns = {
-            element.data.name: f"{element.id}@output_value"
-            for element in input_elements
+            node.data.name: f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}"
+            for node in input_nodes
         }
-        self._payload_manager = PayloadManager(input_elements)
-
-        constant_elements = self._parser.get_elements_by_kind("constant")
-        self._constants = {}
-
-        for element in constant_elements:
-            element_name = self._parser.get_name_by_id(element.id)
-            if element_name is None:
-                raise ValueError(f"Constant {element.id} has no name")
-
-            element_name = (
-                "value" if element_name.lower() == "constant" else element_name.lower()
-            )
-            self._constants[f"{element.id}@output_{element_name}"] = element.data.value
+        self._payload_manager = PayloadManager(input_nodes)
 
         self._execution_order = graph.get_execution_order(self._parser)
         self._state_df = None
 
         self._filters = {}
 
-    def _payload_to_dataframe(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
-        validated_payload = self.payload_manager.validate(payload)
-        validated_payload = [p.dict() for p in validated_payload]
-
-        return pd.DataFrame(validated_payload)
-
     @property
     def payload_manager(self) -> PayloadManager:
         return self._payload_manager
 
+    @property
+    def state_df(self) -> pd.DataFrame:
+        return self._state_df
+
+    def __get_initial_state_df(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
+        validated_payload = self.payload_manager.validate(payload)
+        validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
+
+        state_df = validated_payload.rename(columns=self._input_new_columns)
+
+        state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
+        state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
+
+        return state_df
+
+    @staticmethod
+    def __get_output_state_df(state_df: pd.DataFrame) -> pd.DataFrame:
+        output_state_df = state_df[
+            [
+                constants.OUTPUT_REFERENCE_COLUMN,
+                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+            ]
+        ].copy()
+
+        output_state_df = output_state_df.rename(
+            columns={
+                constants.OUTPUT_REFERENCE_COLUMN: "output",
+                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: "message",
+            }
+        )
+
+        return output_state_df
+
     def __set_output_connection_filters(
-        self, element, value: typing.Any, filter_by_connector=None
+        self, node, value: typing.Any, filter_by_connector=None
     ):
-        output_connections = graph.get_element_connections(
-            element, is_input=False, filter_by_connector=filter_by_connector
+        output_connections = graph.get_node_connections(
+            node, is_input=False, filter_by_connector=filter_by_connector
         )
         for output_connection_id in output_connections:
             if self._filters.get(output_connection_id, None) is None:
@@ -63,91 +75,72 @@ class Runner:
                     self._filters[output_connection_id] & value
                 )
 
-    def __run_element(self, element_id: str):
-        element = self._parser.get_element_by_id(element_id).dict(by_alias=True)
-        element_name = self._parser.get_name_by_id(element_id)
-        input_params = element.get("data", {})
-        current_element_filter = self._filters.get(element_id, None)
+    def __get_input_params(
+        self, node_dict: dict, current_node_filter: pd.Series
+    ) -> dict:
+        input_params = {}
 
-        for connector_name, connections in element.get("inputs", {}).items():
-            if connector_name.endswith("void"):
+        for connector_name, connections in node_dict.get("inputs", {}).items():
+            if connector_name.endswith(constants.NULL_SUFFIX):
                 continue
 
             for connection in connections["connections"]:
-                if current_element_filter is not None:
-                    input_params[connector_name] = self._state_df.loc[
-                        current_element_filter,
-                        f"{connection['node']}@{connection['output']}",
-                    ]
-                else:
-                    input_params[connector_name] = self._state_df[
-                        f"{connection['node']}@{connection['output']}"
-                    ]
+                input_params[connector_name] = self.__get_state_data(
+                    f"{connection['node']}@{connection['output']}", current_node_filter
+                )
 
-        node_executor = node_registry.get(element_name)
+        return input_params
 
-        if current_element_filter is not None:
-            self.__set_output_connection_filters(element, current_element_filter)
+    def __get_state_data(self, column: str, filter_by: typing.Any = None):
+        if filter_by is None:
+            return self._state_df[column]
+        else:
+            return self._state_df.loc[filter_by, column]
 
-        if node_executor:
-            output = node_executor(**input_params)
-            for output_name, output_value in output.items():
-                if (
-                    output_name == constants.OUTPUT_REFERENCE_COLUMN
-                    or output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN
-                ):
-                    if current_element_filter is None:
-                        self._state_df[output_name] = output_value
-                    else:
-                        self._state_df.loc[
-                            current_element_filter, output_name
-                        ] = output_value
-                elif output_name.startswith(constants.FILTER_REFERENCE_COLUMN):
-                    filter_by_connector = None
-                    if len(output_name.split("@")) > 1:
-                        filter_by_connector = output_name.split("@")[-1]
+    def __set_state_data(
+        self, column: str, value: typing.Any, filter_by: typing.Any = None
+    ):
+        if filter_by is None:
+            self._state_df[column] = value
+        else:
+            self._state_df.loc[filter_by, column] = value
 
-                    self.__set_output_connection_filters(
-                        element, output_value, filter_by_connector
-                    )
-                else:
-                    if current_element_filter is None:
-                        self._state_df[f"{element_id}@{output_name}"] = output_value
-                    else:
-                        self._state_df.loc[
-                            current_element_filter, f"{element_id}@{output_name}"
-                        ] = output_value
+    def __run_node(self, node_id: str):
+        node = self._parser.get_node_by_id(node_id)
+        current_node_filter = self._filters.get(node_id, None)
 
-    def __call__(self, payload: typing.Union[dict, list]):
-        self._state_df = self._payload_to_dataframe(payload)
-        self._state_df = self._state_df.rename(columns=self._input_new_columns)
+        input_params = self.__get_input_params(
+            node.dict(by_alias=True), current_node_filter
+        )
 
-        for constant_name, constant_value in self._constants.items():
-            self._state_df[constant_name] = constant_value
+        if (
+            current_node_filter is not None
+        ):  # if there is a filter, we need to set the children nodes to receive filtered data
+            self.__set_output_connection_filters(node, current_node_filter)
 
-        self._state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
-        self._state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
+        output = node.run(**input_params)
+        for output_name, output_value in output.items():
+            if (
+                output_name == constants.OUTPUT_REFERENCE_COLUMN
+                or output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN
+            ):  # Setting output values
+                self.__set_state_data(output_name, output_value, current_node_filter)
+            elif output_name.endswith(constants.FILTER_SUFFIX):  # Setting filters
+                self.__set_output_connection_filters(node, output_value, output_name)
+            else:  # Setting node outputs to be used as inputs by other nodes
+                self.__set_state_data(
+                    f"{node_id}@{output_name}", output_value, current_node_filter
+                )
 
-        for element_id in self._execution_order:
+    def __call__(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
+        self._state_df = self.__get_initial_state_df(payload)
+
+        for node_id in self._execution_order:
             try:
-                self.__run_element(element_id)
+                self.__run_node(node_id)
             except Exception as e:
-                raise e
+                raise e  # TODO: Handle errors
             if self._state_df[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 
-        return (
-            self._state_df[
-                [
-                    constants.OUTPUT_REFERENCE_COLUMN,
-                    constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
-                ]
-            ]
-            .rename(
-                columns={
-                    constants.OUTPUT_REFERENCE_COLUMN: "output",
-                    constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: "message",
-                }
-            )
-            .to_dict(orient="records")
-        )
+        return Runner.__get_output_state_df(self._state_df)

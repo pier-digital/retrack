@@ -1,8 +1,11 @@
 import typing
 
+import numpy as np
+import pandas as pd
 import pydantic
 
 from retack.nodes.base import BaseNode, InputConnectionModel
+from retack.utils import constants
 
 ################################################
 # Output Metadata Models
@@ -28,3 +31,9 @@ class BoolOutputInputsModel(pydantic.BaseModel):
 class BoolOutput(BaseNode):
     inputs: typing.Optional[BoolOutputInputsModel]
     data: OutputMetadataModel
+
+    def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
+        return {
+            constants.OUTPUT_REFERENCE_COLUMN: input_bool,
+            constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: self.data.message,
+        }
