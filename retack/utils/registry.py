@@ -8,15 +8,22 @@ class Registry:
         self._data = {}
         self._case_sensitive = case_sensitive
 
-    def register(self, name: str, data: typing.Any):
+    def register(self, name: str, data: typing.Any, overwrite: bool = False):
         """Register an entry."""
         if not self._case_sensitive:
             name = name.lower()
 
-        if name in self._data:
+        if name in self._data and not overwrite:
             raise ValueError(f"{name} is already registered.")
 
         self._data[name] = data
+
+    def unregister(self, name: str):
+        """Unregister an entry."""
+        if not self._case_sensitive:
+            name = name.lower()
+
+        self._data.pop(name, None)
 
     def get(self, name: str, default: typing.Any = None) -> typing.Any:
         """Get a registered entry."""
