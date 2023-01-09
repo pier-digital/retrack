@@ -134,6 +134,7 @@ class Runner:
 
     def __call__(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
         self._state_df = self.__get_initial_state_df(payload)
+        self._filters = {}
 
         for node_id in self._execution_order:
             try:
