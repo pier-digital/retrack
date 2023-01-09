@@ -14,7 +14,7 @@ class Runner:
 
         input_nodes = self._parser.get_nodes_by_kind("input")
         self._input_new_columns = {
-            node.data.name: f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}"
+            f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
         }
         self._payload_manager = PayloadManager(input_nodes)
@@ -36,7 +36,9 @@ class Runner:
         validated_payload = self.payload_manager.validate(payload)
         validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
 
-        state_df = validated_payload.rename(columns=self._input_new_columns)
+        state_df = pd.DataFrame([])
+        for node_id, input_name in self._input_new_columns.items():
+            state_df[node_id] = validated_payload[input_name]
 
         state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
         state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
