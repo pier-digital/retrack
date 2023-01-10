@@ -1,7 +1,7 @@
 from retack.nodes.start import Start
 
 
-def test_start_model():
+def test_start_node():
     input_data = {
         "id": 0,
         "data": {},
@@ -22,9 +22,9 @@ def test_start_model():
         "name": "Start",
     }
 
-    start_model = Start(**input_data)
+    start_node = Start(**input_data)
 
-    assert start_model.dict(by_alias=True) == {
+    assert start_node.dict(by_alias=True) == {
         "id": "0",
         "outputs": {
             "output_up_void": {
