@@ -62,3 +62,4 @@ class Not(BaseNode):
 
     def run(self, input_bool: pd.Series) -> pd.Series:
         return {"output_bool": ~input_bool}
+
