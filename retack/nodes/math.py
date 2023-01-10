@@ -57,12 +57,24 @@ class Math(BaseNode):
         input_value_1: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
         if self.data.operator == MathOperator.SUM:
-            return {"output_value": input_value_0 + input_value_1}
+            return {
+                "output_value": input_value_0.astype(float)
+                + input_value_1.astype(float)
+            }
         elif self.data.operator == MathOperator.SUB:
-            return {"output_value": input_value_0 - input_value_1}
+            return {
+                "output_value": input_value_0.astype(float)
+                - input_value_1.astype(float)
+            }
         elif self.data.operator == MathOperator.DIVISION:
-            return {"output_value": input_value_0 * input_value_1}
+            return {
+                "output_value": input_value_0.astype(float)
+                * input_value_1.astype(float)
+            }
         elif self.data.operator == MathOperator.MULTIPLY:
-            return {"output_value": input_value_0 / input_value_1}
+            return {
+                "output_value": input_value_0.astype(float)
+                / input_value_1.astype(float)
+            }
         else:
             raise ValueError("Unknown operator")
