@@ -27,4 +27,8 @@ class EndsWith(BaseNode):
     outputs: EndsWithOutputsModel
 
     def run(self, input_value_0: pd.Series, input_value_1: pd.Series) -> pd.Series:
-        return {"output_bool": input_value_0.str.endswith(input_value_1.to_string(index = False))}
+        return {
+            "output_bool": input_value_0.str.endswith(
+                input_value_1.to_string(index=False)
+            )
+        }
