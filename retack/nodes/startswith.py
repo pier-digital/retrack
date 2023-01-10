@@ -27,4 +27,4 @@ class StartsWith(BaseNode):
     outputs: StartsWithOutputsModel
 
     def run(self, input_value_0: pd.Series, input_value_1: pd.Series) -> pd.Series:
-        return {"output_bool": input_value_0.startswith(input_value_1)}
+        return {"output_bool": input_value_0.str.startswith(input_value_1.to_string(index = False))}
