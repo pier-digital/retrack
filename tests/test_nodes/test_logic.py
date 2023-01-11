@@ -95,9 +95,23 @@ def test_And_node_run():
 
     output = And_node.run(pd.Series([True]), pd.Series([False]))
     assert (output["output_bool"] == pd.Series([False])).all()
+    output = And_node.run(pd.Series([False]), pd.Series([True]))
+    assert (output["output_bool"] == pd.Series([False])).all()
+    output = And_node.run(pd.Series([False]), pd.Series([False]))
+    assert (output["output_bool"] == pd.Series([False])).all()
+    output = And_node.run(pd.Series([True]), pd.Series([True]))
+    assert (output["output_bool"] == pd.Series([True])).all()	
 
     output = Or_node.run(pd.Series([True]), pd.Series([False]))
     assert (output["output_bool"] == pd.Series([True])).all()
+    output = Or_node.run(pd.Series([True]), pd.Series([True]))
+    assert (output["output_bool"] == pd.Series([True])).all()
+    output = Or_node.run(pd.Series([False]), pd.Series([True]))
+    assert (output["output_bool"] == pd.Series([True])).all()
+    output = Or_node.run(pd.Series([False]), pd.Series([False]))
+    assert (output["output_bool"] == pd.Series([False])).all()
 
     output = Not_node.run(pd.Series([True]))
     assert (output["output_bool"] == pd.Series([False])).all()
+    output = Not_node.run(pd.Series([False]))
+    assert (output["output_bool"] == pd.Series([True])).all()

@@ -43,5 +43,8 @@ def test_Contains_node():
 def test_Contains_node_run():
 
     Contains_node = Contains(**input_data)
+	
     output = Contains_node.run(pd.Series(["1", "2"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([True])).all()
+    output = Contains_node.run(pd.Series(["1", "2"]), pd.Series(["3"]))
+    assert (output["output_bool"] == pd.Series([False])).all()

@@ -43,5 +43,8 @@ def test_EndsWith_node():
 def test_EndsWith_node_run():
 
     EndsWith_node = EndsWith(**input_data)
+
     output = EndsWith_node.run(pd.Series(["100"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([False])).all()
+    output = EndsWith_node.run(pd.Series(["102"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([True])).all()
