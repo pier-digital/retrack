@@ -31,7 +31,7 @@ def test_EndsWith_node():
     assert isinstance(EndsWith_node, EndsWith)
 
     assert EndsWith_node.dict(by_alias=True) == {
-        "id": "10",
+        "id": "11",
         "inputs": {
             "input_value_0": {"connections": []},
             "input_value_1": {"connections": []},
