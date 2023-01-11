@@ -9,8 +9,8 @@ from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionMo
 
 
 class ContainsInputsModel(pydantic.BaseModel):
-    input_value: InputConnectionModel
     input_list: InputConnectionModel
+    input_value: InputConnectionModel
 
 
 class ContainsOutputsModel(pydantic.BaseModel):
@@ -26,5 +26,5 @@ class Contains(BaseNode):
     inputs: ContainsInputsModel
     outputs: ContainsOutputsModel
 
-    def run(self, input_value: pd.Series, input_list: pd.Series) -> pd.Series:
+    def run(self, input_list: pd.Series, input_value: pd.Series) -> pd.Series:
         return {"output_bool": input_value.isin(input_list.to_list())}

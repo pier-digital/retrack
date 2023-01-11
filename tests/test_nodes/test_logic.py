@@ -69,13 +69,24 @@ input_data_Not = {
 }
 
 def test_Logic_node():
-    And_node = And(**input_data_And)
-    Or_node = Or(**input_data_Or)
-    Not_node = Not(**input_data_Not)
+	And_node = And(**input_data_And)
+	Or_node = Or(**input_data_Or)
+	Not_node = Not(**input_data_Not)
 
-    assert isinstance(And_node, And)
-    assert isinstance(Or_node, Or)
-    assert isinstance(Not_node, Not)
+	assert isinstance(And_node, And)
+	assert isinstance(Or_node, Or)
+	assert isinstance(Not_node, Not)
+	
+	assert And_node.dict(by_alias=True) == {
+        "id": "15",
+        "inputs": {
+            "input_bool_0": {"connections": []},
+            "input_bool_1": {"connections": []},
+        },
+        "outputs": {"output_bool": {"connections": []}},
+    }
+    
+
 
 def test_And_node_run():
     And_node = And(**input_data_And)
