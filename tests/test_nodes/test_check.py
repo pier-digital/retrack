@@ -48,30 +48,56 @@ def test_Check_node():
 def test_Check_node_run():
 
     Check_node = Check(**input_data)
+
     output = Check_node.run(pd.Series(["1"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([True])).all()
+    output = Check_node.run(pd.Series(["1"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([False])).all()
 
     input_data['data']['operator'] = '!='
     Check_node = Check(**input_data)
+
     output = Check_node.run(pd.Series(["1"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([False])).all()
+    output = Check_node.run(pd.Series(["1"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([True])).all()
 
     input_data['data']['operator'] = '>'
     Check_node = Check(**input_data)
+
     output = Check_node.run(pd.Series(["1"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([False])).all()
+    output = Check_node.run(pd.Series(["1"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([False])).all()
+    output = Check_node.run(pd.Series(["2"]), pd.Series(["1"]))
+    assert (output["output_bool"] == pd.Series([True])).all()
 
     input_data['data']['operator'] = '<'
     Check_node = Check(**input_data)
+
     output = Check_node.run(pd.Series(["1"]), pd.Series(["1"]))
+    assert (output["output_bool"] == pd.Series([False])).all()
+    output = Check_node.run(pd.Series(["1"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([True])).all()
+    output = Check_node.run(pd.Series(["2"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([False])).all()
 
     input_data['data']['operator'] = '>='
     Check_node = Check(**input_data)
+    
     output = Check_node.run(pd.Series(["1"]), pd.Series(["1"]))
+    assert (output["output_bool"] == pd.Series([True])).all()
+    output = Check_node.run(pd.Series(["1"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([False])).all()
+    output = Check_node.run(pd.Series(["2"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([True])).all()
 
     input_data['data']['operator'] = '<='
     Check_node = Check(**input_data)
+
     output = Check_node.run(pd.Series(["1"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([True])).all()
+    output = Check_node.run(pd.Series(["1"]), pd.Series(["2"]))
+    assert (output["output_bool"] == pd.Series([True])).all()
+    output = Check_node.run(pd.Series(["2"]), pd.Series(["1"]))
+    assert (output["output_bool"] == pd.Series([False])).all()

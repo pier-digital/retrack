@@ -41,7 +41,9 @@ def test_StartsWithAny_node():
 
 
 def test_StartsWithAny_node_run():
-
     StartsWithAny_node = StartsWithAny(**input_data)
+	
     output = StartsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
     assert (output["output_bool"] == pd.Series([True])).all()
+    output = StartsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "3"]))
+    assert (output["output_bool"] == pd.Series([False])).all()
