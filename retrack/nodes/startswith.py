@@ -1,34 +1,34 @@
 import pandas as pd
 import pydantic
 
-from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ################################################
-# EndsWith Inputs Outputs
+# StartsWith Inputs Outputs
 ################################################
 
 
-class EndsWithInputsModel(pydantic.BaseModel):
+class StartsWithInputsModel(pydantic.BaseModel):
     input_value_0: InputConnectionModel
     input_value_1: InputConnectionModel
 
 
-class EndsWithOutputsModel(pydantic.BaseModel):
+class StartsWithOutputsModel(pydantic.BaseModel):
     output_bool: OutputConnectionModel
 
 
 ################################################
-# EndsWith Nodes
+# StartsWith Nodes
 ################################################
 
 
-class EndsWith(BaseNode):
-    inputs: EndsWithInputsModel
-    outputs: EndsWithOutputsModel
+class StartsWith(BaseNode):
+    inputs: StartsWithInputsModel
+    outputs: StartsWithOutputsModel
 
     def run(self, input_value_0: pd.Series, input_value_1: pd.Series) -> pd.Series:
         return {
-            "output_bool": input_value_0.str.endswith(
+            "output_bool": input_value_0.str.startswith(
                 input_value_1.to_string(index=False)
             )
         }

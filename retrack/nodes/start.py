@@ -1,6 +1,6 @@
 import pydantic
 
-from retack.nodes.base import BaseNode, OutputConnectionModel
+from retrack.nodes.base import BaseNode, OutputConnectionModel
 
 ################################################
 # Start Inputs and Outputs

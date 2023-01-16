@@ -1,6 +1,6 @@
 import pandas as pd
 
-from retack.nodes.check import Check, CheckOperator
+from retrack.nodes.check import Check, CheckOperator
 
 input_data = {
         "id": 8,

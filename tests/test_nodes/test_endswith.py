@@ -1,6 +1,6 @@
 import pandas as pd
 
-from retack.nodes.endswith import EndsWith
+from retrack.nodes.endswith import EndsWith
 
 input_data = {
     "id": 11,

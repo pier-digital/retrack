@@ -2,7 +2,7 @@ import typing
 
 import pydantic
 
-from retack.nodes.inputs import Input
+from retrack.nodes.inputs import Input
 
 
 class PayloadManager:

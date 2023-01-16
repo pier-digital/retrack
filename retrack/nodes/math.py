@@ -5,7 +5,7 @@ import enum
 import pandas as pd
 import pydantic
 
-from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ###############################################################
 # Math Metadata Models

@@ -1,6 +1,6 @@
 import pytest
 
-from retack.engine.parser import Parser
+from retrack.engine.parser import Parser
 
 
 @pytest.mark.parametrize(

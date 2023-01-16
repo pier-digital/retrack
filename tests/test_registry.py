@@ -1,6 +1,6 @@
 import pytest
 
-from retack.utils.registry import Registry
+from retrack.utils.registry import Registry
 
 
 def test_create_registry():

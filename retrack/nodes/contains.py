@@ -1,7 +1,7 @@
 import pandas as pd
 import pydantic
 
-from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ################################################
 # Contains Inputs Outputs

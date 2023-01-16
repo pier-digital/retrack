@@ -1,6 +1,6 @@
 import pandas as pd
 
-from retack.nodes.math import Math, MathOperator
+from retrack.nodes.math import Math, MathOperator
 
 input_data = {
     "id": 18,

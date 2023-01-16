@@ -1,6 +1,6 @@
 import pandas as pd
 
-from retack.nodes.logic import And, Or, Not
+from retrack.nodes.logic import And, Or, Not
 
 input_data_And = {
     "id": 15,

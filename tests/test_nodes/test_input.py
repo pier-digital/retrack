@@ -1,4 +1,4 @@
-from retack.nodes.inputs import Input
+from retrack.nodes.inputs import Input
 
 
 def test_input_node(

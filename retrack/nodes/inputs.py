@@ -2,7 +2,7 @@ import typing
 
 import pydantic
 
-from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ################################################
 # Input Metadata Models

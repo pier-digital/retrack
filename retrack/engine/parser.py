@@ -1,8 +1,8 @@
 import typing
 
-from retack.nodes import BaseNode
-from retack.nodes import registry as GLOBAL_NODE_REGISTRY
-from retack.utils.registry import Registry
+from retrack.nodes import BaseNode
+from retrack.nodes import registry as GLOBAL_NODE_REGISTRY
+from retrack.utils.registry import Registry
 
 INPUT_TOKENS = ["input"]
 

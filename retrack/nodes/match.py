@@ -3,7 +3,7 @@ import typing
 import pandas as pd
 import pydantic
 
-from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ################################################
 # If Inputs and Outputs
