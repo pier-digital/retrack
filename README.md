@@ -24,14 +24,13 @@ pip install retrack
 ## Usage
 
 ```python
-from retack.engine.parser import Parser
-from retack.engine.runner import Runner
+import retrack
 
 # Parse the rule/model
-parser = Parser(rule)
+parser = retrack.Parser(rule)
 
 # Create a runner
-runner = Runner(parser)
+runner = retrack.Runner(parser)
 
 # Run the rule/model passing the data
 runner(data)
@@ -85,22 +84,22 @@ To create a custom node, you need to create a class that inherits from the `Base
 To create a custom node you need to define the inputs and outputs of the node. To do this, you need to define the `inputs` and `outputs` class attributes. Let's see an example of a custom node that has two inputs, sum them and return the result:
 
 ```python
-from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+import retrack
 import pydantic
 import pandas as pd
 import typing
 
 
 class SumInputsModel(pydantic.BaseModel):
-    input_value_0: InputConnectionModel
-    input_value_1: InputConnectionModel
+    input_value_0: retrack.InputConnectionModel
+    input_value_1: retrack.InputConnectionModel
 
 
 class SumOutputsModel(pydantic.BaseModel):
-    output_value: OutputConnectionModel
+    output_value: retrack.OutputConnectionModel
 
 
-class SumNode(BaseNode):
+class SumNode(retrack.BaseNode):
     inputs: SumInputsModel
     outputs: SumOutputsModel
 
@@ -116,14 +115,13 @@ class SumNode(BaseNode):
 After creating the custom node, you need to register it in the nodes registry and pass the registry to the parser. Let's see an example:
 
 ```python
-from retack.engine.parser import Parser
-from retack.nodes import registry
+import retrack
 
 # Register the custom node
-registry.register_node("sum", SumNode)
+retrack.component_registry.register_node("sum", SumNode)
 
 # Parse the rule/model
-parser = Parser(rule, component_registry=registry)
+parser = Parser(rule, component_registry=retrack.component_registry)
 ```
 
 ## Contributing

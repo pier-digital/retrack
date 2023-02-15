@@ -64,7 +64,7 @@ indent = 4
 color_output = true
 
 [tool.pytest.ini_options]
-addopts = "-p no:warnings --cov-report term-missing --cov=retrack"
+addopts = "--junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
