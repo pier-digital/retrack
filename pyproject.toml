@@ -1,8 +1,13 @@
 [tool.poetry]
 name = "retrack"
-version = "0.2.1"
+version = "0.2.2"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabrielguarisa@gmail.com>", "Nathalia Trotte <nathaliatrotte@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/gabrielguarisa/retrack"
+homepage = "https://github.com/gabrielguarisa/retrack"
+keywords = ["rules", "models", "business", "node", "graph"]
 
 [tool.poetry.dependencies]
 python = "^3.8.16"
