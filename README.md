@@ -41,7 +41,7 @@ runner(data)
 
 A rule is a set of conditions and actions that are executed when the conditions are met. The conditions are evaluated using the data passed to the runner. The actions are executed when the conditions are met.
 
-Each rule is composed of many nodes. To see each node type, check the [nodes](https://github.com/gabrielguarisa/retrack/tree/main/retrack/nodes) folder. To see some examples, check the [examples](https://github.com/gabrielguarisa/retrack/tree/main/examples) folder.
+Each rule is composed of many nodes. To see each node type, check the [nodes](https://github.com/gabrielguarisa/retrack/tree/main/retrack/nodes) folder.
 
 To create a rule, you need to create a JSON file with the following structure:
 
@@ -55,7 +55,7 @@ To create a rule, you need to create a JSON file with the following structure:
 			"outputs": {},
 			"name": "node name",
 		},
-    ... more nodes
+    // ... more nodes
   }
 }
 ```
@@ -67,3 +67,15 @@ The `nodes` key is a dictionary of nodes. Each node has the following properties
 - `inputs`: The node inputs. This is used to reference the node inputs.
 - `outputs`: The node outputs. This is used to reference the node outputs.
 - `name`: The node name. This is used to define the node type.
+
+The `inputs` and `outputs` properties are dictionaries of node connections. Each connection has the following properties:
+
+- `node`: The node id that is connected to the current node.
+- `input`: The input name of the connection that is connected to the current node. This is only used in the `inputs` property.
+- `output`: The output name of the connection that is connected to the current node. This is only used in the `outputs` property.
+
+To see some examples, check the [examples](https://github.com/gabrielguarisa/retrack/tree/main/examples) folder.
+
+## Contributing
+
+Contributions are welcome! Please read the [contributing guidelines](https://github.com/gabrielguarisa/retrack/tree/main/CONTRIBUTING.md) first.
