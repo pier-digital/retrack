@@ -1,0 +1,296 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": [
+						{
+							"node": 3,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-570.16015625,
+				-16.7578125
+			],
+			"name": "Start"
+		},
+		"2": {
+			"id": 2,
+			"data": {
+				"name": "age",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_value_0",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-262.082231911288,
+				-229.52363816128795
+			],
+			"name": "Input"
+		},
+		"3": {
+			"id": 3,
+			"data": {
+				"value": "18"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_down_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_value_1",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-266.79444352384587,
+				85.59488398537597
+			],
+			"name": "Constant"
+		},
+		"4": {
+			"id": 4,
+			"data": {
+				"operator": ">="
+			},
+			"inputs": {
+				"input_value_0": {
+					"connections": [
+						{
+							"node": 2,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_value_1": {
+					"connections": [
+						{
+							"node": 3,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 6,
+							"input": "input_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				83.84765625,
+				-146.80078125
+			],
+			"name": "Check"
+		},
+		"6": {
+			"id": 6,
+			"data": {},
+			"inputs": {
+				"input_bool": {
+					"connections": [
+						{
+							"node": 4,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_then_filter": {
+					"connections": [
+						{
+							"node": 9,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_else_filter": {
+					"connections": [
+						{
+							"node": 8,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				387.98276806872417,
+				-127.24641593097007
+			],
+			"name": "If"
+		},
+		"7": {
+			"id": 7,
+			"data": {
+				"message": "invalid age"
+			},
+			"inputs": {
+				"input_bool": {
+					"connections": [
+						{
+							"node": 8,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				972.3247551810931,
+				-8.462733235746624
+			],
+			"name": "BoolOutput"
+		},
+		"8": {
+			"id": 8,
+			"data": {
+				"value": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 6,
+							"output": "output_else_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 7,
+							"input": "input_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				696.7790861556878,
+				-16.077469330043932
+			],
+			"name": "Bool"
+		},
+		"9": {
+			"id": 9,
+			"data": {
+				"value": true
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 6,
+							"output": "output_then_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 10,
+							"input": "input_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				693.7214037048345,
+				-194.67415220412568
+			],
+			"name": "Bool"
+		},
+		"10": {
+			"id": 10,
+			"data": {
+				"message": "valid age"
+			},
+			"inputs": {
+				"input_bool": {
+					"connections": [
+						{
+							"node": 9,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				974.0269089794663,
+				-190.8242802623253
+			],
+			"name": "BoolOutput"
+		}
+	}
+}
