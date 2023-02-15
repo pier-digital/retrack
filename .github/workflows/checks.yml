@@ -9,6 +9,10 @@ on:
 
 jobs:
   test:
+    permissions:
+      pull-requests: write
+    timeout-minutes: 10
+    if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
       matrix:
@@ -38,6 +42,8 @@ jobs:
           badge-title: coverage
           create-new-comment: true
   code-quality:
+    timeout-minutes: 10
+    if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
       matrix:
