@@ -14,4 +14,4 @@ check-formatting:
 
 .PHONY: tests
 tests:
-	poetry run pytest
+	poetry run pytest | tee pytest-coverage.txt
