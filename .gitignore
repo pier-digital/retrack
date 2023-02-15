@@ -111,6 +111,7 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
+pytest-coverage.txt
 coverage.xml
 *.cover
 *.py,cover
@@ -141,6 +142,9 @@ docs/_build/
 # PyBuilder
 .pybuilder/
 target/
+
+# Data
+downloads
 
 # Jupyter Notebook
 
