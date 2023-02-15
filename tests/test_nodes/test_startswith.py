@@ -3,27 +3,17 @@ import pandas as pd
 from retrack.nodes.startswith import StartsWith
 
 input_data = {
-	"id": 10,
-	"data": {},
-	"inputs": {
-		"input_value_0": {
-			"connections": []
-		},
-		"input_value_1": {
-			"connections": []
-		}
-	},
-	"outputs": {
-		"output_bool": {
-			"connections": []
-		}
-	},
-	"position": [
-		1321.9899743354695,
-		255.18171516041082
-	],
-	"name": "StartsWith"
+    "id": 10,
+    "data": {},
+    "inputs": {
+        "input_value_0": {"connections": []},
+        "input_value_1": {"connections": []},
+    },
+    "outputs": {"output_bool": {"connections": []}},
+    "position": [1321.9899743354695, 255.18171516041082],
+    "name": "StartsWith",
 }
+
 
 def test_StartsWith_node():
     StartsWith_node = StartsWith(**input_data)

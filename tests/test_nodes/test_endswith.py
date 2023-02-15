@@ -4,26 +4,16 @@ from retrack.nodes.endswith import EndsWith
 
 input_data = {
     "id": 11,
-	"data": {},
-	"inputs": {
-		"input_value_0": {
-			"connections": []
-		},
-		"input_value_1": {
-			"connections": []
-		}
-	},
-	"outputs": {
-		"output_bool": {
-			"connections": []
-		}
-	},
-	"position": [
-		1277.7969569337479,
-		537.1240779622773
-	],
-	"name": "EndsWith"
+    "data": {},
+    "inputs": {
+        "input_value_0": {"connections": []},
+        "input_value_1": {"connections": []},
+    },
+    "outputs": {"output_bool": {"connections": []}},
+    "position": [1277.7969569337479, 537.1240779622773],
+    "name": "EndsWith",
 }
+
 
 def test_EndsWith_node():
     EndsWith_node = EndsWith(**input_data)

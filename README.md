@@ -37,6 +37,8 @@ runner = Runner(parser)
 runner(data)
 ```
 
+The `Parser` class parses the rule/model and creates a graph of nodes. The `Runner` class runs the rule/model using the data passed to the runner. The `data` is a dictionary or a list of dictionaries containing the data that will be used to evaluate the conditions and execute the actions. To see wich data is required for the given rule/model, check the `runner.payload_manager.model` property that is a pydantic model used to validate the data.
+
 ### Creating a rule/model
 
 A rule is a set of conditions and actions that are executed when the conditions are met. The conditions are evaluated using the data passed to the runner. The actions are executed when the conditions are met.
@@ -75,6 +77,54 @@ The `inputs` and `outputs` properties are dictionaries of node connections. Each
 - `output`: The output name of the connection that is connected to the current node. This is only used in the `outputs` property.
 
 To see some examples, check the [examples](https://github.com/gabrielguarisa/retrack/tree/main/examples) folder.
+
+### Creating a custom node
+
+To create a custom node, you need to create a class that inherits from the `BaseNode` class. Each node is a pydantic model, so you can use pydantic features to create your custom node. To see the available features, check the [pydantic documentation](https://pydantic-docs.helpmanual.io/).
+
+To create a custom node you need to define the inputs and outputs of the node. To do this, you need to define the `inputs` and `outputs` class attributes. Let's see an example of a custom node that has two inputs, sum them and return the result:
+
+```python
+from retack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+import pydantic
+import pandas as pd
+import typing
+
+
+class SumInputsModel(pydantic.BaseModel):
+    input_value_0: InputConnectionModel
+    input_value_1: InputConnectionModel
+
+
+class SumOutputsModel(pydantic.BaseModel):
+    output_value: OutputConnectionModel
+
+
+class SumNode(BaseNode):
+    inputs: SumInputsModel
+    outputs: SumOutputsModel
+
+    def run(self, input_value_0: pd.Series,
+        input_value_1: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        output_value = input_value_0.astype(float) + input_value_1.astype(float)
+        return {
+            "output_value": output_value,
+        }
+```
+
+After creating the custom node, you need to register it in the nodes registry and pass the registry to the parser. Let's see an example:
+
+```python
+from retack.engine.parser import Parser
+from retack.nodes import registry
+
+# Register the custom node
+registry.register_node("sum", SumNode)
+
+# Parse the rule/model
+parser = Parser(rule, component_registry=registry)
+```
 
 ## Contributing
 
