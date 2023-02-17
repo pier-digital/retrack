@@ -56,4 +56,4 @@ class BaseNode(pydantic.BaseModel):
         return {}
 
     def kind(self) -> NodeKind:
-        raise NodeKind.OTHER
+        return NodeKind.OTHER

@@ -6,13 +6,13 @@ import pandas as pd
 from retrack.engine.parser import Parser
 from retrack.engine.payload_manager import PayloadManager
 from retrack.utils import constants, graph
-
+from retrack.nodes.base import NodeKind
 
 class Runner:
     def __init__(self, parser: Parser):
         self._parser = parser
 
-        input_nodes = self._parser.get_nodes_by_kind("input")
+        input_nodes = self._parser.get_nodes_by_kind(NodeKind.INPUT)
         self._input_new_columns = {
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes

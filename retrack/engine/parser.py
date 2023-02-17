@@ -21,6 +21,7 @@ class Parser:
         Parser._check_input_data(data)
 
         node_registry = Registry()
+        self._kind_index_map = {}
         tokens = {}
 
         for node_id, node_data in data["nodes"].items():
@@ -39,7 +40,14 @@ class Parser:
 
                 node_data["id"] = node_id
                 if node_id not in node_registry:
-                    node_registry.register(node_id, validation_model(**node_data))
+                    node = validation_model(**node_data)
+                    node_registry.register(node_id, node)
+
+                    if node.kind() not in self._kind_index_map:
+                        self._kind_index_map[node.kind()] = []
+
+                    self._kind_index_map[node.kind()].append(node_id)
+
             elif unknown_node_error:
                 raise ValueError(f"Unknown node name: {node_name}")
 
@@ -77,7 +85,13 @@ class Parser:
 
     @property
     def tokens(self) -> dict:
+        """Returns a dictionary of tokens (node name) and their associated node ids."""
         return self._tokens
+
+    @property
+    def kind_index_map(self) -> dict:
+        """Returns a dictionary of node kinds and their associated node ids."""
+        return self._kind_index_map
 
     def get_node_by_id(self, node_id: str) -> BaseNode:
         return self._node_registry.get(node_id)
@@ -96,11 +110,4 @@ class Parser:
         return all_nodes
 
     def get_nodes_by_kind(self, kind: str) -> typing.List[BaseNode]:
-        if kind == "input":
-            return self.get_nodes_by_multiple_names(INPUT_TOKENS)
-        if kind == "output":
-            return self.get_nodes_by_multiple_names(OUTPUT_TOKENS)
-        if kind == "constant":
-            return self.get_nodes_by_multiple_names(CONSTANT_TOKENS)
-
-        return []
+        return [self.get_node_by_id(i) for i in self.kind_index_map.get(kind, [])]
