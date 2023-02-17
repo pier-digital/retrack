@@ -5,7 +5,7 @@ import pandas as pd
 import pydantic
 
 from retrack.engine.parser import Parser
-from retrack.engine.payload_manager import PayloadManager
+from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind
 from retrack.utils import constants, graph
 
@@ -19,7 +19,7 @@ class Runner:
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
         }
-        self._payload_manager = PayloadManager(input_nodes)
+        self._request_manager = RequestManager(input_nodes)
 
         self._execution_order = graph.get_execution_order(self._parser)
         self._state_df = None
@@ -27,12 +27,12 @@ class Runner:
         self._filters = {}
 
     @property
-    def payload_manager(self) -> PayloadManager:
-        return self._payload_manager
+    def request_manager(self) -> RequestManager:
+        return self._request_manager
 
     @property
-    def model(self) -> pydantic.BaseModel:
-        return self._payload_manager.model
+    def request_model(self) -> pydantic.BaseModel:
+        return self._request_manager.model
 
     @property
     def state_df(self) -> pd.DataFrame:
@@ -51,7 +51,7 @@ class Runner:
         return pd.DataFrame(self._filters)
 
     def __get_initial_state_df(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
-        validated_payload = self.payload_manager.validate(payload)
+        validated_payload = self.request_manager.validate(payload)
         validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
 
         state_df = pd.DataFrame([])

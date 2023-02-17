@@ -5,7 +5,7 @@ import pydantic
 from retrack.nodes.inputs import Input
 
 
-class PayloadManager:
+class RequestManager:
     def __init__(self, inputs: typing.List[Input]):
         self._model = None
         self.inputs = inputs
