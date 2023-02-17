@@ -53,7 +53,7 @@ class RequestManager:
             )
 
         return pydantic.create_model(
-            "Payload",
+            "RequestModel",
             **fields,
         )
 
