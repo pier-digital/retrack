@@ -2,7 +2,12 @@ import typing
 
 import pydantic
 
-from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    BaseNode,
+    InputConnectionModel,
+    NodeKind,
+    OutputConnectionModel,
+)
 
 ################################################
 # Input Metadata Models
@@ -36,3 +41,6 @@ class Input(BaseNode):
     data: InputMetadataModel
     inputs: typing.Optional[InputInputsModel] = None
     outputs: InputOutputsModel
+
+    def kind(self) -> NodeKind:
+        return NodeKind.INPUT

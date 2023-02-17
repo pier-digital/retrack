@@ -1,10 +1,9 @@
 import typing
 
-import numpy as np
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import BaseNode, InputConnectionModel
+from retrack.nodes.base import BaseNode, InputConnectionModel, NodeKind
 from retrack.utils import constants
 
 ################################################
@@ -31,6 +30,9 @@ class BoolOutputInputsModel(pydantic.BaseModel):
 class BoolOutput(BaseNode):
     inputs: typing.Optional[BoolOutputInputsModel]
     data: OutputMetadataModel
+
+    def kind(self) -> NodeKind:
+        return NodeKind.OUTPUT
 
     def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
         return {

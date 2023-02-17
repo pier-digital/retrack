@@ -1,6 +1,23 @@
 import typing
 
+import enum
+
 import pydantic
+
+###############################################################
+# Node Kind
+###############################################################
+
+
+class NodeKind(str, enum.Enum):
+    INPUT = "input"
+    CONSTANT = "constant"
+    OUTPUT = "output"
+    FILTER = "filter"
+    CONNECTOR = "connector"
+    START = "start"
+    OTHER = "other"
+
 
 ###############################################################
 # Connection Models
@@ -38,6 +55,5 @@ class BaseNode(pydantic.BaseModel):
     def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {}
 
-    @property
-    def node_type(self) -> str:
-        raise NotImplementedError
+    def kind(self) -> NodeKind:
+        raise NodeKind.OTHER

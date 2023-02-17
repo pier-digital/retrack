@@ -1,6 +1,6 @@
 import pydantic
 
-from retrack.nodes.base import BaseNode, OutputConnectionModel
+from retrack.nodes.base import BaseNode, NodeKind, OutputConnectionModel
 
 ################################################
 # Start Inputs and Outputs
@@ -19,3 +19,6 @@ class StartOutputsModel(pydantic.BaseModel):
 
 class Start(BaseNode):
     outputs: StartOutputsModel
+
+    def kind(self) -> NodeKind:
+        return NodeKind.START

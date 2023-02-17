@@ -5,7 +5,12 @@ import enum
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    BaseNode,
+    InputConnectionModel,
+    NodeKind,
+    OutputConnectionModel,
+)
 
 ###############################################################
 # Check Metadata Models
@@ -48,10 +53,6 @@ class Check(BaseNode):
     data: CheckMetadataModel
     inputs: CheckInputsModel
     outputs: CheckOutputsModel
-
-    @property
-    def node_type(self) -> str:
-        return "logic.check"
 
     def run(
         self,

@@ -47,10 +47,6 @@ class Math(BaseNode):
     inputs: MathInputsModel
     outputs: MathOutputsModel
 
-    @property
-    def node_type(self) -> str:
-        return "logic.math"
-
     def run(
         self,
         input_value_0: pd.Series,

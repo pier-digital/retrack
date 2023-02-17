@@ -2,7 +2,12 @@ import typing
 
 import pydantic
 
-from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    BaseNode,
+    InputConnectionModel,
+    NodeKind,
+    OutputConnectionModel,
+)
 
 #######################################################
 # Constant Metadata Models
@@ -56,9 +61,8 @@ class BoolOutputsModel(pydantic.BaseModel):
 class BaseConstant(BaseNode):
     inputs: typing.Optional[ConstantInputsModel] = None
 
-    @property
-    def node_type(self) -> str:
-        return "variable.constant"
+    def kind(self) -> NodeKind:
+        return NodeKind.CONSTANT
 
 
 class Constant(BaseConstant):
