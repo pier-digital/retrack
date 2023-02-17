@@ -18,8 +18,8 @@ class OutputMetadataModel(pydantic.BaseModel):
 ################################################
 # Output Inputs and Outputs
 ################################################
-class BoolOutputInputsModel(pydantic.BaseModel):
-    input_bool: InputConnectionModel
+class OutputInputsModel(pydantic.BaseModel):
+    input_value: InputConnectionModel
 
 
 ################################################
@@ -27,15 +27,15 @@ class BoolOutputInputsModel(pydantic.BaseModel):
 ################################################
 
 
-class BoolOutput(BaseNode):
-    inputs: typing.Optional[BoolOutputInputsModel]
+class Output(BaseNode):
+    inputs: typing.Optional[OutputInputsModel]
     data: OutputMetadataModel
 
     def kind(self) -> NodeKind:
         return NodeKind.OUTPUT
 
-    def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
+    def run(self, input_value: pd.Series) -> typing.Dict[str, pd.Series]:
         return {
-            constants.OUTPUT_REFERENCE_COLUMN: input_bool,
+            constants.OUTPUT_REFERENCE_COLUMN: input_value,
             constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: self.data.message,
         }

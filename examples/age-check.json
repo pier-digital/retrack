@@ -135,8 +135,8 @@
 				}
 			},
 			"position": [
-				83.84765625,
-				-146.80078125
+				45.51953125,
+				-136.8515625
 			],
 			"name": "Check"
 		},
@@ -180,29 +180,6 @@
 			],
 			"name": "If"
 		},
-		"7": {
-			"id": 7,
-			"data": {
-				"message": "invalid age"
-			},
-			"inputs": {
-				"input_bool": {
-					"connections": [
-						{
-							"node": 8,
-							"output": "output_bool",
-							"data": {}
-						}
-					]
-				}
-			},
-			"outputs": {},
-			"position": [
-				972.3247551810931,
-				-8.462733235746624
-			],
-			"name": "BoolOutput"
-		},
 		"8": {
 			"id": 8,
 			"data": {
@@ -223,8 +200,8 @@
 				"output_bool": {
 					"connections": [
 						{
-							"node": 7,
-							"input": "input_bool",
+							"node": 11,
+							"input": "input_value",
 							"data": {}
 						}
 					]
@@ -257,7 +234,7 @@
 					"connections": [
 						{
 							"node": 10,
-							"input": "input_bool",
+							"input": "input_value",
 							"data": {}
 						}
 					]
@@ -275,7 +252,7 @@
 				"message": "valid age"
 			},
 			"inputs": {
-				"input_bool": {
+				"input_value": {
 					"connections": [
 						{
 							"node": 9,
@@ -287,10 +264,33 @@
 			},
 			"outputs": {},
 			"position": [
-				974.0269089794663,
-				-190.8242802623253
+				1015.5346416468075,
+				-247.2703893983769
 			],
-			"name": "BoolOutput"
+			"name": "Output"
+		},
+		"11": {
+			"id": 11,
+			"data": {
+				"message": "invalid age"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 8,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				1008.826235840524,
+				-68.88453626006572
+			],
+			"name": "Output"
 		}
 	}
 }
