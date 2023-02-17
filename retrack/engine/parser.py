@@ -4,12 +4,6 @@ from retrack.nodes import BaseNode
 from retrack.nodes import registry as GLOBAL_NODE_REGISTRY
 from retrack.utils.registry import Registry
 
-INPUT_TOKENS = ["input"]
-
-OUTPUT_TOKENS = ["booloutput"]
-
-CONSTANT_TOKENS = ["constant", "list", "bool"]
-
 
 class Parser:
     def __init__(
@@ -21,8 +15,8 @@ class Parser:
         Parser._check_input_data(data)
 
         node_registry = Registry()
-        self._kind_index_map = {}
-        tokens = {}
+        self._indexes_by_kind_map = {}
+        self._indexes_by_name_map = {}
 
         for node_id, node_data in data["nodes"].items():
             node_name = node_data.get("name", None)
@@ -33,26 +27,25 @@ class Parser:
 
             validation_model = component_registry.get(node_name)
             if validation_model is not None:
-                if node_name not in tokens:
-                    tokens[node_name] = []
+                if node_name not in self._indexes_by_name_map:
+                    self._indexes_by_name_map[node_name] = []
 
-                tokens[node_name].append(node_id)
+                self._indexes_by_name_map[node_name].append(node_id)
 
                 node_data["id"] = node_id
                 if node_id not in node_registry:
                     node = validation_model(**node_data)
                     node_registry.register(node_id, node)
 
-                    if node.kind() not in self._kind_index_map:
-                        self._kind_index_map[node.kind()] = []
+                    if node.kind() not in self._indexes_by_kind_map:
+                        self._indexes_by_kind_map[node.kind()] = []
 
-                    self._kind_index_map[node.kind()].append(node_id)
+                    self._indexes_by_kind_map[node.kind()].append(node_id)
 
             elif unknown_node_error:
                 raise ValueError(f"Unknown node name: {node_name}")
 
         self._node_registry = node_registry
-        self._tokens = tokens
 
     @staticmethod
     def _check_node_name(node_name: str, node_id: str):
@@ -86,12 +79,12 @@ class Parser:
     @property
     def tokens(self) -> dict:
         """Returns a dictionary of tokens (node name) and their associated node ids."""
-        return self._tokens
+        return self._indexes_by_name_map
 
     @property
-    def kind_index_map(self) -> dict:
+    def indexes_by_kind_map(self) -> dict:
         """Returns a dictionary of node kinds and their associated node ids."""
-        return self._kind_index_map
+        return self._indexes_by_kind_map
 
     def get_node_by_id(self, node_id: str) -> BaseNode:
         return self._node_registry.get(node_id)
@@ -110,4 +103,4 @@ class Parser:
         return all_nodes
 
     def get_nodes_by_kind(self, kind: str) -> typing.List[BaseNode]:
-        return [self.get_node_by_id(i) for i in self.kind_index_map.get(kind, [])]
+        return [self.get_node_by_id(i) for i in self.indexes_by_kind_map.get(kind, [])]

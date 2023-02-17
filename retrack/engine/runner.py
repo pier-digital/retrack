@@ -2,11 +2,13 @@ import typing
 
 import numpy as np
 import pandas as pd
+import pydantic
 
 from retrack.engine.parser import Parser
 from retrack.engine.payload_manager import PayloadManager
-from retrack.utils import constants, graph
 from retrack.nodes.base import NodeKind
+from retrack.utils import constants, graph
+
 
 class Runner:
     def __init__(self, parser: Parser):
@@ -29,8 +31,24 @@ class Runner:
         return self._payload_manager
 
     @property
+    def model(self) -> pydantic.BaseModel:
+        return self._payload_manager.model
+
+    @property
     def state_df(self) -> pd.DataFrame:
         return self._state_df
+
+    @property
+    def states(self) -> list:
+        return self._state_df.to_dict(orient="records")
+
+    @property
+    def filters(self) -> dict:
+        return self._filters
+
+    @property
+    def filter_df(self) -> pd.DataFrame:
+        return pd.DataFrame(self._filters)
 
     def __get_initial_state_df(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
         validated_payload = self.payload_manager.validate(payload)
@@ -134,7 +152,9 @@ class Runner:
                     f"{node_id}@{output_name}", output_value, current_node_filter
                 )
 
-    def __call__(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
+    def __call__(
+        self, payload: typing.Union[dict, list], to_dict: bool = True
+    ) -> pd.DataFrame:
         self._state_df = self.__get_initial_state_df(payload)
         self._filters = {}
 
@@ -145,5 +165,8 @@ class Runner:
                 raise e  # TODO: Handle errors
             if self._state_df[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
+
+        if to_dict:
+            return self.__get_output_state_df(self._state_df).to_dict(orient="records")
 
         return Runner.__get_output_state_df(self._state_df)
