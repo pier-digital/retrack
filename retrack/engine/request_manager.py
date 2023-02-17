@@ -44,15 +44,17 @@ class RequestManager:
         return self._model
 
     def _create_model(self) -> typing.Type[pydantic.BaseModel]:
+        fields = {}
+        for input_field in self.inputs:
+            fields[input_field.data.name] = (
+                (str, ...)
+                if input_field.data.default is None
+                else (str, input_field.data.default)
+            )
+
         return pydantic.create_model(
             "Payload",
-            **{
-                input_.data.name: (
-                    str,
-                    ...,
-                )
-                for input_ in self.inputs
-            },
+            **fields,
         )
 
     def validate(
