@@ -1,0 +1,221 @@
+{
+  "0": {
+      "id": "0",
+      "inputs": {},
+      "outputs": {
+          "output_up_void": {
+              "connections": [{"node": "2", "input": "input_void"}]
+          },
+          "output_down_void": {
+              "connections": [{"node": "3", "input": "input_void"}]
+          }
+      }
+  },
+  "2": {
+      "id": "2",
+      "inputs": {
+          "input_void": {
+              "connections": [{"node": "0", "output": "output_up_void"}]
+          }
+      },
+      "outputs": {
+          "output_value": {
+              "connections": [{"node": "4", "input": "input_value_0"}]
+          }
+      },
+      "data": {"name": "age", "default": null}
+  },
+  "3": {
+      "id": "3",
+      "inputs": {
+          "input_void": {
+              "connections": [{"node": "0", "output": "output_down_void"}]
+          }
+      },
+      "outputs": {
+          "output_value": {
+              "connections": [{"node": "4", "input": "input_value_1"}]
+          }
+      },
+      "data": {"value": "18"}
+  },
+  "4": {
+      "id": "4",
+      "inputs": {
+          "input_value_0": {
+              "connections": [{"node": "2", "output": "output_value"}]
+          },
+          "input_value_1": {
+              "connections": [{"node": "3", "output": "output_value"}]
+          }
+      },
+      "outputs": {
+          "output_bool": {
+              "connections": [{"node": "6", "input": "input_bool"}]
+          }
+      },
+      "data": {"operator": ">="}
+  },
+  "6": {
+      "id": "6",
+      "inputs": {
+          "input_bool": {
+              "connections": [{"node": "4", "output": "output_bool"}]
+          }
+      },
+      "outputs": {
+          "output_then_filter": {
+              "connections": [{"node": "9", "input": "input_void"}]
+          },
+          "output_else_filter": {
+              "connections": [
+                  {"node": "13", "input": "input_void"},
+                  {"node": "14", "input": "input_void"}
+              ]
+          }
+      }
+  },
+  "9": {
+      "id": "9",
+      "inputs": {
+          "input_void": {
+              "connections": [
+                  {"node": "6", "output": "output_then_filter"}
+              ]
+          }
+      },
+      "outputs": {
+          "output_bool": {
+              "connections": [{"node": "10", "input": "input_value"}]
+          }
+      },
+      "data": {"value": true}
+  },
+  "10": {
+      "id": "10",
+      "inputs": {
+          "input_value": {
+              "connections": [{"node": "9", "output": "output_bool"}]
+          }
+      },
+      "outputs": {},
+      "data": {"message": "valid age"}
+  },
+  "13": {
+      "id": "13",
+      "inputs": {
+          "input_void": {
+              "connections": [
+                  {"node": "6", "output": "output_else_filter"}
+              ]
+          }
+      },
+      "outputs": {
+          "output_value": {
+              "connections": [{"node": "15", "input": "input_value_0"}]
+          }
+      },
+      "data": {"name": "age", "default": null}
+  },
+  "14": {
+      "id": "14",
+      "inputs": {
+          "input_void": {
+              "connections": [
+                  {"node": "6", "output": "output_else_filter"}
+              ]
+          }
+      },
+      "outputs": {
+          "output_value": {
+              "connections": [{"node": "15", "input": "input_value_1"}]
+          }
+      },
+      "data": {"value": "0"}
+  },
+  "15": {
+      "id": "15",
+      "inputs": {
+          "input_value_0": {
+              "connections": [{"node": "13", "output": "output_value"}]
+          },
+          "input_value_1": {
+              "connections": [{"node": "14", "output": "output_value"}]
+          }
+      },
+      "outputs": {
+          "output_bool": {
+              "connections": [{"node": "16", "input": "input_bool"}]
+          }
+      },
+      "data": {"operator": ">"}
+  },
+  "16": {
+      "id": "16",
+      "inputs": {
+          "input_bool": {
+              "connections": [{"node": "15", "output": "output_bool"}]
+          }
+      },
+      "outputs": {
+          "output_then_filter": {
+              "connections": [{"node": "17", "input": "input_void"}]
+          },
+          "output_else_filter": {
+              "connections": [{"node": "18", "input": "input_void"}]
+          }
+      }
+  },
+  "17": {
+      "id": "17",
+      "inputs": {
+          "input_void": {
+              "connections": [
+                  {"node": "16", "output": "output_then_filter"}
+              ]
+          }
+      },
+      "outputs": {
+          "output_bool": {
+              "connections": [{"node": "19", "input": "input_value"}]
+          }
+      },
+      "data": {"value": false}
+  },
+  "18": {
+      "id": "18",
+      "inputs": {
+          "input_void": {
+              "connections": [
+                  {"node": "16", "output": "output_else_filter"}
+              ]
+          }
+      },
+      "outputs": {
+          "output_bool": {
+              "connections": [{"node": "20", "input": "input_value"}]
+          }
+      },
+      "data": {"value": false}
+  },
+  "19": {
+      "id": "19",
+      "inputs": {
+          "input_value": {
+              "connections": [{"node": "17", "output": "output_bool"}]
+          }
+      },
+      "outputs": {},
+      "data": {"message": "underage"}
+  },
+  "20": {
+      "id": "20",
+      "inputs": {
+          "input_value": {
+              "connections": [{"node": "18", "output": "output_bool"}]
+          }
+      },
+      "outputs": {},
+      "data": {"message": "invalid age"}
+  }
+}

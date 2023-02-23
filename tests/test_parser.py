@@ -1,58 +1,38 @@
+import json
+
 import pytest
 
 from retrack.engine.parser import Parser
 
 
 @pytest.mark.parametrize(
-    "input_data,expected_output_data",
+    "data_filename,expected_data_filename,expected_tokens",
     [
         (
+            "tests/resources/age-negative.json",
+            "tests/resources/age-negative-data.json",
             {
-                "nodes": {
-                    "1": {
-                        "id": 3,
-                        "data": {"name": "age"},
-                        "inputs": {
-                            "input_void": {
-                                "connections": [
-                                    {"node": 0, "output": "output_void", "data": {}}
-                                ]
-                            }
-                        },
-                        "outputs": {
-                            "output_value": {
-                                "connections": [
-                                    {"node": 5, "input": "input_value", "data": {}}
-                                ]
-                            }
-                        },
-                        "name": "Input",
-                    }
-                }
-            },
-            {
-                "1": {
-                    "id": "1",
-                    "data": {"name": "age", "default": None},
-                    "inputs": {
-                        "input_void": {
-                            "connections": [{"node": "0", "output": "output_void"}]
-                        }
-                    },
-                    "outputs": {
-                        "output_value": {
-                            "connections": [{"node": "5", "input": "input_value"}]
-                        }
-                    },
-                }
+                "start": ["0"],
+                "input": ["2", "13"],
+                "constant": ["3", "14"],
+                "check": ["4", "15"],
+                "if": ["6", "16"],
+                "bool": ["9", "17", "18"],
+                "output": ["10", "19", "20"],
             },
         )
     ],
 )
-def test_parser_extract(input_data, expected_output_data):
+def test_parser_extract(data_filename, expected_data_filename, expected_tokens):
+    with open(data_filename) as f:
+        input_data = json.load(f)
+
+    with open(expected_data_filename) as f:
+        expected_output_data = json.load(f)
+
     parser = Parser(input_data)
     assert parser.data == expected_output_data
-    assert parser.tokens == {"input": ["1"]}
+    assert parser.tokens == expected_tokens
 
 
 def test_parser_with_unknown_node():

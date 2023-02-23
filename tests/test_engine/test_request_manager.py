@@ -19,7 +19,10 @@ def test_create_request_manager_with_list_of_inputs_and_duplicate_names(
     valid_input_dict_before_validation,
 ):
     pm = RequestManager(
-        [Input(**valid_input_dict_before_validation), Input(**valid_input_dict_before_validation)]
+        [
+            Input(**valid_input_dict_before_validation),
+            Input(**valid_input_dict_before_validation),
+        ]
     )
     assert len(pm.inputs) == 1
     assert pm.model is not None

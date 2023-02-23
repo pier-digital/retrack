@@ -1,5 +1,6 @@
 import typing
 
+from retrack.engine.validators import registry as GLOBAL_VALIDATOR_REGISTRY
 from retrack.nodes import BaseNode
 from retrack.nodes import registry as GLOBAL_NODE_REGISTRY
 from retrack.utils.registry import Registry
@@ -8,17 +9,26 @@ from retrack.utils.registry import Registry
 class Parser:
     def __init__(
         self,
-        data: dict,
+        graph_data: dict,
         component_registry: Registry = GLOBAL_NODE_REGISTRY,
+        validator_registry: Registry = GLOBAL_VALIDATOR_REGISTRY,
         unknown_node_error: bool = False,
     ):
-        Parser._check_input_data(data)
+        """Parses a dictionary of nodes and returns a dictionary of BaseNode objects.
+
+        Args:
+            data (dict): A dictionary of nodes.
+            component_registry (Registry, optional): A registry of BaseNode objects. Defaults to GLOBAL_NODE_REGISTRY.
+            validator_registry (Registry, optional): A registry of BaseValidator objects. Defaults to GLOBAL_VALIDATOR_REGISTRY.
+            unknown_node_error (bool, optional): Whether to raise an error if an unknown node is found. Defaults to False.
+        """
+        Parser._check_input_data(graph_data)
 
         node_registry = Registry()
         self._indexes_by_kind_map = {}
         self._indexes_by_name_map = {}
 
-        for node_id, node_data in data["nodes"].items():
+        for node_id, node_data in graph_data["nodes"].items():
             node_name = node_data.get("name", None)
 
             Parser._check_node_name(node_name, node_id)
@@ -44,6 +54,10 @@ class Parser:
 
             elif unknown_node_error:
                 raise ValueError(f"Unknown node name: {node_name}")
+
+        for validator_name, validator in validator_registry.data.items():
+            if not validator.validate(graph_data):
+                raise ValueError(f"Invalid graph data: {validator_name}")
 
         self._node_registry = node_registry
 

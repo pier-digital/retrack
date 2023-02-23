@@ -25,6 +25,12 @@ class CheckOperator(str, enum.Enum):
     GREATER_THAN_OR_EQUAL = ">="
     LESS_THAN_OR_EQUAL = "<="
 
+    def __str__(self):
+        return self.value
+
+    def __repr__(self) -> str:
+        return self.value
+
 
 class CheckMetadataModel(pydantic.BaseModel):
     operator: typing.Optional[CheckOperator] = CheckOperator.EQUAL
