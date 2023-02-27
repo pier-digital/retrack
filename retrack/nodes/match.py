@@ -3,7 +3,12 @@ import typing
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    BaseNode,
+    InputConnectionModel,
+    NodeKind,
+    OutputConnectionModel,
+)
 
 ################################################
 # If Inputs and Outputs
@@ -27,6 +32,9 @@ class IfOutputsModel(pydantic.BaseModel):
 class If(BaseNode):
     inputs: IfInputsModel
     outputs: IfOutputsModel
+
+    def kind(self) -> NodeKind:
+        return NodeKind.FILTER
 
     def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
         return {

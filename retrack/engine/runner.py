@@ -2,9 +2,11 @@ import typing
 
 import numpy as np
 import pandas as pd
+import pydantic
 
 from retrack.engine.parser import Parser
-from retrack.engine.payload_manager import PayloadManager
+from retrack.engine.request_manager import RequestManager
+from retrack.nodes.base import NodeKind
 from retrack.utils import constants, graph
 
 
@@ -12,12 +14,12 @@ class Runner:
     def __init__(self, parser: Parser):
         self._parser = parser
 
-        input_nodes = self._parser.get_nodes_by_kind("input")
+        input_nodes = self._parser.get_nodes_by_kind(NodeKind.INPUT)
         self._input_new_columns = {
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
         }
-        self._payload_manager = PayloadManager(input_nodes)
+        self._request_manager = RequestManager(input_nodes)
 
         self._execution_order = graph.get_execution_order(self._parser)
         self._state_df = None
@@ -25,15 +27,31 @@ class Runner:
         self._filters = {}
 
     @property
-    def payload_manager(self) -> PayloadManager:
-        return self._payload_manager
+    def request_manager(self) -> RequestManager:
+        return self._request_manager
+
+    @property
+    def request_model(self) -> pydantic.BaseModel:
+        return self._request_manager.model
 
     @property
     def state_df(self) -> pd.DataFrame:
         return self._state_df
 
+    @property
+    def states(self) -> list:
+        return self._state_df.to_dict(orient="records")
+
+    @property
+    def filters(self) -> dict:
+        return self._filters
+
+    @property
+    def filter_df(self) -> pd.DataFrame:
+        return pd.DataFrame(self._filters)
+
     def __get_initial_state_df(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
-        validated_payload = self.payload_manager.validate(payload)
+        validated_payload = self.request_manager.validate(payload)
         validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
 
         state_df = pd.DataFrame([])
@@ -134,7 +152,9 @@ class Runner:
                     f"{node_id}@{output_name}", output_value, current_node_filter
                 )
 
-    def __call__(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
+    def __call__(
+        self, payload: typing.Union[dict, list], to_dict: bool = True
+    ) -> pd.DataFrame:
         self._state_df = self.__get_initial_state_df(payload)
         self._filters = {}
 
@@ -145,5 +165,8 @@ class Runner:
                 raise e  # TODO: Handle errors
             if self._state_df[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
+
+        if to_dict:
+            return self.__get_output_state_df(self._state_df).to_dict(orient="records")
 
         return Runner.__get_output_state_df(self._state_df)

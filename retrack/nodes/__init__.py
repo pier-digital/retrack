@@ -8,7 +8,7 @@ from retrack.nodes.inputs import Input
 from retrack.nodes.logic import And, Not, Or
 from retrack.nodes.match import If
 from retrack.nodes.math import Math
-from retrack.nodes.outputs import BoolOutput
+from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
@@ -21,7 +21,7 @@ registry.register("Start", Start)
 registry.register("Constant", Constant)
 registry.register("List", List)
 registry.register("Bool", Bool)
-registry.register("BoolOutput", BoolOutput)
+registry.register("Output", Output)
 registry.register("Check", Check)
 registry.register("If", If)
 registry.register("And", And)
