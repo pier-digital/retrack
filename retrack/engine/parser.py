@@ -27,6 +27,7 @@ class Parser:
         node_registry = Registry()
         self._indexes_by_kind_map = {}
         self._indexes_by_name_map = {}
+        self.__edges = None
 
         for node_id, node_data in graph_data["nodes"].items():
             node_name = node_data.get("name", None)
@@ -55,11 +56,11 @@ class Parser:
             elif unknown_node_error:
                 raise ValueError(f"Unknown node name: {node_name}")
 
-        for validator_name, validator in validator_registry.data.items():
-            if not validator.validate(graph_data):
-                raise ValueError(f"Invalid graph data: {validator_name}")
-
         self._node_registry = node_registry
+
+        for validator_name, validator in validator_registry.data.items():
+            if not validator.validate(graph_data=graph_data, edges=self.edges):
+                raise ValueError(f"Invalid graph data: {validator_name}")
 
     @staticmethod
     def _check_node_name(node_name: str, node_id: str):
@@ -85,6 +86,20 @@ class Parser:
     @property
     def nodes(self) -> typing.Dict[str, BaseNode]:
         return self._node_registry.data
+
+    @property
+    def edges(self) -> typing.List[typing.Tuple[str, str]]:
+        if self.__edges is None:
+            edges = []
+
+            for node_id, node in self.nodes.items():
+                for _, output_connection in node.outputs:
+                    for c in output_connection.connections:
+                        edges.append((node_id, c.node))
+
+            self.__edges = edges
+
+        return self.__edges
 
     @property
     def data(self) -> dict:

@@ -18,7 +18,7 @@ class NodeExistsValidator(BaseValidator):
         self.max_quantity = max_quantity
         self.min_quantity = min_quantity
 
-    def validate(self, graph_data: dict) -> bool:
+    def validate(self, graph_data: dict, **kwargs) -> bool:
         """Validate the graph data.
 
         Args:
