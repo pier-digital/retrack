@@ -1,0 +1,716 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": [
+						{
+							"node": 3,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-541.046875,
+				-69.94140625
+			],
+			"name": "Start"
+		},
+		"2": {
+			"id": 2,
+			"data": {
+				"name": "number",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_value_0",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-232.140625,
+				-265.17578125
+			],
+			"name": "Input"
+		},
+		"3": {
+			"id": 3,
+			"data": {
+				"value": "1"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_down_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_value_1",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-233.8984375,
+				9.2109375
+			],
+			"name": "Constant"
+		},
+		"4": {
+			"id": 4,
+			"data": {
+				"operator": "=="
+			},
+			"inputs": {
+				"input_value_0": {
+					"connections": [
+						{
+							"node": 2,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_value_1": {
+					"connections": [
+						{
+							"node": 3,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 5,
+							"input": "input_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				85.94921875,
+				-151.54296875
+			],
+			"name": "Check"
+		},
+		"5": {
+			"id": 5,
+			"data": {},
+			"inputs": {
+				"input_bool": {
+					"connections": [
+						{
+							"node": 4,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_then_filter": {
+					"connections": [
+						{
+							"node": 10,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_else_filter": {
+					"connections": [
+						{
+							"node": 6,
+							"input": "input_void",
+							"data": {}
+						},
+						{
+							"node": 7,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				391.59645390537196,
+				-195.2584515796633
+			],
+			"name": "If"
+		},
+		"6": {
+			"id": 6,
+			"data": {
+				"name": "number",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 5,
+							"output": "output_else_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 12,
+							"input": "input_value_0",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				677.273253686871,
+				-99.51029607389484
+			],
+			"name": "Input"
+		},
+		"7": {
+			"id": 7,
+			"data": {
+				"value": "2"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 5,
+							"output": "output_else_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 12,
+							"input": "input_value_1",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				674.8144465573389,
+				156.26079784779859
+			],
+			"name": "Constant"
+		},
+		"10": {
+			"id": 10,
+			"data": {
+				"value": "1"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 5,
+							"output": "output_then_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 11,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				683.1885458669273,
+				-305.04161735974293
+			],
+			"name": "Constant"
+		},
+		"11": {
+			"id": 11,
+			"data": {
+				"message": "first"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 10,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				1005.135434526846,
+				-287.55703688913104
+			],
+			"name": "Output"
+		},
+		"12": {
+			"id": 12,
+			"data": {
+				"operator": "=="
+			},
+			"inputs": {
+				"input_value_0": {
+					"connections": [
+						{
+							"node": 6,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_value_1": {
+					"connections": [
+						{
+							"node": 7,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 13,
+							"input": "input_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				980.7535311889883,
+				2.928947121487271
+			],
+			"name": "Check"
+		},
+		"13": {
+			"id": 13,
+			"data": {},
+			"inputs": {
+				"input_bool": {
+					"connections": [
+						{
+							"node": 12,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_then_filter": {
+					"connections": [
+						{
+							"node": 14,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_else_filter": {
+					"connections": [
+						{
+							"node": 16,
+							"input": "input_void",
+							"data": {}
+						},
+						{
+							"node": 17,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				1269.314834650143,
+				-11.264604317155857
+			],
+			"name": "If"
+		},
+		"14": {
+			"id": 14,
+			"data": {
+				"value": "2"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 13,
+							"output": "output_then_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 15,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				1553.666222556354,
+				-123.72348595289333
+			],
+			"name": "Constant"
+		},
+		"15": {
+			"id": 15,
+			"data": {
+				"message": "second"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 14,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				1836.9009191990704,
+				-152.8446598115035
+			],
+			"name": "Output"
+		},
+		"16": {
+			"id": 16,
+			"data": {
+				"name": "number",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 13,
+							"output": "output_else_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 18,
+							"input": "input_value_0",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				1547.1232183994962,
+				82.63101131150805
+			],
+			"name": "Input"
+		},
+		"17": {
+			"id": 17,
+			"data": {
+				"value": "3"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 13,
+							"output": "output_else_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 18,
+							"input": "input_value_1",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				1545.9895761297034,
+				344.9279787495316
+			],
+			"name": "Constant"
+		},
+		"18": {
+			"id": 18,
+			"data": {
+				"operator": "=="
+			},
+			"inputs": {
+				"input_value_0": {
+					"connections": [
+						{
+							"node": 16,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_value_1": {
+					"connections": [
+						{
+							"node": 17,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 21,
+							"input": "input_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				1817.9033565634622,
+				178.64075343168426
+			],
+			"name": "Check"
+		},
+		"20": {
+			"id": 20,
+			"data": {
+				"message": "third"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 22,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				2558.3564942509242,
+				68.94427065989652
+			],
+			"name": "Output"
+		},
+		"21": {
+			"id": 21,
+			"data": {},
+			"inputs": {
+				"input_bool": {
+					"connections": [
+						{
+							"node": 18,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_then_filter": {
+					"connections": [
+						{
+							"node": 22,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_else_filter": {
+					"connections": [
+						{
+							"node": 23,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				2057.9117508031372,
+				161.72627964236332
+			],
+			"name": "If"
+		},
+		"22": {
+			"id": 22,
+			"data": {
+				"value": "3"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 21,
+							"output": "output_then_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 20,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				2315.1936187054284,
+				38.81957542871652
+			],
+			"name": "Constant"
+		},
+		"23": {
+			"id": 23,
+			"data": {
+				"value": "0"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 21,
+							"output": "output_else_filter",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 24,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				2316.6487997845193,
+				282.7729752267469
+			],
+			"name": "Constant"
+		},
+		"24": {
+			"id": 24,
+			"data": {
+				"message": "other"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 23,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				2555.308493387755,
+				281.51261293236865
+			],
+			"name": "Output"
+		}
+	}
+}
