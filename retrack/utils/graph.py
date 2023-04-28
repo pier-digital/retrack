@@ -16,7 +16,7 @@ def get_node_connections(node, is_input: bool = True, filter_by_connector=None):
 
 
 def walk(parser, actual_id: str, skiped_ids=[], callback=None):
-    node = parser.get_node_by_id(actual_id)
+    node = parser.get_by_id(actual_id)
     if callback:
         callback(node.id)
     skiped_ids.append(actual_id)
@@ -25,7 +25,7 @@ def walk(parser, actual_id: str, skiped_ids=[], callback=None):
 
     for next_id in output_ids:
         if next_id not in skiped_ids:
-            next_node = parser.get_node_by_id(next_id)
+            next_node = parser.get_by_id(next_id)
 
             next_node_input_ids = get_node_connections(next_node, is_input=True)
             run_next = True
@@ -41,7 +41,7 @@ def walk(parser, actual_id: str, skiped_ids=[], callback=None):
 
 
 def get_execution_order(parser):
-    start_nodes = parser.get_nodes_by_name("start")
+    start_nodes = parser.get_by_name("start")
     if len(start_nodes) == 0:
         raise ValueError("No start node found")
     elif len(start_nodes) > 1:

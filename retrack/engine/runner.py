@@ -14,7 +14,7 @@ class Runner:
     def __init__(self, parser: Parser):
         self._parser = parser
 
-        input_nodes = self._parser.get_nodes_by_kind(NodeKind.INPUT)
+        input_nodes = self._parser.get_by_kind(NodeKind.INPUT)
         self._input_new_columns = {
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
@@ -126,7 +126,7 @@ class Runner:
             self._state_df.loc[filter_by, column] = value
 
     def __run_node(self, node_id: str):
-        node = self._parser.get_node_by_id(node_id)
+        node = self._parser.get_by_id(node_id)
         current_node_filter = self._filters.get(node_id, None)
 
         input_params = self.__get_input_params(
