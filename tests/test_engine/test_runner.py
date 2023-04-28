@@ -4,6 +4,7 @@ import pytest
 
 from retrack import Parser, Runner
 
+
 @pytest.mark.parametrize(
     "filename, in_values, expected_out_values",
     [
@@ -28,7 +29,6 @@ from retrack import Parser, Runner
                 {"message": "valid age", "output": True},
             ],
         ),
-
     ],
 )
 def test_flows(filename, in_values, expected_out_values):
