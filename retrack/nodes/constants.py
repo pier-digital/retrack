@@ -79,7 +79,7 @@ class List(BaseConstant):
     outputs: ListOutputsModel
 
     def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
-        return {"output_list": self.data.value}
+        return {}  # {"output_list": self.data.value}
 
     def memory_type(self) -> NodeMemoryType:
         return NodeMemoryType.CONSTANT

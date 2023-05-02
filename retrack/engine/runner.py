@@ -44,7 +44,10 @@ class Runner:
 
     def _set_constants(self):
         constant_nodes = self.parser.get_by_memory_type(NodeMemoryType.CONSTANT)
-        self._constants = {node.id: node.data.value for node in constant_nodes}
+        self._constants = {}
+        for node in constant_nodes:
+            for output_connector_name, _ in node.outputs:
+                self._constants[f"{node.id}@{output_connector_name}"] = node.data.value
 
     @property
     def input_columns(self) -> dict:
@@ -76,9 +79,10 @@ class Runner:
                         self._filters[output_connection_id] & filter
                     )
 
-    def _create_state_from_payload(
+    def _create_initial_state_from_payload(
         self, payload: typing.Union[dict, list]
     ) -> pd.DataFrame:
+        """Create initial state from payload. This is the first step of the runner."""
         validated_payload = self.request_manager.validate(payload)
         validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
 
@@ -116,10 +120,13 @@ class Runner:
             self._states.loc[filter_by, column] = value
 
     def __get_state_data(self, column: str, filter_by: typing.Any = None):
+        if column in self._constants:
+            return self._constants[column]
+
         if filter_by is None:
             return self._states[column]
-        else:
-            return self._states.loc[filter_by, column]
+
+        return self._states.loc[filter_by, column]
 
     def __run_node(self, node_id: str):
         current_node_filter = self._filters.get(node_id, None)
@@ -127,6 +134,10 @@ class Runner:
         self.__set_output_connection_filters(node_id, current_node_filter)
 
         node = self.parser.get_by_id(node_id)
+
+        if node.memory_type == NodeMemoryType.CONSTANT:
+            return
+
         input_params = self.__get_input_params(
             node.dict(by_alias=True), current_node_filter
         )
@@ -145,27 +156,19 @@ class Runner:
                     f"{node_id}@{output_name}", output_value, current_node_filter
                 )
 
-    @staticmethod
-    def __get_output_state_df(state_df: pd.DataFrame) -> pd.DataFrame:
-        output_state_df = state_df[
-            [
-                constants.OUTPUT_REFERENCE_COLUMN,
-                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
-            ]
-        ].copy()
-
-        output_state_df = output_state_df.rename(
-            columns={
-                constants.OUTPUT_REFERENCE_COLUMN: "output",
-                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: "message",
+    def __get_output_states(self) -> pd.DataFrame:
+        """Returns a dataframe with the final states of the flow"""
+        return pd.DataFrame(
+            {
+                "output": self.states[constants.OUTPUT_REFERENCE_COLUMN],
+                "message": self.states[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN],
             }
         )
 
-        return output_state_df
-
     def execute(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
+        """Executes the flow with the given payload"""
         self.reset()
-        self._states = self._create_state_from_payload(payload)
+        self._states = self._create_initial_state_from_payload(payload)
 
         for node_id in self.parser.execution_order:
             try:
@@ -176,4 +179,4 @@ class Runner:
             if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 
-        return Runner.__get_output_state_df(self.states)
+        return self.__get_output_states()
