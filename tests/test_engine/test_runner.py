@@ -1,9 +1,9 @@
 import json
 
+import pandas as pd
 import pytest
 
 from retrack import Parser, Runner
-import pandas as pd
 
 
 @pytest.mark.parametrize(
