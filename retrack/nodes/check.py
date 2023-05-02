@@ -5,12 +5,7 @@ import enum
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import (
-    BaseNode,
-    InputConnectionModel,
-    NodeKind,
-    OutputConnectionModel,
-)
+from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ###############################################################
 # Check Metadata Models

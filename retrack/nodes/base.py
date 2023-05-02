@@ -20,6 +20,17 @@ class NodeKind(str, enum.Enum):
 
 
 ###############################################################
+# Node Memory Types
+###############################################################
+
+
+class NodeMemoryType(str, enum.Enum):
+    STATE = "state"
+    FILTER = "filter"
+    CONSTANT = "constant"
+
+
+###############################################################
 # Connection Models
 ###############################################################
 
@@ -57,3 +68,6 @@ class BaseNode(pydantic.BaseModel):
 
     def kind(self) -> NodeKind:
         return NodeKind.OTHER
+
+    def memory_type(self) -> NodeMemoryType:
+        return NodeMemoryType.STATE

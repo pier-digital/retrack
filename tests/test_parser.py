@@ -6,11 +6,10 @@ from retrack.engine.parser import Parser
 
 
 @pytest.mark.parametrize(
-    "data_filename,expected_data_filename,expected_tokens",
+    "data_filename,expected_tokens",
     [
         (
             "tests/resources/age-negative.json",
-            "tests/resources/age-negative-data.json",
             {
                 "start": ["0"],
                 "input": ["2", "13"],
@@ -23,21 +22,17 @@ from retrack.engine.parser import Parser
         )
     ],
 )
-def test_parser_extract(data_filename, expected_data_filename, expected_tokens):
+def test_parser_extract(data_filename, expected_tokens):
     with open(data_filename) as f:
         input_data = json.load(f)
 
-    with open(expected_data_filename) as f:
-        expected_output_data = json.load(f)
-
     parser = Parser(input_data)
-    assert parser.data == expected_output_data
-    assert parser.tokens == expected_tokens
+    assert parser.indexes_by_name_map == expected_tokens
 
 
 def test_parser_with_unknown_node():
     with pytest.raises(ValueError):
-        Parser({"nodes": {"1": {"name": "Unknown"}}}, unknown_node_error=True)
+        Parser({"nodes": {"1": {"name": "Unknown"}}})
 
 
 def test_parser_invalid_input_data():

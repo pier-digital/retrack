@@ -2,6 +2,7 @@ import pandas as pd
 import pydantic
 
 from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.utils import transformers
 
 ################################################
 # EndsWithAny Inputs Outputs
@@ -27,4 +28,5 @@ class EndsWithAny(BaseNode):
     outputs: EndsWithAnyOutputsModel
 
     def run(self, input_value: pd.Series, input_list: pd.Series) -> pd.Series:
-        return {"output_bool": input_value.str.endswith(tuple(input_list.to_list()))}
+        input_list = transformers.to_list(input_list)
+        return {"output_bool": input_value.str.endswith(tuple(input_list))}

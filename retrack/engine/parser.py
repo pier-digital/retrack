@@ -1,8 +1,6 @@
 import typing
 
-from retrack.engine.validators import registry as GLOBAL_VALIDATOR_REGISTRY
-from retrack.nodes import BaseNode
-from retrack.nodes import registry as GLOBAL_NODE_REGISTRY
+from retrack import nodes, validators
 from retrack.utils.registry import Registry
 
 
@@ -10,64 +8,24 @@ class Parser:
     def __init__(
         self,
         graph_data: dict,
-        component_registry: Registry = GLOBAL_NODE_REGISTRY,
-        validator_registry: Registry = GLOBAL_VALIDATOR_REGISTRY,
-        unknown_node_error: bool = False,
+        component_registry: Registry = nodes.registry(),
+        validator_registry: Registry = validators.registry(),
     ):
-        """Parses a dictionary of nodes and returns a dictionary of BaseNode objects.
-
-        Args:
-            data (dict): A dictionary of nodes.
-            component_registry (Registry, optional): A registry of BaseNode objects. Defaults to GLOBAL_NODE_REGISTRY.
-            validator_registry (Registry, optional): A registry of BaseValidator objects. Defaults to GLOBAL_VALIDATOR_REGISTRY.
-            unknown_node_error (bool, optional): Whether to raise an error if an unknown node is found. Defaults to False.
-        """
-        Parser._check_input_data(graph_data)
-
-        node_registry = Registry()
-        self._indexes_by_kind_map = {}
-        self._indexes_by_name_map = {}
+        self._execution_order = None
+        self.__components = {}
         self.__edges = None
 
-        for node_id, node_data in graph_data["nodes"].items():
-            node_name = node_data.get("name", None)
+        self._check_input_data(graph_data)
 
-            Parser._check_node_name(node_name, node_id)
+        self._set_components(graph_data, component_registry)
+        self._set_edges()
 
-            node_name = node_name.lower()
+        self._validate_graph(graph_data, validator_registry)
 
-            validation_model = component_registry.get(node_name)
-            if validation_model is not None:
-                if node_name not in self._indexes_by_name_map:
-                    self._indexes_by_name_map[node_name] = []
-
-                self._indexes_by_name_map[node_name].append(node_id)
-
-                node_data["id"] = node_id
-                if node_id not in node_registry:
-                    node = validation_model(**node_data)
-                    node_registry.register(node_id, node)
-
-                    if node.kind() not in self._indexes_by_kind_map:
-                        self._indexes_by_kind_map[node.kind()] = []
-
-                    self._indexes_by_kind_map[node.kind()].append(node_id)
-
-            elif unknown_node_error:
-                raise ValueError(f"Unknown node name: {node_name}")
-
-        self._node_registry = node_registry
-
-        for validator_name, validator in validator_registry.data.items():
-            if not validator.validate(graph_data=graph_data, edges=self.edges):
-                raise ValueError(f"Invalid graph data: {validator_name}")
-
-    @staticmethod
-    def _check_node_name(node_name: str, node_id: str):
-        if node_name is None:
-            raise ValueError(f"BaseNode {node_id} has no name")
-        if not isinstance(node_name, str):
-            raise TypeError(f"BaseNode {node_id} name must be a string")
+        self._set_indexes_by_name_map()
+        self._set_indexes_by_kind_map()
+        self._set_execution_order()
+        self._set_indexes_by_memory_type_map()
 
     @staticmethod
     def _check_input_data(data: dict):
@@ -83,53 +41,150 @@ class Parser:
                 + str(type(data["nodes"]))
             )
 
+    @staticmethod
+    def _check_node_name(node_name: str, node_id: str):
+        if node_name is None:
+            raise ValueError(f"BaseNode {node_id} has no name")
+        if not isinstance(node_name, str):
+            raise TypeError(f"BaseNode {node_id} name must be a string")
+
     @property
-    def nodes(self) -> typing.Dict[str, BaseNode]:
-        return self._node_registry.data
+    def components(self) -> typing.Dict[str, nodes.BaseNode]:
+        return self.__components
+
+    def _set_components(self, graph_data: dict, component_registry: Registry):
+        for node_id, node_metadata in graph_data["nodes"].items():
+            if node_id in self.__components:
+                raise ValueError(f"Duplicate node id: {node_id}")
+
+            node_name = node_metadata.get("name", None)
+            self._check_node_name(node_name, node_id)
+
+            node_name = node_name.lower()
+
+            validation_model = component_registry.get(node_name)
+
+            if validation_model is None:
+                raise ValueError(f"Unknown node name: {node_name}")
+
+            self.__components[node_id] = validation_model(**node_metadata)
 
     @property
     def edges(self) -> typing.List[typing.Tuple[str, str]]:
-        if self.__edges is None:
-            edges = []
-
-            for node_id, node in self.nodes.items():
-                for _, output_connection in node.outputs:
-                    for c in output_connection.connections:
-                        edges.append((node_id, c.node))
-
-            self.__edges = edges
-
         return self.__edges
 
-    @property
-    def data(self) -> dict:
-        return {i: j.dict(by_alias=True) for i, j in self.nodes.items()}
+    def _set_edges(self):
+        self.__edges = []
+
+        for node_id, node in self.components.items():
+            for _, output_connection in node.outputs:
+                for c in output_connection.connections:
+                    self.__edges.append((node_id, c.node))
+
+    def _validate_graph(self, graph_data: dict, validator_registry: Registry):
+        for validator_name, validator in validator_registry.data.items():
+            if not validator.validate(graph_data=graph_data, edges=self.edges):
+                raise ValueError(f"Invalid graph data: {validator_name}")
+
+    def get_by_id(self, id_: str) -> nodes.BaseNode:
+        return self.components.get(id_)
 
     @property
-    def tokens(self) -> dict:
-        """Returns a dictionary of tokens (node name) and their associated node ids."""
+    def indexes_by_name_map(self) -> typing.Dict[str, typing.List[str]]:
         return self._indexes_by_name_map
 
+    def _set_indexes_by_name_map(self):
+        self._indexes_by_name_map = {}
+
+        for node_id, node in self.components.items():
+            node_name = node.__class__.__name__.lower()
+            if node_name not in self._indexes_by_name_map:
+                self._indexes_by_name_map[node_name] = []
+
+            self._indexes_by_name_map[node_name].append(node_id)
+
+    def get_by_name(self, name: str) -> typing.List[nodes.BaseNode]:
+        return [self.get_by_id(id_) for id_ in self.indexes_by_name_map.get(name, [])]
+
     @property
-    def indexes_by_kind_map(self) -> dict:
-        """Returns a dictionary of node kinds and their associated node ids."""
+    def indexes_by_kind_map(self) -> typing.Dict[str, typing.List[str]]:
         return self._indexes_by_kind_map
 
-    def get_node_by_id(self, node_id: str) -> BaseNode:
-        return self._node_registry.get(node_id)
+    def _set_indexes_by_kind_map(self):
+        self._indexes_by_kind_map = {}
 
-    def get_nodes_by_name(self, node_name: str) -> typing.List[BaseNode]:
-        node_name = node_name.lower()
-        return [self.get_node_by_id(i) for i in self.tokens.get(node_name, [])]
+        for node_id, node in self.components.items():
+            if node.kind() not in self._indexes_by_kind_map:
+                self._indexes_by_kind_map[node.kind()] = []
 
-    def get_nodes_by_multiple_names(self, node_names: list) -> typing.List[BaseNode]:
-        all_nodes = []
-        for node_name in node_names:
-            nodes = self.get_nodes_by_name(node_name)
-            if nodes is not None:
-                all_nodes.extend(nodes)
+            self._indexes_by_kind_map[node.kind()].append(node_id)
 
-        return all_nodes
+    def get_by_kind(self, kind: str) -> typing.List[nodes.BaseNode]:
+        return [self.get_by_id(id_) for id_ in self.indexes_by_kind_map.get(kind, [])]
 
-    def get_nodes_by_kind(self, kind: str) -> typing.List[BaseNode]:
-        return [self.get_node_by_id(i) for i in self.indexes_by_kind_map.get(kind, [])]
+    @property
+    def indexes_by_memory_type_map(self) -> typing.Dict[str, typing.List[str]]:
+        return self._indexes_by_memory_type_map
+
+    def _set_indexes_by_memory_type_map(self):
+        self._indexes_by_memory_type_map = {}
+
+        for node_id, node in self.components.items():
+            memory_type = node.memory_type()
+            if memory_type not in self.indexes_by_memory_type_map:
+                self._indexes_by_memory_type_map[memory_type] = []
+
+            self._indexes_by_memory_type_map[memory_type].append(node_id)
+
+    def get_by_memory_type(self, memory_type: str) -> typing.List[nodes.BaseNode]:
+        return [
+            self.get_by_id(id_)
+            for id_ in self.indexes_by_memory_type_map.get(memory_type, [])
+        ]
+
+    @property
+    def execution_order(self) -> typing.List[str]:
+        return self._execution_order
+
+    def _set_execution_order(self):
+        start_nodes = self.get_by_name("start")
+
+        self._execution_order = self._walk(start_nodes[0].id, [])
+
+    def get_node_connections(
+        self, node_id: str, is_input: bool = True, filter_by_connector=None
+    ):
+        node_dict = self.get_by_id(node_id).dict(by_alias=True)
+
+        connectors = node_dict.get("inputs" if is_input else "outputs", {})
+        result = []
+
+        for connector_name, value in connectors.items():
+            if (
+                filter_by_connector is not None
+                and connector_name != filter_by_connector
+            ):
+                continue
+
+            for connection in value["connections"]:
+                result.append(connection["node"])
+        return result
+
+    def _walk(self, actual_id: str, skiped_ids: list):
+        skiped_ids.append(actual_id)
+
+        output_ids = self.get_node_connections(actual_id, is_input=False)
+
+        for next_id in output_ids:
+            if next_id not in skiped_ids:
+                next_node_input_ids = self.get_node_connections(next_id, is_input=True)
+                run_next = True
+                for next_node_input_id in next_node_input_ids:
+                    if next_node_input_id not in skiped_ids:
+                        run_next = False
+                        break
+
+                if run_next:
+                    self._walk(next_id, skiped_ids)
+
+        return skiped_ids

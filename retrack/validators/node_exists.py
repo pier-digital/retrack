@@ -1,4 +1,4 @@
-from retrack.engine.validators.base import BaseValidator
+from retrack.validators.base import BaseValidator
 
 
 class NodeExistsValidator(BaseValidator):

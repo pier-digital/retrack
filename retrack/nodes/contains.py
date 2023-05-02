@@ -2,6 +2,7 @@ import pandas as pd
 import pydantic
 
 from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
+from retrack.utils import transformers
 
 ################################################
 # Contains Inputs Outputs
@@ -27,4 +28,4 @@ class Contains(BaseNode):
     outputs: ContainsOutputsModel
 
     def run(self, input_list: pd.Series, input_value: pd.Series) -> pd.Series:
-        return {"output_bool": input_value.isin(input_list.to_list())}
+        return {"output_bool": input_value.isin(transformers.to_list(input_list))}

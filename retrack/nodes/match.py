@@ -7,6 +7,7 @@ from retrack.nodes.base import (
     BaseNode,
     InputConnectionModel,
     NodeKind,
+    NodeMemoryType,
     OutputConnectionModel,
 )
 
@@ -41,3 +42,6 @@ class If(BaseNode):
             f"output_then_filter": input_bool,
             f"output_else_filter": ~input_bool,
         }
+
+    def memory_type(self) -> NodeMemoryType:
+        return NodeMemoryType.FILTER
