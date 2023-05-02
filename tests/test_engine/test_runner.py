@@ -3,6 +3,7 @@ import json
 import pytest
 
 from retrack import Parser, Runner
+import pandas as pd
 
 
 @pytest.mark.parametrize(
@@ -36,6 +37,7 @@ def test_flows(filename, in_values, expected_out_values):
         rule = json.load(f)
 
     runner = Runner(Parser(rule))
-    out_values = runner(in_values)
+    out_values = runner.execute(in_values)
 
-    assert out_values == expected_out_values
+    assert isinstance(out_values, pd.DataFrame)
+    assert out_values.to_dict(orient="records") == expected_out_values
