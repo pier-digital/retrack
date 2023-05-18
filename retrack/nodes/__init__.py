@@ -2,12 +2,13 @@ from retrack.nodes.base import BaseNode
 from retrack.nodes.check import Check
 from retrack.nodes.constants import Bool, Constant, List
 from retrack.nodes.contains import Contains
+from retrack.nodes.datetime import CurrentYear
 from retrack.nodes.endswith import EndsWith
 from retrack.nodes.endswithany import EndsWithAny
 from retrack.nodes.inputs import Input
 from retrack.nodes.logic import And, Not, Or
 from retrack.nodes.match import If
-from retrack.nodes.math import Math
+from retrack.nodes.math import AbsoluteValue, Math
 from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
@@ -37,10 +38,12 @@ register("And", And)
 register("Or", Or)
 register("Not", Not)
 register("Math", Math)
+register("AbsoluteValue", AbsoluteValue)
 register("StartsWith", StartsWith)
 register("EndsWith", EndsWith)
 register("StartsWithAny", StartsWithAny)
 register("EndsWithAny", EndsWithAny)
 register("Contains", Contains)
+register("CurrentYear", CurrentYear)
 
 __all__ = ["registry", "register", "BaseNode"]
