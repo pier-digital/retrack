@@ -74,3 +74,24 @@ class Math(BaseNode):
             }
         else:
             raise ValueError("Unknown operator")
+
+
+
+###############################################################
+# Absolute Value Node
+###############################################################
+
+
+class AbsoluteValueInputsModel(pydantic.BaseModel):
+    input_value: InputConnectionModel
+
+
+class AbsoluteValue(BaseNode):
+    inputs: AbsoluteValueInputsModel
+    outputs: MathOutputsModel
+
+    def run(
+        self,
+        input_value: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        return {"output_value": input_value.astype(float).abs()}
