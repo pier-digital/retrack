@@ -21,6 +21,9 @@ pytest-cov = "^3.0.0"
 black = "^22.6.0"
 isort = {extras = ["colors"], version = "^5.12.0"}
 
+[tool.poetry.group.dev.dependencies]
+pytest-mock = "^3.10.0"
+
 [tool.black]
 # https://github.com/psf/black
 target-version = ["py37"]
