@@ -20,6 +20,6 @@ def register(
     registry().register(name, factory)
 
 
-register("CSVTable", csv_table_factory)
+register("CSVTableV0", csv_table_factory)
 
 __all__ = ["registry", "register", "BaseDynamicNode"]

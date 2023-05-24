@@ -7,20 +7,20 @@ from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 
-class CSVTableMetadataModel(pydantic.BaseModel):
+class CSVTableV0MetadataModel(pydantic.BaseModel):
     value: typing.Union[typing.List[str], typing.List[typing.List[str]]]
     target: str
     headers: typing.List[str]
     headers_map: typing.List[str]
     separator: typing.Optional[str] = ","
     default: typing.Optional[str] = None
-    
+
     def df(self) -> pd.DataFrame:
         rows = [values.split(self.separator) for values in self.value[1:]]
         return pd.DataFrame(rows, columns=self.headers_map)
 
 
-class CSVTableOutputsModel(pydantic.BaseModel):
+class CSVTableV0OutputsModel(pydantic.BaseModel):
     output_value: OutputConnectionModel
 
 
@@ -32,17 +32,19 @@ def csv_table_factory(
     for name in inputs.keys():
         input_fields[name] = BaseDynamicNode.create_sub_field(InputConnectionModel)
 
-    inputs_model = BaseDynamicIOModel.with_fields("CSVTableInputsModel", **input_fields)
+    inputs_model = BaseDynamicIOModel.with_fields(
+        "CSVTableV0InputsModel", **input_fields
+    )
 
     models = {
         "inputs": BaseDynamicNode.create_sub_field(inputs_model),
-        "outputs": BaseDynamicNode.create_sub_field(CSVTableOutputsModel),
-        "data": BaseDynamicNode.create_sub_field(CSVTableMetadataModel),
+        "outputs": BaseDynamicNode.create_sub_field(CSVTableV0OutputsModel),
+        "data": BaseDynamicNode.create_sub_field(CSVTableV0MetadataModel),
     }
 
-    BaseCSVTableModel = BaseDynamicNode.with_fields("CSVTable", **models)
+    BaseCSVTableV0Model = BaseDynamicNode.with_fields("CSVTableV0", **models)
 
-    class CSVTableModel(BaseCSVTableModel):
+    class CSVTableV0Model(BaseCSVTableV0Model):
         def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
             csv_df = self.data.df()
 
@@ -57,7 +59,7 @@ def csv_table_factory(
                     continue
 
                 if name not in kwargs.keys():
-                    raise ValueError(f"Missing input {name} in CSVTable node")
+                    raise ValueError(f"Missing input {name} in CSVTableV0 node")
 
                 response_df[name] = kwargs[name]
 
@@ -72,4 +74,4 @@ def csv_table_factory(
 
             return {"output_value": response_df[self.data.target]}
 
-    return CSVTableModel
+    return CSVTableV0Model

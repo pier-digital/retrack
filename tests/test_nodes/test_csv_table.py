@@ -55,33 +55,33 @@ def csv_table_metadata():
                 ]
             }
         },
-        "name": "CSVTable",
+        "name": "CSVTableV0",
     }
 
 
 def test_get_csv_table_factory():
-    csv_table_factory = dynamic_registry().get("CSVTable")
+    csv_table_factory = dynamic_registry().get("CSVTableV0")
 
     assert callable(csv_table_factory)
 
 
 def test_create_model_from_factory(csv_table_metadata):
-    csv_table_factory = dynamic_registry().get("CSVTable")
-    CSVTable = csv_table_factory(**csv_table_metadata)
+    csv_table_factory = dynamic_registry().get("CSVTableV0")
+    CSVTableV0 = csv_table_factory(**csv_table_metadata)
 
-    assert issubclass(CSVTable, pydantic.BaseModel)
+    assert issubclass(CSVTableV0, pydantic.BaseModel)
 
-    model = CSVTable(**csv_table_metadata)
+    model = CSVTableV0(**csv_table_metadata)
 
-    assert isinstance(model, CSVTable)
+    assert isinstance(model, CSVTableV0)
     assert hasattr(model, "run")
 
 
 def test_csv_table_run(csv_table_metadata):
-    csv_table_factory = dynamic_registry().get("CSVTable")
-    CSVTable = csv_table_factory(**csv_table_metadata)
+    csv_table_factory = dynamic_registry().get("CSVTableV0")
+    CSVTableV0 = csv_table_factory(**csv_table_metadata)
 
-    model = CSVTable(**csv_table_metadata)
+    model = CSVTableV0(**csv_table_metadata)
 
     payload = {
         "input_value_0": pd.Series(["MAY", "JUN", "JUL", "AUG", "SEP"]),
