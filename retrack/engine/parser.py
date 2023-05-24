@@ -69,8 +69,8 @@ class Parser:
 
             if node_factory is not None:
                 validation_model = node_factory(**node_metadata)
-
-            validation_model = component_registry.get(node_name)
+            else:
+                validation_model = component_registry.get(node_name)
 
             if validation_model is None:
                 raise ValueError(f"Unknown node name: {node_name}")
