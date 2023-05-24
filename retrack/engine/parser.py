@@ -9,6 +9,7 @@ class Parser:
         self,
         graph_data: dict,
         component_registry: Registry = nodes.registry(),
+        dynamic_registry: Registry = nodes.dynamic_registry(),
         validator_registry: Registry = validators.registry(),
     ):
         self._execution_order = None
@@ -17,7 +18,7 @@ class Parser:
 
         self._check_input_data(graph_data)
 
-        self._set_components(graph_data, component_registry)
+        self._set_components(graph_data, component_registry, dynamic_registry)
         self._set_edges()
 
         self._validate_graph(graph_data, validator_registry)
@@ -52,7 +53,9 @@ class Parser:
     def components(self) -> typing.Dict[str, nodes.BaseNode]:
         return self.__components
 
-    def _set_components(self, graph_data: dict, component_registry: Registry):
+    def _set_components(
+        self, graph_data: dict, component_registry: Registry, dynamic_registry: Registry
+    ):
         for node_id, node_metadata in graph_data["nodes"].items():
             if node_id in self.__components:
                 raise ValueError(f"Duplicate node id: {node_id}")
@@ -62,7 +65,12 @@ class Parser:
 
             node_name = node_name.lower()
 
-            validation_model = component_registry.get(node_name)
+            node_factory = dynamic_registry.get(node_name)
+
+            if node_factory is not None:
+                validation_model = node_factory(**node_metadata)
+            else:
+                validation_model = component_registry.get(node_name)
 
             if validation_model is None:
                 raise ValueError(f"Unknown node name: {node_name}")
