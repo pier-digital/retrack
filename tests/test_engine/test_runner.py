@@ -41,3 +41,42 @@ def test_flows(filename, in_values, expected_out_values):
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
+
+
+@pytest.mark.parametrize(
+    "filename, in_values, expected_out_values",
+    [
+        (
+            "multiple-ifs",
+            [{"number": 1}, {"number": 2}, {"number": 3}, {"number": 4}],
+            [
+                {"message": "first", "output": "1"},
+                {"message": "second", "output": "2"},
+                {"message": "third", "output": "3"},
+                {"message": "other", "output": "0"},
+            ],
+        ),
+        (
+            "age-negative",
+            [{"age": 10}, {"age": -10}, {"age": 18}, {"age": 19}, {"age": 100}],
+            [
+                {"message": "underage", "output": False},
+                {"message": "invalid age", "output": False},
+                {"message": "valid age", "output": True},
+                {"message": "valid age", "output": True},
+                {"message": "valid age", "output": True},
+            ],
+        ),
+    ],
+)
+def test_create_from_json(filename, in_values, expected_out_values):
+    runner = Runner.from_json(f"tests/resources/{filename}.json")
+    out_values = runner.execute(in_values)
+
+    assert isinstance(out_values, pd.DataFrame)
+    assert out_values.to_dict(orient="records") == expected_out_values
+
+
+def test_create_from_json_with_invalid_type():
+    with pytest.raises(ValueError):
+        Runner.from_json(1)

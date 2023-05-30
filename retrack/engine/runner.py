@@ -1,5 +1,7 @@
 import typing
 
+import json
+
 import numpy as np
 import pandas as pd
 import pydantic
@@ -17,6 +19,16 @@ class Runner:
         self._set_constants()
         self._set_input_columns()
         self._request_manager = RequestManager(self._parser.get_by_kind(NodeKind.INPUT))
+
+    @classmethod
+    def from_json(cls, data: typing.Union[str, dict], **kwargs):
+        if isinstance(data, str) and data.endswith(".json"):
+            data = json.loads(open(data).read())
+        elif not isinstance(data, dict):
+            raise ValueError("data must be a dict or a json file path")
+
+        parser = Parser(data, **kwargs)
+        return cls(parser)
 
     @property
     def parser(self) -> Parser:
