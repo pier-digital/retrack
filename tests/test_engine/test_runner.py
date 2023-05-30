@@ -80,3 +80,32 @@ def test_create_from_json(filename, in_values, expected_out_values):
 def test_create_from_json_with_invalid_type():
     with pytest.raises(ValueError):
         Runner.from_json(1)
+
+
+def test_csv_table_with_if():
+    runner = Runner.from_json("tests/resources/csv-table-with-if.json")
+
+    in_values = [
+        {"in_a": 0, "in_b": 0, "in_d": 0, "in_e": 0},
+        {"in_a": 0, "in_b": 1, "in_d": 0, "in_e": 0},
+        {"in_a": 1, "in_b": 0, "in_d": 0, "in_e": 0},
+        {"in_a": 1, "in_b": 1, "in_d": 0, "in_e": 1},
+        {"in_a": 1, "in_b": 1, "in_d": 1, "in_e": 0},
+        {"in_a": 1, "in_b": 1, "in_d": 0, "in_e": 0},
+        {"in_a": 1, "in_b": 1, "in_d": -1, "in_e": 0},
+    ]
+
+    out_values = runner.execute(in_values)
+
+    assert isinstance(out_values, pd.DataFrame)
+    assert len(out_values) == len(in_values)
+    assert out_values["output"].astype(int).values.tolist() == [-1, -1, -1, 1, 1, 0, 3]
+    assert out_values["message"].values.tolist() == [
+        "else",
+        "else",
+        "else",
+        "then",
+        "then",
+        "then",
+        "then",
+    ]

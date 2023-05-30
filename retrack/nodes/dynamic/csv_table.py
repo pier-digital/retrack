@@ -72,6 +72,10 @@ def csv_table_factory(
                     self.data.default
                 )
 
+            response_df.set_index(
+                kwargs[input_columns[0]].index, inplace=True, drop=True
+            )
+
             return {"output_value": response_df[self.data.target]}
 
     return CSVTableV0Model
