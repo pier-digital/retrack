@@ -26,6 +26,16 @@ pip install retrack
 ```python
 import retrack
 
+runner = retrack.Runner.from_json("your-rule.json")
+
+response = runner.execute(input_data)
+```
+
+Or, if you want to create the parser and runner manually:
+
+```python
+import retrack
+
 # Parse the rule/model
 parser = retrack.Parser(rule)
 
