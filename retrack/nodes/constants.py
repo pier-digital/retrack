@@ -30,7 +30,13 @@ class BoolMetadataModel(pydantic.BaseModel):
     def validate_value(cls, value):
         if value is None:
             return False
-        return value
+        
+        value = str(value).lower()
+
+        if value in ["true", "1", "yes", "y", "t"]:
+            return True
+        
+        return False
 
 
 #######################################################
