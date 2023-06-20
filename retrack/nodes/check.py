@@ -61,9 +61,13 @@ class Check(BaseNode):
         input_value_1: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
         if self.data.operator == CheckOperator.EQUAL:
-            return {"output_bool": input_value_0 == input_value_1}
+            return {
+                "output_bool": input_value_0.astype(str) == input_value_1.astype(str)
+            }
         elif self.data.operator == CheckOperator.NOT_EQUAL:
-            return {"output_bool": input_value_0 != input_value_1}
+            return {
+                "output_bool": input_value_0.astype(str) != input_value_1.astype(str)
+            }
         elif self.data.operator == CheckOperator.GREATER_THAN:
             return {
                 "output_bool": input_value_0.astype(float) > input_value_1.astype(float)
