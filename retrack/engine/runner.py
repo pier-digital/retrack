@@ -177,9 +177,12 @@ class Runner:
             }
         )
 
-    def execute(self, payload: typing.Union[dict, list]) -> pd.DataFrame:
+    def execute(self, payload: typing.Union[dict, list, pd.DataFrame]) -> pd.DataFrame:
         """Executes the flow with the given payload"""
         self.reset()
+        if isinstance(payload, pd.DataFrame):
+            payload = payload.to_dict("records")
+
         self._states = self._create_initial_state_from_payload(payload)
 
         for node_id in self.parser.execution_order:
