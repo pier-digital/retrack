@@ -180,8 +180,11 @@ class Runner:
     def __parse_payload(
         self, payload: typing.Union[dict, list, pd.DataFrame]
     ) -> typing.List[dict]:
+        if isinstance(payload, dict):
+            payload = [payload]
+
         if not isinstance(payload, pd.DataFrame):
-            payload = pd.DataFrame(payload)
+            payload = pd.DataFrame(payload, index=list(range(len(payload))))
 
         for column in payload.columns:
             payload[column] = payload[column].astype(str)

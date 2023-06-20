@@ -11,6 +11,36 @@ from retrack import Parser, Runner
     [
         (
             "multiple-ifs",
+            {"number": 1},
+            [
+                {"message": "first", "output": "1"},
+            ],
+        ),
+        (
+            "age-negative",
+            {"age": 10},
+            [
+                {"message": "underage", "output": False},
+            ],
+        ),
+    ],
+)
+def test_flows_with_single_element(filename, in_values, expected_out_values):
+    with open(f"tests/resources/{filename}.json", "r") as f:
+        rule = json.load(f)
+
+    runner = Runner(Parser(rule))
+    out_values = runner.execute(in_values)
+
+    assert isinstance(out_values, pd.DataFrame)
+    assert out_values.to_dict(orient="records") == expected_out_values
+
+
+@pytest.mark.parametrize(
+    "filename, in_values, expected_out_values",
+    [
+        (
+            "multiple-ifs",
             [{"number": 1}, {"number": 2}, {"number": 3}, {"number": 4}],
             [
                 {"message": "first", "output": "1"},
