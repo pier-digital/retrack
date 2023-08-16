@@ -60,6 +60,29 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
                 {"message": "valid age", "output": True},
             ],
         ),
+        (
+            "age-categorizer",
+            [
+                {"age": 0},
+                {"age": 17},
+                {"age": 18},
+                {"age": 23},
+                {"age": 24},
+                {"age": 39},
+                {"age": 40},
+                {"age": 99},
+            ],
+            [
+                {"message": None, "output": "invalid"},
+                {"message": None, "output": "invalid"},
+                {"message": None, "output": "group 1"},
+                {"message": None, "output": "group 1"},
+                {"message": None, "output": "group 2"},
+                {"message": None, "output": "group 2"},
+                {"message": None, "output": "group 3"},
+                {"message": None, "output": "group 3"},
+            ],
+        ),
     ],
 )
 def test_flows(filename, in_values, expected_out_values):

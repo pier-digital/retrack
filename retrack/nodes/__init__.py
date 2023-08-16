@@ -1,6 +1,6 @@
 from retrack.nodes.base import BaseNode
 from retrack.nodes.check import Check
-from retrack.nodes.constants import Bool, Constant, List
+from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
 from retrack.nodes.datetime import CurrentYear
 from retrack.nodes.dynamic import BaseDynamicNode
@@ -47,5 +47,6 @@ register("StartsWithAny", StartsWithAny)
 register("EndsWithAny", EndsWithAny)
 register("Contains", Contains)
 register("CurrentYear", CurrentYear)
+register("IntervalCatV0", IntervalCatV0)
 
 __all__ = ["registry", "register", "BaseNode", "dynamic_registry", "BaseDynamicNode"]
