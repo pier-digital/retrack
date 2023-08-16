@@ -1,0 +1,135 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": []
+				}
+			},
+			"position": [
+				-546.34375,
+				-24.87890625
+			],
+			"name": "Start"
+		},
+		"2": {
+			"id": 2,
+			"data": {
+				"name": "age",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 3,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-255.72265625,
+				-165.5859375
+			],
+			"name": "Input"
+		},
+		"3": {
+			"id": 3,
+			"data": {
+				"separator": ",",
+				"value": [
+					"min_age,max_age,cat",
+					"0,18,invalid",
+					"18,24,group 1",
+					"24,40,group 2",
+					"40,100,group 3"
+				],
+				"default": null,
+				"headers": [
+					"min_age",
+					"max_age",
+					"cat"
+				],
+				"start_interval_column": "min_age",
+				"end_interval_column": "max_age",
+				"category_column": "cat"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 2,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-3.359375,
+				-237.8984375
+			],
+			"name": "IntervalCatV0"
+		},
+		"4": {
+			"id": 4,
+			"data": {
+				"message": null
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 3,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				279.16796875,
+				-117.12109375
+			],
+			"name": "Output"
+		}
+	}
+}
