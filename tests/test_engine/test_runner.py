@@ -97,6 +97,29 @@ def test_flows(filename, in_values, expected_out_values):
                 {"message": "valid age", "output": True},
             ],
         ),
+        (
+            "round-node",
+            [{"var_a": 1.1, "var_b": 1.5}, {"var_a": 3.6, "var_b": 2.1}],
+            [
+                {"output": 2, "message": None},
+                {"output": 8, "message": None},
+            ],
+        ),
+        (
+            "rule-of-rules",
+            [
+                {"example_a": 1, "var_b": 2},
+                {"example_a": 3, "var_b": 2},
+                {"example_a": 4, "var_b": 2},
+                {"example_a": 5, "var_b": 5},
+            ],
+            [
+                {"output": 2, "message": None},
+                {"output": 6, "message": None},
+                {"output": 8, "message": None},
+                {"output": 25, "message": None},
+            ],
+        ),
     ],
 )
 def test_create_from_json(filename, in_values, expected_out_values):

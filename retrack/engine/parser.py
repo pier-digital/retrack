@@ -112,6 +112,7 @@ class Parser:
             self._indexes_by_name_map[node_name].append(node_id)
 
     def get_by_name(self, name: str) -> typing.List[nodes.BaseNode]:
+        name = name.lower()
         return [self.get_by_id(id_) for id_ in self.indexes_by_name_map.get(name, [])]
 
     @property
