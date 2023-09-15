@@ -10,7 +10,7 @@ from retrack.nodes.endswithany import EndsWithAny
 from retrack.nodes.inputs import Input
 from retrack.nodes.logic import And, Not, Or
 from retrack.nodes.match import If
-from retrack.nodes.math import AbsoluteValue, Math
+from retrack.nodes.math import AbsoluteValue, Math, Round
 from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
@@ -40,6 +40,7 @@ register("And", And)
 register("Or", Or)
 register("Not", Not)
 register("Math", Math)
+register("Round", Round)
 register("AbsoluteValue", AbsoluteValue)
 register("StartsWith", StartsWith)
 register("EndsWith", EndsWith)

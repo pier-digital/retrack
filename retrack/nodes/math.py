@@ -94,3 +94,19 @@ class AbsoluteValue(BaseNode):
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
         return {"output_value": input_value.astype(float).abs()}
+
+
+###############################################################
+# Round Node
+###############################################################
+
+
+class Round(BaseNode):
+    inputs: AbsoluteValueInputsModel
+    outputs: MathOutputsModel
+
+    def run(
+        self,
+        input_value: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        return {"output_value": input_value.astype(float).round(0).astype(int)}

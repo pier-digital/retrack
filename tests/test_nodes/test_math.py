@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from retrack.nodes.math import AbsoluteValue, Math, MathOperator
+from retrack.nodes.math import AbsoluteValue, Math, MathOperator, Round
 
 
 @pytest.fixture
@@ -75,3 +75,9 @@ def test_absolute_value_node_run(absolute_value_input_data):
     absolute_value_node = AbsoluteValue(**absolute_value_input_data)
     output = absolute_value_node.run(pd.Series(["-1", "1", "0", "-2"]))
     assert (output["output_value"] == pd.Series([1, 1, 0, 2])).all()
+
+
+def test_round_node_run(absolute_value_input_data):
+    round_node = Round(**absolute_value_input_data)
+    output = round_node.run(pd.Series(["-1.5", "1.5", "0", "-2.5"]))
+    assert (output["output_value"] == pd.Series([-2, 2, 0, -2])).all()

@@ -1,0 +1,169 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 3,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				0,
+				0
+			],
+			"name": "Start"
+		},
+		"2": {
+			"id": 2,
+			"data": {
+				"value": "{\n\t\"id\": \"demo@0.1.0\",\n\t\"nodes\": {\n\t\t\"0\": {\n\t\t\t\"id\": 0,\n\t\t\t\"data\": {},\n\t\t\t\"inputs\": {},\n\t\t\t\"outputs\": {\n\t\t\t\t\"output_up_void\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 2,\n\t\t\t\t\t\t\t\"input\": \"input_void\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t},\n\t\t\t\t\"output_down_void\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 3,\n\t\t\t\t\t\t\t\"input\": \"input_void\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"position\": [\n\t\t\t\t0,\n\t\t\t\t0\n\t\t\t],\n\t\t\t\"name\": \"Start\"\n\t\t},\n\t\t\"2\": {\n\t\t\t\"id\": 2,\n\t\t\t\"data\": {\n\t\t\t\t\"name\": \"var_a\",\n\t\t\t\t\"default\": null\n\t\t\t},\n\t\t\t\"inputs\": {\n\t\t\t\t\"input_void\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 0,\n\t\t\t\t\t\t\t\"output\": \"output_up_void\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"outputs\": {\n\t\t\t\t\"output_value\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 4,\n\t\t\t\t\t\t\t\"input\": \"input_value_0\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"position\": [\n\t\t\t\t364.0234375,\n\t\t\t\t-195.8359375\n\t\t\t],\n\t\t\t\"name\": \"Input\"\n\t\t},\n\t\t\"3\": {\n\t\t\t\"id\": 3,\n\t\t\t\"data\": {\n\t\t\t\t\"name\": \"var_b\",\n\t\t\t\t\"default\": null\n\t\t\t},\n\t\t\t\"inputs\": {\n\t\t\t\t\"input_void\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 0,\n\t\t\t\t\t\t\t\"output\": \"output_down_void\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"outputs\": {\n\t\t\t\t\"output_value\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 4,\n\t\t\t\t\t\t\t\"input\": \"input_value_1\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"position\": [\n\t\t\t\t363.8376785973601,\n\t\t\t\t108.76168656142642\n\t\t\t],\n\t\t\t\"name\": \"Input\"\n\t\t},\n\t\t\"4\": {\n\t\t\t\"id\": 4,\n\t\t\t\"data\": {\n\t\t\t\t\"operator\": \"*\"\n\t\t\t},\n\t\t\t\"inputs\": {\n\t\t\t\t\"input_value_0\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 2,\n\t\t\t\t\t\t\t\"output\": \"output_value\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t},\n\t\t\t\t\"input_value_1\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 3,\n\t\t\t\t\t\t\t\"output\": \"output_value\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"outputs\": {\n\t\t\t\t\"output_value\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 6,\n\t\t\t\t\t\t\t\"input\": \"input_value\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"position\": [\n\t\t\t\t717.8109142505134,\n\t\t\t\t-74.6040121470534\n\t\t\t],\n\t\t\t\"name\": \"Math\"\n\t\t},\n\t\t\"6\": {\n\t\t\t\"id\": 6,\n\t\t\t\"data\": {},\n\t\t\t\"inputs\": {\n\t\t\t\t\"input_value\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 4,\n\t\t\t\t\t\t\t\"output\": \"output_value\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"outputs\": {\n\t\t\t\t\"output_value\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 7,\n\t\t\t\t\t\t\t\"input\": \"input_value\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"position\": [\n\t\t\t\t1005.7455832447746,\n\t\t\t\t-52.25458299824986\n\t\t\t],\n\t\t\t\"name\": \"Round\"\n\t\t},\n\t\t\"7\": {\n\t\t\t\"id\": 7,\n\t\t\t\"data\": {\n\t\t\t\t\"message\": null\n\t\t\t},\n\t\t\t\"inputs\": {\n\t\t\t\t\"input_value\": {\n\t\t\t\t\t\"connections\": [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"node\": 6,\n\t\t\t\t\t\t\t\"output\": \"output_value\",\n\t\t\t\t\t\t\t\"data\": {}\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"outputs\": {},\n\t\t\t\"position\": [\n\t\t\t\t1279.293661227661,\n\t\t\t\t-54.172931549720175\n\t\t\t],\n\t\t\t\"name\": \"Output\"\n\t\t}\n\t}\n}",
+				"default": null
+			},
+			"inputs": {
+				"input_var_a": {
+					"connections": [
+						{
+							"node": 3,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_var_b": {
+					"connections": [
+						{
+							"node": 4,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 5,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				588.546875,
+				-135.41796875
+			],
+			"name": "FlowV0"
+		},
+		"3": {
+			"id": 3,
+			"data": {
+				"name": "example_a",
+				"default": ""
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_var_a",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				292.11328125,
+				-192.6953125
+			],
+			"name": "Input"
+		},
+		"4": {
+			"id": 4,
+			"data": {
+				"name": "var_b",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_down_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_var_b",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				308.3056102761418,
+				98.85067813963023
+			],
+			"name": "Input"
+		},
+		"5": {
+			"id": 5,
+			"data": {
+				"message": null
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 2,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				853.1862787404114,
+				-109.19324694397277
+			],
+			"name": "Output"
+		}
+	}
+}

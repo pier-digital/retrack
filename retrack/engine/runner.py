@@ -15,10 +15,12 @@ from retrack.utils import constants
 class Runner:
     def __init__(self, parser: Parser):
         self._parser = parser
+        self._internal_runners = {}
         self.reset()
         self._set_constants()
         self._set_input_columns()
         self._request_manager = RequestManager(self._parser.get_by_kind(NodeKind.INPUT))
+        self._set_internal_runners()
 
     @classmethod
     def from_json(cls, data: typing.Union[str, dict], **kwargs):
@@ -60,6 +62,19 @@ class Runner:
         for node in constant_nodes:
             for output_connector_name, _ in node.outputs:
                 self._constants[f"{node.id}@{output_connector_name}"] = node.data.value
+
+    def _set_internal_runners(self):
+        for node_id in self.parser.indexes_by_name_map.get(
+            constants.FLOW_NODE_NAME, []
+        ):
+            try:
+                self._internal_runners[node_id] = Runner.from_json(
+                    self.parser.get_by_id(node_id).data.parsed_value()
+                )
+            except Exception as e:
+                raise Exception(
+                    f"Error setting internal runner for node {node_id}"
+                ) from e
 
     @property
     def input_columns(self) -> dict:
@@ -108,7 +123,7 @@ class Runner:
         return state_df
 
     def __get_input_params(
-        self, node_dict: dict, current_node_filter: pd.Series
+        self, node_id: str, node_dict: dict, current_node_filter: pd.Series
     ) -> dict:
         input_params = {}
 
@@ -120,6 +135,9 @@ class Runner:
                 input_params[connector_name] = self.__get_state_data(
                     f"{connection['node']}@{connection['output']}", current_node_filter
                 )
+
+        if node_id in self._internal_runners:
+            input_params["runner"] = self._internal_runners[node_id]
 
         return input_params
 
@@ -151,7 +169,7 @@ class Runner:
             return
 
         input_params = self.__get_input_params(
-            node.dict(by_alias=True), current_node_filter
+            node_id, node.dict(by_alias=True), current_node_filter
         )
         output = node.run(**input_params)
 

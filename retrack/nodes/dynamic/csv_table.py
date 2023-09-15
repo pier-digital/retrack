@@ -44,7 +44,7 @@ def csv_table_factory(
 
     BaseCSVTableV0Model = BaseDynamicNode.with_fields("CSVTableV0", **models)
 
-    class CSVTableV0Model(BaseCSVTableV0Model):
+    class CSVTableV0(BaseCSVTableV0Model):
         def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
             csv_df = self.data.df()
 
@@ -78,4 +78,4 @@ def csv_table_factory(
 
             return {"output_value": response_df[self.data.target]}
 
-    return CSVTableV0Model
+    return CSVTableV0
