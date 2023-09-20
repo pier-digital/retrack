@@ -12,21 +12,26 @@ class Parser:
         dynamic_registry: Registry = nodes.dynamic_registry(),
         validator_registry: Registry = validators.registry(),
     ):
+        self.__graph_data = graph_data
         self._execution_order = None
         self.__components = {}
         self.__edges = None
 
-        self._check_input_data(graph_data)
+        self._check_input_data(self.graph_data)
 
-        self._set_components(graph_data, component_registry, dynamic_registry)
+        self._set_components(component_registry, dynamic_registry)
         self._set_edges()
 
-        self._validate_graph(graph_data, validator_registry)
+        self._validate_graph(validator_registry)
 
         self._set_indexes_by_name_map()
         self._set_indexes_by_kind_map()
         self._set_execution_order()
         self._set_indexes_by_memory_type_map()
+
+    @property
+    def graph_data(self) -> dict:
+        return self.__graph_data
 
     @staticmethod
     def _check_input_data(data: dict):
@@ -53,10 +58,8 @@ class Parser:
     def components(self) -> typing.Dict[str, nodes.BaseNode]:
         return self.__components
 
-    def _set_components(
-        self, graph_data: dict, component_registry: Registry, dynamic_registry: Registry
-    ):
-        for node_id, node_metadata in graph_data["nodes"].items():
+    def _set_components(self, component_registry: Registry, dynamic_registry: Registry):
+        for node_id, node_metadata in self.graph_data["nodes"].items():
             if node_id in self.__components:
                 raise ValueError(f"Duplicate node id: {node_id}")
 
@@ -89,9 +92,9 @@ class Parser:
                 for c in output_connection.connections:
                     self.__edges.append((node_id, c.node))
 
-    def _validate_graph(self, graph_data: dict, validator_registry: Registry):
+    def _validate_graph(self, validator_registry: Registry):
         for validator_name, validator in validator_registry.data.items():
-            if not validator.validate(graph_data=graph_data, edges=self.edges):
+            if not validator.validate(graph_data=self.graph_data, edges=self.edges):
                 raise ValueError(f"Invalid graph data: {validator_name}")
 
     def get_by_id(self, id_: str) -> nodes.BaseNode:
