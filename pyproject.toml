@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "retrack"
-version = "0.11.1"
+version = "1.0.0-alpha.1"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabrielguarisa@gmail.com>", "Nathalia Trotte <nathaliatrotte@gmail.com>"]
 license = "MIT"
@@ -10,39 +10,18 @@ homepage = "https://github.com/gabrielguarisa/retrack"
 keywords = ["rules", "models", "business", "node", "graph"]
 
 [tool.poetry.dependencies]
-python = "^3.7.16"
-pandas = [
-  { version = "1.2.0", python = "<3.8" },
-  { version = "^1.2.0", python = ">=3.8" }
-]
-numpy = [
-  { version = "1.19.5", python = "<3.8" },
-  { version = "^1.19.5", python = ">=3.8" }
-]
-pydantic = "^1.10.4"
-networkx = [
-  { version = "2.6.3", python = "<3.8" },
-  { version = "^2.6.3", python = ">=3.8" }
-]
+python = ">=3.8,<4.0.0"
+pandas = "^1.2.0"
+numpy = "^1.19.5"
+pydantic = "2.4.2"
+networkx = "^2.6.3"
 
 [tool.poetry.dev-dependencies]
-pytest = [
-  { version = "6.2.2", python = "<3.8" },
-  { version = "^6.2.4", python = ">=3.8" }
-]
-pytest-cov = [
-  { version = "2.11.1", python = "<3.8" },
-  { version = "^3.0.0", python = ">=3.8" }
-]
-black = [
-  { version = "20.8b1", python = "<3.8" },
-  { version = "^22.6.0", python = ">=3.8" }
-]
+pytest = "^6.2.4"
+pytest-cov = "^3.0.0"
+black = "^22.6.0"
 isort = {extras = ["colors"], version = "*"}
-pytest-mock = [
-  { version = "3.5.1", python = "<3.8" },
-  { version = "^3.10.0", python = ">=3.8" }
-]
+pytest-mock = "^3.10.0"
 
 [tool.black]
 # https://github.com/psf/black
