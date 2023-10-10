@@ -24,7 +24,7 @@ def test_start_node():
 
     start_node = Start(**input_data)
 
-    assert start_node.dict(by_alias=True) == {
+    assert start_node.model_dump(by_alias=True) == {
         "id": "0",
         "outputs": {
             "output_up_void": {

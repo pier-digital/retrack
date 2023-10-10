@@ -17,7 +17,7 @@ def test_StartsWithAny_node():
 
     assert isinstance(StartsWithAny_node, StartsWithAny)
 
-    assert StartsWithAny_node.dict(by_alias=True) == {
+    assert StartsWithAny_node.model_dump(by_alias=True) == {
         "id": "13",
         "inputs": {
             "input_value": {"connections": []},

@@ -6,4 +6,4 @@ def test_input_node(
 ):
     input_node = Input(**valid_input_dict_before_validation)
 
-    assert input_node.dict(by_alias=True) == valid_input_dict_after_validation
+    assert input_node.model_dump(by_alias=True) == valid_input_dict_after_validation

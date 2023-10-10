@@ -39,7 +39,7 @@ def test_math_node(math_operator_input_data):
     assert isinstance(math_node, Math)
     assert isinstance(math_node.data.operator, MathOperator)
 
-    assert math_node.dict(by_alias=True) == {
+    assert math_node.model_dump(by_alias=True) == {
         "id": "18",
         "data": {"operator": MathOperator.SUM},
         "inputs": {

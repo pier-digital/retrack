@@ -111,7 +111,7 @@ class Runner:
     ) -> pd.DataFrame:
         """Create initial state from payload. This is the first step of the runner."""
         validated_payload = self.request_manager.validate(payload)
-        validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
+        validated_payload = pd.DataFrame([p.model_dump() for p in validated_payload])
 
         state_df = pd.DataFrame([])
         for node_id, input_name in self.input_columns.items():
@@ -169,7 +169,7 @@ class Runner:
             return
 
         input_params = self.__get_input_params(
-            node_id, node.dict(by_alias=True), current_node_filter
+            node_id, node.model_dump(by_alias=True), current_node_filter
         )
         output = node.run(**input_params)
 

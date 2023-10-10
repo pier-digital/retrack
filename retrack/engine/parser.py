@@ -166,7 +166,7 @@ class Parser:
     def get_node_connections(
         self, node_id: str, is_input: bool = True, filter_by_connector=None
     ):
-        node_dict = self.get_by_id(node_id).dict(by_alias=True)
+        node_dict = self.get_by_id(node_id).model_dump(by_alias=True)
 
         connectors = node_dict.get("inputs" if is_input else "outputs", {})
         result = []

@@ -17,7 +17,7 @@ def test_EndsWithAny_node():
 
     assert isinstance(EndsWithAny_node, EndsWithAny)
 
-    assert EndsWithAny_node.dict(by_alias=True) == {
+    assert EndsWithAny_node.model_dump(by_alias=True) == {
         "id": "13",
         "inputs": {
             "input_value": {"connections": []},

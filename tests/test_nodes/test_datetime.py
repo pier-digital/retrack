@@ -22,7 +22,7 @@ def test_current_year_node(current_year_input_data):
 
     assert isinstance(current_year_node, CurrentYear)
 
-    assert current_year_node.dict(by_alias=True) == {
+    assert current_year_node.model_dump(by_alias=True) == {
         "id": "18",
         "inputs": {
             "input_void": {"connections": []},
