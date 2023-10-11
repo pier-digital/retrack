@@ -107,11 +107,12 @@ class Runner:
                     )
 
     def _create_initial_state_from_payload(
-        self, payload: typing.Union[dict, list]
+        self, payload_df: pd.DataFrame
     ) -> pd.DataFrame:
         """Create initial state from payload. This is the first step of the runner."""
-        validated_payload = self.request_manager.validate(payload)
-        validated_payload = pd.DataFrame([p.model_dump() for p in validated_payload])
+        validated_payload = self.request_manager.validate(
+            payload_df.reset_index(drop=True)
+        )
 
         state_df = pd.DataFrame([])
         for node_id, input_name in self.input_columns.items():
@@ -186,34 +187,14 @@ class Runner:
                     f"{node_id}@{output_name}", output_value, current_node_filter
                 )
 
-    def __get_output_states(self) -> pd.DataFrame:
-        """Returns a dataframe with the final states of the flow"""
-        return pd.DataFrame(
-            {
-                "output": self.states[constants.OUTPUT_REFERENCE_COLUMN],
-                "message": self.states[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN],
-            }
-        )
-
-    def __parse_payload(
-        self, payload: typing.Union[dict, list, pd.DataFrame]
-    ) -> typing.List[dict]:
-        if isinstance(payload, dict):
-            payload = [payload]
-
-        if not isinstance(payload, pd.DataFrame):
-            payload = pd.DataFrame(payload, index=list(range(len(payload))))
-
-        for column in payload.columns:
-            payload[column] = payload[column].astype(str)
-
-        return payload.to_dict("records")
-
-    def execute(self, payload: typing.Union[dict, list, pd.DataFrame]) -> pd.DataFrame:
+    def execute(
+        self,
+        payload_df: typing.Union[dict, pd.DataFrame],
+        return_all_states: bool = False,
+    ) -> pd.DataFrame:
         """Executes the flow with the given payload"""
         self.reset()
-        payload = self.__parse_payload(payload)
-        self._states = self._create_initial_state_from_payload(payload)
+        self._states = self._create_initial_state_from_payload(payload_df)
 
         for node_id in self.parser.execution_order:
             try:
@@ -224,4 +205,12 @@ class Runner:
             if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 
-        return self.__get_output_states()
+        if return_all_states:
+            return self.states
+
+        return self.states[
+            [
+                constants.OUTPUT_REFERENCE_COLUMN,
+                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+            ]
+        ]

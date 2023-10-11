@@ -2,7 +2,7 @@ import pytest
 
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.inputs import Input
-
+import pandas as pd
 
 def test_create_request_manager(valid_input_dict_before_validation):
     with pytest.raises(TypeError):
@@ -36,4 +36,4 @@ def test_create_request_manager_with_invalid_input(valid_input_dict_before_valid
 def test_validate_payload_with_valid_payload(valid_input_dict_before_validation):
     pm = RequestManager([Input(**valid_input_dict_before_validation)])
     payload = pm.model(example="test")
-    assert pm.validate({"example": "test"})[0] == payload
+    assert pm.validate(pd.DataFrame([{{"example": "test"}}]))[0] == payload

@@ -34,10 +34,15 @@ class NodeMemoryType(str, enum.Enum):
 # Connection Models
 ###############################################################
 
+
 def cast_int_to_str(v: typing.Any, info: pydantic.ValidationInfo) -> str:
     return str(v)
 
-CastedToStringType = typing.Annotated[typing.Any, pydantic.BeforeValidator(cast_int_to_str)]
+
+CastedToStringType = typing.Annotated[
+    typing.Any, pydantic.BeforeValidator(cast_int_to_str)
+]
+
 
 class OutputConnectionItemModel(pydantic.BaseModel):
     node: CastedToStringType
@@ -61,12 +66,15 @@ class InputConnectionModel(pydantic.BaseModel):
 # Base Node
 ###############################################################
 
+
 class BaseNode(pydantic.BaseModel):
     id: CastedToStringType
-    inputs: typing.Optional[typing.Dict[CastedToStringType, InputConnectionModel]] = None
-    outputs: typing.Optional[typing.Dict[CastedToStringType, OutputConnectionModel]] = None
-
-
+    inputs: typing.Optional[
+        typing.Dict[CastedToStringType, InputConnectionModel]
+    ] = None
+    outputs: typing.Optional[
+        typing.Dict[CastedToStringType, OutputConnectionModel]
+    ] = None
 
     def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {}

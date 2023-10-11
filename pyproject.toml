@@ -15,13 +15,14 @@ pandas = "^1.2.0"
 numpy = "^1.19.5"
 pydantic = "2.4.2"
 networkx = "^2.6.3"
+pandera = "^0.17.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
-pytest-cov = "^3.0.0"
+pytest = "*"
+pytest-cov = "*"
 black = "^22.6.0"
 isort = {extras = ["colors"], version = "*"}
-pytest-mock = "^3.10.0"
+pytest-mock = "*"
 
 [tool.black]
 # https://github.com/psf/black
@@ -72,7 +73,7 @@ indent = 4
 color_output = true
 
 [tool.pytest.ini_options]
-addopts = "--junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
+addopts = "-vv --junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
