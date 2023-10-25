@@ -33,8 +33,6 @@ class Parser:
         self._set_indexes_by_memory_type_map()
         self._set_version()
 
-
-
     @property
     def graph_data(self) -> dict:
         return self.__graph_data
@@ -214,8 +212,11 @@ class Parser:
     def _set_version(self):
         self._version = self.graph_data.get("version", None)
 
-        graph_json_content = json.dumps(self.graph_data["nodes"]).replace(": ", ":").replace(", ", ",").encode(
-            "utf-8"
+        graph_json_content = (
+            json.dumps(self.graph_data["nodes"])
+            .replace(": ", ":")
+            .replace(", ", ",")
+            .encode("utf-8")
         )
         calculated_hash = hashlib.sha256(graph_json_content).hexdigest()[:10]
 

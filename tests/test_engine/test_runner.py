@@ -92,6 +92,15 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
                 {"message": None, "output": False},
             ],
         ),
+        (
+            "to-lowercase",
+            [{"var": "EXAMPLE"}, {"var": "test with numbers 120"}, {"var": 200}],
+            [
+                {"message": None, "output": "example"},
+                {"message": None, "output": "test with numbers 120"},
+                {"message": None, "output": "200"},
+            ],
+        ),
     ],
 )
 def test_flows(filename, in_values, expected_out_values):
