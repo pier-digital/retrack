@@ -83,6 +83,15 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
                 {"message": None, "output": "group 3"},
             ],
         ),
+        (
+            "rule-with-version",
+            [{"variable": 0}, {"variable": 100}, {"variable": 200}],
+            [
+                {"message": None, "output": False},
+                {"message": None, "output": True},
+                {"message": None, "output": False},
+            ],
+        ),
     ],
 )
 def test_flows(filename, in_values, expected_out_values):
