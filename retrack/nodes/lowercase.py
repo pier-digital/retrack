@@ -1,7 +1,5 @@
 import typing
 
-import enum
-
 import pandas as pd
 import pydantic
 
