@@ -39,8 +39,8 @@ class If(BaseNode):
 
     def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
         return {
-            f"output_then_filter": input_bool,
-            f"output_else_filter": ~input_bool,
+            "output_then_filter": input_bool,
+            "output_else_filter": ~input_bool,
         }
 
     def memory_type(self) -> NodeMemoryType:

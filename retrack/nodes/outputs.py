@@ -12,7 +12,7 @@ from retrack.utils import constants
 
 
 class OutputMetadataModel(pydantic.BaseModel):
-    message: str = None
+    message: typing.Optional[str] = None
 
 
 ################################################

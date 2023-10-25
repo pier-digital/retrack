@@ -15,6 +15,7 @@ from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
+from retrack.nodes.lowercase import LowerCase
 from retrack.utils.registry import Registry
 
 _registry = Registry()
@@ -49,5 +50,6 @@ register("EndsWithAny", EndsWithAny)
 register("Contains", Contains)
 register("CurrentYear", CurrentYear)
 register("IntervalCatV0", IntervalCatV0)
+register("LowerCase", LowerCase)
 
 __all__ = ["registry", "register", "BaseNode", "dynamic_registry", "BaseDynamicNode"]

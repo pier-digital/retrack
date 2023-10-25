@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "retrack"
-version = "0.11.1"
+version = "1.0.0-alpha.1"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabrielguarisa@gmail.com>", "Nathalia Trotte <nathaliatrotte@gmail.com>"]
 license = "MIT"
@@ -10,90 +10,21 @@ homepage = "https://github.com/gabrielguarisa/retrack"
 keywords = ["rules", "models", "business", "node", "graph"]
 
 [tool.poetry.dependencies]
-python = "^3.7.16"
-pandas = [
-  { version = "1.2.0", python = "<3.8" },
-  { version = "^1.2.0", python = ">=3.8" }
-]
-numpy = [
-  { version = "1.19.5", python = "<3.8" },
-  { version = "^1.19.5", python = ">=3.8" }
-]
-pydantic = "^1.10.4"
-networkx = [
-  { version = "2.6.3", python = "<3.8" },
-  { version = "^2.6.3", python = ">=3.8" }
-]
+python = ">=3.9,<4.0.0"
+pandas = "^1.2.0"
+numpy = "^1.19.5"
+pydantic = "2.4.2"
+networkx = "^2.6.3"
+pandera = "^0.17.2"
 
 [tool.poetry.dev-dependencies]
-pytest = [
-  { version = "6.2.2", python = "<3.8" },
-  { version = "^6.2.4", python = ">=3.8" }
-]
-pytest-cov = [
-  { version = "2.11.1", python = "<3.8" },
-  { version = "^3.0.0", python = ">=3.8" }
-]
-black = [
-  { version = "20.8b1", python = "<3.8" },
-  { version = "^22.6.0", python = ">=3.8" }
-]
-isort = {extras = ["colors"], version = "*"}
-pytest-mock = [
-  { version = "3.5.1", python = "<3.8" },
-  { version = "^3.10.0", python = ">=3.8" }
-]
-
-[tool.black]
-# https://github.com/psf/black
-target-version = ["py37"]
-line-length = 88
-color = true
-
-exclude = '''
-/(
-    \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | env
-    | venv
-)/
-'''
-
-[tool.isort]
-# https://github.com/timothycrosley/isort/
-py_version = 37
-line_length = 88
-
-known_typing = [
-  "typing",
-  "types",
-  "typing_extensions",
-  "mypy",
-  "mypy_extensions",
-]
-sections = [
-  "FUTURE",
-  "TYPING",
-  "STDLIB",
-  "THIRDPARTY",
-  "FIRSTPARTY",
-  "LOCALFOLDER",
-]
-include_trailing_comma = true
-profile = "black"
-multi_line_output = 3
-indent = 4
-color_output = true
+pytest = "*"
+pytest-cov = "*"
+ruff = "^0.1.2"
+pytest-mock = "*"
 
 [tool.pytest.ini_options]
-addopts = "--junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
+addopts = "-vv --junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -20,7 +20,7 @@ def test_EndsWith_node():
 
     assert isinstance(EndsWith_node, EndsWith)
 
-    assert EndsWith_node.dict(by_alias=True) == {
+    assert EndsWith_node.model_dump(by_alias=True) == {
         "id": "11",
         "inputs": {
             "input_value_0": {"connections": []},
@@ -31,7 +31,6 @@ def test_EndsWith_node():
 
 
 def test_EndsWith_node_run():
-
     EndsWith_node = EndsWith(**input_data)
 
     output = EndsWith_node.run(pd.Series(["100"]), pd.Series(["2"]))

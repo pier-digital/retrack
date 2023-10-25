@@ -45,7 +45,7 @@ def test_Logic_node():
     assert isinstance(Or_node, Or)
     assert isinstance(Not_node, Not)
 
-    assert And_node.dict(by_alias=True) == {
+    assert And_node.model_dump(by_alias=True) == {
         "id": "15",
         "inputs": {
             "input_bool_0": {"connections": []},

@@ -17,7 +17,7 @@ def test_Contains_node():
 
     assert isinstance(Contains_node, Contains)
 
-    assert Contains_node.dict(by_alias=True) == {
+    assert Contains_node.model_dump(by_alias=True) == {
         "id": "9",
         "inputs": {
             "input_list": {"connections": []},
@@ -28,7 +28,6 @@ def test_Contains_node():
 
 
 def test_Contains_node_run():
-
     Contains_node = Contains(**input_data)
 
     output = Contains_node.run(pd.Series(["1", "2"]), pd.Series(["2"]))

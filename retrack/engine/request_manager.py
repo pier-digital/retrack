@@ -1,5 +1,7 @@
 import typing
 
+import pandas as pd
+import pandera
 import pydantic
 
 from retrack.nodes.base import BaseNode, NodeKind
@@ -8,6 +10,7 @@ from retrack.nodes.base import BaseNode, NodeKind
 class RequestManager:
     def __init__(self, inputs: typing.List[BaseNode]):
         self._model = None
+        self._dataframe_model = None
         self.inputs = inputs
 
     @property
@@ -41,12 +44,18 @@ class RequestManager:
 
         if len(self.inputs) > 0:
             self._model = self.__create_model()
+            self._dataframe_model = self.__create_dataframe_model()
         else:
             self._model = None
+            self._dataframe_model = None
 
     @property
     def model(self) -> typing.Type[pydantic.BaseModel]:
         return self._model
+
+    @property
+    def dataframe_model(self) -> pandera.DataFrameSchema:
+        return self._dataframe_model
 
     def __create_model(
         self, model_name: str = "RequestModel"
@@ -62,9 +71,12 @@ class RequestManager:
         fields = {}
         for input_field in self.inputs:
             fields[input_field.data.name] = (
-                (str, ...)
-                if input_field.data.default is None
-                else (str, input_field.data.default)
+                str,
+                pydantic.Field(
+                    default=Ellipsis
+                    if input_field.data.default is None
+                    else input_field.data.default,
+                ),
             )
 
         return pydantic.create_model(
@@ -72,16 +84,32 @@ class RequestManager:
             **fields,
         )
 
+    def __create_dataframe_model(self) -> pandera.DataFrameSchema:
+        """Create a pydantic model from the RequestManager's inputs"""
+        fields = {}
+        for input_field in self.inputs:
+            fields[input_field.data.name] = pandera.Column(
+                str,
+                nullable=input_field.data.default is not None,
+                coerce=True,
+                default=input_field.data.default,
+            )
+
+        return pandera.DataFrameSchema(
+            fields,
+            index=pandera.Index(int),
+            strict=True,
+            coerce=True,
+        )
+
     def validate(
         self,
-        payload: typing.Union[
-            typing.Dict[str, str], typing.List[typing.Dict[str, str]]
-        ],
+        payload: pd.DataFrame,
     ) -> typing.List[pydantic.BaseModel]:
         """Validate the payload against the RequestManager's model
 
         Args:
-            payload (typing.Union[typing.Dict[str, str], typing.List[typing.Dict[str, str]]]): The payload to validate
+            payload (pandas.DataFrame): The payload to validate
 
         Raises:
             ValueError: If the RequestManager has no model
@@ -92,7 +120,7 @@ class RequestManager:
         if self.model is None:
             raise ValueError("No inputs found")
 
-        if not isinstance(payload, list):
-            payload = [payload]
+        if not isinstance(payload, pd.DataFrame):
+            raise TypeError(f"payload must be a pandas.DataFrame, not {type(payload)}")
 
-        return pydantic.parse_obj_as(typing.List[self.model], payload)
+        return self.dataframe_model.validate(payload)

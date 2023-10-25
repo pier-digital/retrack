@@ -25,7 +25,7 @@ def test_check_node(node_schema):
     assert isinstance(check_node, Check)
     assert isinstance(check_node.data.operator, CheckOperator)
 
-    assert check_node.dict(by_alias=True) == {
+    assert check_node.model_dump(by_alias=True) == {
         "id": "8",
         "data": {"operator": CheckOperator.EQUAL},
         "inputs": {

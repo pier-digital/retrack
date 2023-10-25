@@ -13,8 +13,9 @@ from retrack.utils import constants
 
 
 class Runner:
-    def __init__(self, parser: Parser):
+    def __init__(self, parser: Parser, name: str = None):
         self._parser = parser
+        self._name = name
         self._internal_runners = {}
         self.reset()
         self._set_constants()
@@ -23,18 +24,24 @@ class Runner:
         self._set_internal_runners()
 
     @classmethod
-    def from_json(cls, data: typing.Union[str, dict], **kwargs):
+    def from_json(cls, data: typing.Union[str, dict], name: str = None, **kwargs):
         if isinstance(data, str) and data.endswith(".json"):
+            if name is None:
+                name = data
             data = json.loads(open(data).read())
         elif not isinstance(data, dict):
             raise ValueError("data must be a dict or a json file path")
 
         parser = Parser(data, **kwargs)
-        return cls(parser)
+        return cls(parser, name=name)
 
     @property
     def parser(self) -> Parser:
         return self._parser
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def request_manager(self) -> RequestManager:
@@ -68,8 +75,9 @@ class Runner:
             constants.FLOW_NODE_NAME, []
         ):
             try:
+                node_data = self.parser.get_by_id(node_id).data
                 self._internal_runners[node_id] = Runner.from_json(
-                    self.parser.get_by_id(node_id).data.parsed_value()
+                    node_data.parsed_value(), name=node_data.name
                 )
             except Exception as e:
                 raise Exception(
@@ -107,11 +115,12 @@ class Runner:
                     )
 
     def _create_initial_state_from_payload(
-        self, payload: typing.Union[dict, list]
+        self, payload_df: pd.DataFrame
     ) -> pd.DataFrame:
         """Create initial state from payload. This is the first step of the runner."""
-        validated_payload = self.request_manager.validate(payload)
-        validated_payload = pd.DataFrame([p.dict() for p in validated_payload])
+        validated_payload = self.request_manager.validate(
+            payload_df.reset_index(drop=True)
+        )
 
         state_df = pd.DataFrame([])
         for node_id, input_name in self.input_columns.items():
@@ -169,7 +178,7 @@ class Runner:
             return
 
         input_params = self.__get_input_params(
-            node_id, node.dict(by_alias=True), current_node_filter
+            node_id, node.model_dump(by_alias=True), current_node_filter
         )
         output = node.run(**input_params)
 
@@ -186,42 +195,41 @@ class Runner:
                     f"{node_id}@{output_name}", output_value, current_node_filter
                 )
 
-    def __get_output_states(self) -> pd.DataFrame:
-        """Returns a dataframe with the final states of the flow"""
-        return pd.DataFrame(
-            {
-                "output": self.states[constants.OUTPUT_REFERENCE_COLUMN],
-                "message": self.states[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN],
-            }
-        )
+    def execute(
+        self,
+        payload_df: pd.DataFrame,
+        return_all_states: bool = False,
+    ) -> pd.DataFrame:
+        """Executes the flow with the given payload.
 
-    def __parse_payload(
-        self, payload: typing.Union[dict, list, pd.DataFrame]
-    ) -> typing.List[dict]:
-        if isinstance(payload, dict):
-            payload = [payload]
+        Args:
+            payload_df (pd.DataFrame): The payload to be used as input.
+            return_all_states (bool, optional): If True, returns all states. Defaults to False.
 
-        if not isinstance(payload, pd.DataFrame):
-            payload = pd.DataFrame(payload, index=list(range(len(payload))))
+        Returns:
+            pd.DataFrame: The output of the flow.
+        """
+        if not isinstance(payload_df, pd.DataFrame):
+            raise ValueError("payload_df must be a pandas.DataFrame")
 
-        for column in payload.columns:
-            payload[column] = payload[column].astype(str)
-
-        return payload.to_dict("records")
-
-    def execute(self, payload: typing.Union[dict, list, pd.DataFrame]) -> pd.DataFrame:
-        """Executes the flow with the given payload"""
         self.reset()
-        payload = self.__parse_payload(payload)
-        self._states = self._create_initial_state_from_payload(payload)
+        self._states = self._create_initial_state_from_payload(payload_df)
 
         for node_id in self.parser.execution_order:
             try:
                 self.__run_node(node_id)
             except Exception as e:
-                print(f"Error running node {node_id}")
-                raise e
+                raise Exception(f"Error running node {node_id} in {self.name}") from e
+
             if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 
-        return self.__get_output_states()
+        if return_all_states:
+            return self.states
+
+        return self.states[
+            [
+                constants.OUTPUT_REFERENCE_COLUMN,
+                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+            ]
+        ]

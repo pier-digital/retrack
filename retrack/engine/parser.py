@@ -1,7 +1,10 @@
 import typing
 
+import hashlib
+
 from retrack import nodes, validators
 from retrack.utils.registry import Registry
+import json
 
 
 class Parser:
@@ -28,10 +31,15 @@ class Parser:
         self._set_indexes_by_kind_map()
         self._set_execution_order()
         self._set_indexes_by_memory_type_map()
+        self._set_version()
 
     @property
     def graph_data(self) -> dict:
         return self.__graph_data
+
+    @property
+    def version(self) -> str:
+        return self._version
 
     @staticmethod
     def _check_input_data(data: dict):
@@ -166,7 +174,7 @@ class Parser:
     def get_node_connections(
         self, node_id: str, is_input: bool = True, filter_by_connector=None
     ):
-        node_dict = self.get_by_id(node_id).dict(by_alias=True)
+        node_dict = self.get_by_id(node_id).model_dump(by_alias=True)
 
         connectors = node_dict.get("inputs" if is_input else "outputs", {})
         result = []
@@ -200,3 +208,24 @@ class Parser:
                     self._walk(next_id, skiped_ids)
 
         return skiped_ids
+
+    def _set_version(self):
+        self._version = self.graph_data.get("version", None)
+
+        graph_json_content = (
+            json.dumps(self.graph_data["nodes"])
+            .replace(": ", ":")
+            .replace(", ", ",")
+            .encode("utf-8")
+        )
+        calculated_hash = hashlib.sha256(graph_json_content).hexdigest()[:10]
+
+        if self.version is None:
+            self._version = f"{calculated_hash}.dynamic"
+        else:
+            file_version_hash = self.version.split(".")[0]
+
+            if file_version_hash != calculated_hash:
+                raise ValueError(
+                    f"Invalid version. Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
+                )
