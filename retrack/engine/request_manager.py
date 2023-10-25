@@ -71,7 +71,7 @@ class RequestManager:
         fields = {}
         for input_field in self.inputs:
             fields[input_field.data.name] = (
-                str,
+                typing.Annotated[str, pydantic.BeforeValidator(str)],
                 pydantic.Field(
                     default=Ellipsis
                     if input_field.data.default is None

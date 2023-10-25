@@ -48,3 +48,10 @@ def test_validate_payload_with_valid_payload(valid_input_dict_before_validation)
     assert isinstance(payload, pydantic.BaseModel)
     result = rm.validate(pd.DataFrame([{"example": "test"}]))
     assert isinstance(result, pd.DataFrame)
+
+
+def test_validate_dict_with_model(valid_input_dict_before_validation):
+    rm = RequestManager([Input(**valid_input_dict_before_validation)])
+
+    assert issubclass(rm.model, pydantic.BaseModel)
+    assert rm.model.model_validate({"example": 1111}) == rm.model(example="1111")
