@@ -40,13 +40,15 @@ import retrack
 parser = retrack.Parser(rule)
 
 # Create a runner
-runner = retrack.Runner(parser)
+runner = retrack.Runner(parser, name="your-rule")
 
 # Run the rule/model passing the data
 runner.execute(data)
 ```
 
 The `Parser` class parses the rule/model and creates a graph of nodes. The `Runner` class runs the rule/model using the data passed to the runner. The `data` is a dictionary or a list of dictionaries containing the data that will be used to evaluate the conditions and execute the actions. To see wich data is required for the given rule/model, check the `runner.request_model` property that is a pydantic model used to validate the data.
+
+Optionally you can name the rule by passing the `name` field to the `retrack.Runner` constructor. This is useful to identify the rule when exceptions are raised.
 
 ### Creating a rule/model
 

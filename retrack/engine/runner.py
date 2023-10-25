@@ -13,8 +13,9 @@ from retrack.utils import constants
 
 
 class Runner:
-    def __init__(self, parser: Parser):
+    def __init__(self, parser: Parser, name: str = None):
         self._parser = parser
+        self._name = name
         self._internal_runners = {}
         self.reset()
         self._set_constants()
@@ -23,18 +24,24 @@ class Runner:
         self._set_internal_runners()
 
     @classmethod
-    def from_json(cls, data: typing.Union[str, dict], **kwargs):
+    def from_json(cls, data: typing.Union[str, dict], name: str = None, **kwargs):
         if isinstance(data, str) and data.endswith(".json"):
+            if name is None:
+                name = data
             data = json.loads(open(data).read())
         elif not isinstance(data, dict):
             raise ValueError("data must be a dict or a json file path")
 
         parser = Parser(data, **kwargs)
-        return cls(parser)
+        return cls(parser, name=name)
 
     @property
     def parser(self) -> Parser:
         return self._parser
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def request_manager(self) -> RequestManager:
@@ -68,8 +75,9 @@ class Runner:
             constants.FLOW_NODE_NAME, []
         ):
             try:
+                node_data = self.parser.get_by_id(node_id).data
                 self._internal_runners[node_id] = Runner.from_json(
-                    self.parser.get_by_id(node_id).data.parsed_value()
+                    node_data.parsed_value(), name=node_data.name
                 )
             except Exception as e:
                 raise Exception(
@@ -211,8 +219,8 @@ class Runner:
             try:
                 self.__run_node(node_id)
             except Exception as e:
-                print(f"Error running node {node_id}")
-                raise e
+                raise Exception(f"Error running node {node_id} in {self.name}") from e
+            
             if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 

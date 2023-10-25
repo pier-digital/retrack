@@ -11,6 +11,7 @@ from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 class FlowV0MetadataModel(pydantic.BaseModel):
     value: str
+    name: typing.Optional[str] = None
     default: typing.Optional[str] = None
 
     def parsed_value(self) -> typing.Dict[str, typing.Any]:
