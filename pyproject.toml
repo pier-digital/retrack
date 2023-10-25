@@ -16,60 +16,12 @@ numpy = "^1.19.5"
 pydantic = "2.4.2"
 networkx = "^2.6.3"
 pandera = "^0.17.2"
-ruff = "^0.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
 pytest-cov = "*"
+ruff = "^0.1.2"
 pytest-mock = "*"
-
-[tool.black]
-# https://github.com/psf/black
-target-version = ["py37"]
-line-length = 88
-color = true
-
-exclude = '''
-/(
-    \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | env
-    | venv
-)/
-'''
-
-[tool.isort]
-# https://github.com/timothycrosley/isort/
-py_version = 37
-line_length = 88
-
-known_typing = [
-  "typing",
-  "types",
-  "typing_extensions",
-  "mypy",
-  "mypy_extensions",
-]
-sections = [
-  "FUTURE",
-  "TYPING",
-  "STDLIB",
-  "THIRDPARTY",
-  "FIRSTPARTY",
-  "LOCALFOLDER",
-]
-include_trailing_comma = true
-profile = "black"
-multi_line_output = 3
-indent = 4
-color_output = true
 
 [tool.pytest.ini_options]
 addopts = "-vv --junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
