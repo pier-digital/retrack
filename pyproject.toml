@@ -16,12 +16,11 @@ numpy = "^1.19.5"
 pydantic = "2.4.2"
 networkx = "^2.6.3"
 pandera = "^0.17.2"
+ruff = "^0.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
 pytest-cov = "*"
-black = "^22.6.0"
-isort = {extras = ["colors"], version = "*"}
 pytest-mock = "*"
 
 [tool.black]

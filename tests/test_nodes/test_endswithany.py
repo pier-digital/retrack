@@ -28,7 +28,6 @@ def test_EndsWithAny_node():
 
 
 def test_EndsWithAny_node_run():
-
     EndsWithAny_node = EndsWithAny(**input_data)
 
     output = EndsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
