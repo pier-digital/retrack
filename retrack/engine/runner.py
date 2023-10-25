@@ -189,10 +189,21 @@ class Runner:
 
     def execute(
         self,
-        payload_df: typing.Union[dict, pd.DataFrame],
+        payload_df: pd.DataFrame,
         return_all_states: bool = False,
     ) -> pd.DataFrame:
-        """Executes the flow with the given payload"""
+        """Executes the flow with the given payload.
+
+        Args:
+            payload_df (pd.DataFrame): The payload to be used as input.
+            return_all_states (bool, optional): If True, returns all states. Defaults to False.
+
+        Returns:
+            pd.DataFrame: The output of the flow.
+        """
+        if not isinstance(payload_df, pd.DataFrame):
+            raise ValueError("payload_df must be a pandas.DataFrame")
+
         self.reset()
         self._states = self._create_initial_state_from_payload(payload_df)
 

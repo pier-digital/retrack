@@ -84,17 +84,8 @@ class RequestManager:
             **fields,
         )
 
-    def __create_dataframe_model(
-        self, model_name: str = "RequestModel"
-    ) -> pandera.DataFrameSchema:
-        """Create a pydantic model from the RequestManager's inputs
-
-        Args:
-            model_name (str, optional): The name of the model. Defaults to "RequestModel".
-
-        Returns:
-            typing.Type[pydantic.BaseModel]: The pydantic model
-        """
+    def __create_dataframe_model(self) -> pandera.DataFrameSchema:
+        """Create a pydantic model from the RequestManager's inputs"""
         fields = {}
         for input_field in self.inputs:
             fields[input_field.data.name] = pandera.Column(
@@ -113,14 +104,12 @@ class RequestManager:
 
     def validate(
         self,
-        payload: typing.Union[
-            typing.Dict[str, str], typing.List[typing.Dict[str, str]]
-        ],
+        payload: pd.DataFrame,
     ) -> typing.List[pydantic.BaseModel]:
         """Validate the payload against the RequestManager's model
 
         Args:
-            payload (typing.Union[typing.Dict[str, str], typing.List[typing.Dict[str, str]]]): The payload to validate
+            payload (pandas.DataFrame): The payload to validate
 
         Raises:
             ValueError: If the RequestManager has no model

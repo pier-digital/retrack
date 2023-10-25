@@ -1,5 +1,7 @@
 import typing
 
+import hashlib
+
 from retrack import nodes, validators
 from retrack.utils.registry import Registry
 
@@ -29,9 +31,34 @@ class Parser:
         self._set_execution_order()
         self._set_indexes_by_memory_type_map()
 
+        self._version = self.graph_data.get("version", None)
+
+        if self._version is None:
+            self._version = "{}.dynamic".format(
+                hashlib.sha256(str(self.graph_data).encode("utf-8")).hexdigest()[:10],
+            )
+        else:
+            graph_data_without_version = self.graph_data.copy()
+            file_version_hash = graph_data_without_version["version"].split(".")[0]
+            del graph_data_without_version["version"]
+
+            if (
+                file_version_hash
+                != hashlib.sha256(
+                    str(graph_data_without_version).encode("utf-8")
+                ).hexdigest()[:10]
+            ):
+                raise ValueError(
+                    "Invalid version. Graph data has changed and the hash is different"
+                )
+
     @property
     def graph_data(self) -> dict:
         return self.__graph_data
+
+    @property
+    def version(self) -> str:
+        return self._version
 
     @staticmethod
     def _check_input_data(data: dict):

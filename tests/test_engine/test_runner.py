@@ -30,7 +30,7 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
         rule = json.load(f)
 
     runner = Runner(Parser(rule))
-    out_values = runner.execute(in_values)
+    out_values = runner.execute(pd.DataFrame([in_values]))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
@@ -90,7 +90,7 @@ def test_flows(filename, in_values, expected_out_values):
         rule = json.load(f)
 
     runner = Runner(Parser(rule))
-    out_values = runner.execute(in_values)
+    out_values = runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
@@ -147,7 +147,7 @@ def test_flows(filename, in_values, expected_out_values):
 )
 def test_create_from_json(filename, in_values, expected_out_values):
     runner = Runner.from_json(f"tests/resources/{filename}.json")
-    out_values = runner.execute(in_values)
+    out_values = runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
@@ -171,7 +171,7 @@ def test_csv_table_with_if():
         {"in_a": 1, "in_b": 1, "in_d": -1, "in_e": 0},
     ]
 
-    out_values = runner.execute(in_values)
+    out_values = runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert len(out_values) == len(in_values)
