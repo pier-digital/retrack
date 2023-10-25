@@ -28,7 +28,7 @@ class ListMetadataModel(pydantic.BaseModel):
 class BoolMetadataModel(pydantic.BaseModel):
     value: typing.Optional[bool] = pydantic.Field(False, alias="value")
 
-    @pydantic.validator("value")
+    @pydantic.field_validator("value")
     def validate_value(cls, value):
         if value is None:
             return False
