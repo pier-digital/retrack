@@ -10,7 +10,7 @@ homepage = "https://github.com/gabrielguarisa/retrack"
 keywords = ["rules", "models", "business", "node", "graph"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0.0"
+python = ">=3.9,<4.0.0"
 pandas = "^1.2.0"
 numpy = "^1.19.5"
 pydantic = "2.4.2"
