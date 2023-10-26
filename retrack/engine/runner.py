@@ -219,7 +219,9 @@ class Runner:
             try:
                 self.__run_node(node_id)
             except Exception as e:
-                raise Exception(f"Error running node {node_id} in {self.name}") from e
+                raise Exception(
+                    f"Error running node {node_id} in {self.name} with version {self.parser.version}"
+                ) from e
 
             if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
