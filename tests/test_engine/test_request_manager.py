@@ -55,3 +55,11 @@ def test_validate_dict_with_model(valid_input_dict_before_validation):
 
     assert issubclass(rm.model, pydantic.BaseModel)
     assert rm.model.model_validate({"example": 1111}) == rm.model(example="1111")
+
+
+def test_validate_dict_with_none_value(valid_input_dict_before_validation):
+    rm = RequestManager([Input(**valid_input_dict_before_validation)])
+
+    assert issubclass(rm.model, pydantic.BaseModel)
+    assert rm.model(example=None) == rm.model(example="Hello World")
+    assert rm.model() == rm.model(example="Hello World")

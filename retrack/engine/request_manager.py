@@ -7,6 +7,20 @@ import pydantic
 from retrack.nodes.base import BaseNode, NodeKind
 
 
+class StrFieldValidator:
+    def __init__(self, default: typing.Optional[typing.Any] = None):
+        self.default = default
+
+    def __call__(self, value: typing.Any) -> typing.Any:
+        if value in [None, "None", "", "null"]:
+            if self.default is None:
+                raise ValueError("value cannot be None")
+            else:
+                return self.default
+
+        return str(value) if type(value) != str else value
+
+
 class RequestManager:
     def __init__(self, inputs: typing.List[BaseNode]):
         self._model = None
@@ -71,11 +85,18 @@ class RequestManager:
         fields = {}
         for input_field in self.inputs:
             fields[input_field.data.name] = (
-                typing.Annotated[str, pydantic.BeforeValidator(str)],
+                typing.Annotated[
+                    str if input_field.data.default is None else typing.Optional[str],
+                    pydantic.BeforeValidator(
+                        StrFieldValidator(input_field.data.default)
+                    ),
+                ],
                 pydantic.Field(
                     default=Ellipsis
                     if input_field.data.default is None
                     else input_field.data.default,
+                    optional=input_field.data.default is not None,
+                    validate_default=False,
                 ),
             )
 
