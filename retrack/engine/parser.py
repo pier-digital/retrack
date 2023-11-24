@@ -230,7 +230,7 @@ class Parser:
 
         if self.version is None:
             if self._raise_if_null_version:
-                raise ValueError(f"Missing version")
+                raise ValueError("Missing version")
 
             self._version = f"{calculated_hash}.dynamic"
         else:
