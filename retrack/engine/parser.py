@@ -4,6 +4,7 @@ import hashlib
 
 from retrack import nodes, validators
 from retrack.utils.registry import Registry
+from retrack.engine.exceptions import InvalidVersionException
 import json
 
 
@@ -211,6 +212,8 @@ class Parser:
 
     def _set_version(self):
         self._version = self.graph_data.get("version", None)
+        if self.version is None:
+            raise InvalidVersionException("No version found in graph data")
 
         graph_json_content = (
             json.dumps(self.graph_data["nodes"])
@@ -220,12 +223,9 @@ class Parser:
         )
         calculated_hash = hashlib.sha256(graph_json_content).hexdigest()[:10]
 
-        if self.version is None:
-            self._version = f"{calculated_hash}.dynamic"
-        else:
-            file_version_hash = self.version.split(".")[0]
+        file_version_hash = self.version.split(".")[0]
 
-            if file_version_hash != calculated_hash:
-                raise ValueError(
-                    f"Invalid version. Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
-                )
+        if file_version_hash != calculated_hash:
+            raise ValueError(
+                f"Invalid version. Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
+            )
