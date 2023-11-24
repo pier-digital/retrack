@@ -6,6 +6,8 @@ from retrack import nodes, validators
 from retrack.utils.registry import Registry
 import json
 
+from unidecode import unidecode
+
 
 class Parser:
     def __init__(
@@ -14,11 +16,15 @@ class Parser:
         component_registry: Registry = nodes.registry(),
         dynamic_registry: Registry = nodes.dynamic_registry(),
         validator_registry: Registry = validators.registry(),
+        raise_if_null_version: bool = False,
+        validate_version: bool = True,
     ):
         self.__graph_data = graph_data
         self._execution_order = None
         self.__components = {}
         self.__edges = None
+        self._raise_if_null_version = raise_if_null_version
+        self._validate_version = validate_version
 
         self._check_input_data(self.graph_data)
 
@@ -213,19 +219,24 @@ class Parser:
         self._version = self.graph_data.get("version", None)
 
         graph_json_content = (
-            json.dumps(self.graph_data["nodes"])
+            json.dumps(self.graph_data["nodes"], ensure_ascii=False)
             .replace(": ", ":")
+            .replace("\\", "")
+            .replace('"', "")
             .replace(", ", ",")
-            .encode("utf-8")
         )
-        calculated_hash = hashlib.sha256(graph_json_content).hexdigest()[:10]
+        graph_json_content = unidecode(graph_json_content, errors="strict")
+        calculated_hash = hashlib.sha256(graph_json_content.encode()).hexdigest()[:10]
 
         if self.version is None:
+            if self._raise_if_null_version:
+                raise ValueError("Missing version")
+
             self._version = f"{calculated_hash}.dynamic"
         else:
             file_version_hash = self.version.split(".")[0]
 
-            if file_version_hash != calculated_hash:
+            if file_version_hash != calculated_hash and self._validate_version:
                 raise ValueError(
                     f"Invalid version. Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
                 )

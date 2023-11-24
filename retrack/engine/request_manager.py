@@ -18,7 +18,7 @@ class StrFieldValidator:
             else:
                 return self.default
 
-        return str(value) if type(value) != str else value
+        return str(value) if not isinstance(value, str) else value
 
 
 class RequestManager:
