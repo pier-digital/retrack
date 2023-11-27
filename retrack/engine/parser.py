@@ -4,6 +4,7 @@ import hashlib
 
 from retrack import nodes, validators
 from retrack.utils.registry import Registry
+from retrack.nodes.base import NodeKind
 import json
 
 from unidecode import unidecode
@@ -38,6 +39,7 @@ class Parser:
         self._set_execution_order()
         self._set_indexes_by_memory_type_map()
         self._set_version()
+        self._set_input_nodes_from_connectors()
 
     @property
     def graph_data(self) -> dict:
@@ -247,3 +249,11 @@ class Parser:
                 raise ValueError(
                     f"Invalid version. Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
                 )
+
+    def _set_input_nodes_from_connectors(self):
+        connector_nodes = self.get_by_kind(NodeKind.CONNECTOR)
+
+        for connector_node in connector_nodes:
+            input_nodes = connector_node.generate_input_nodes()
+            for input_node in input_nodes:
+                self.components_registry.register(input_node.id, input_node)

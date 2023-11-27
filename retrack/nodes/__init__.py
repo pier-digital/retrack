@@ -30,6 +30,8 @@ def register(name: str, node: BaseNode) -> None:
 
 
 register("Input", Input)
+register("Connector", Input)  # virtual node
+register("ConnectorV0", Input)  # virtual node
 register("Start", Start)
 register("Constant", Constant)
 register("List", List)

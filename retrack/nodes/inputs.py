@@ -44,3 +44,11 @@ class Input(BaseNode):
 
     def kind(self) -> NodeKind:
         return NodeKind.INPUT
+
+
+class BaseConnector(BaseNode):
+    def kind(self) -> NodeKind:
+        return NodeKind.CONNECTOR
+
+    def generate_input_nodes(self) -> typing.List[Input]:
+        return []
