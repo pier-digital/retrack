@@ -13,22 +13,22 @@ class Parser:
     def __init__(
         self,
         graph_data: dict,
-        component_registry: Registry = nodes.registry(),
-        dynamic_registry: Registry = nodes.dynamic_registry(),
+        nodes_registry: Registry = nodes.registry(),
+        dynamic_nodes_registry: Registry = nodes.dynamic_nodes_registry(),
         validator_registry: Registry = validators.registry(),
         raise_if_null_version: bool = False,
         validate_version: bool = True,
     ):
         self.__graph_data = graph_data
+        self.__components_registry = Registry()
         self._execution_order = None
-        self.__components = {}
         self.__edges = None
         self._raise_if_null_version = raise_if_null_version
         self._validate_version = validate_version
 
         self._check_input_data(self.graph_data)
 
-        self._set_components(component_registry, dynamic_registry)
+        self._set_components(nodes_registry, dynamic_nodes_registry)
         self._set_edges()
 
         self._validate_graph(validator_registry)
@@ -47,6 +47,14 @@ class Parser:
     def version(self) -> str:
         return self._version
 
+    @property
+    def components_registry(self) -> Registry:
+        return self.__components_registry
+
+    @property
+    def components(self) -> typing.Dict[str, nodes.BaseNode]:
+        return self.components_registry.data
+
     @staticmethod
     def _check_input_data(data: dict):
         if not isinstance(data, dict):
@@ -57,24 +65,21 @@ class Parser:
             raise ValueError("No nodes found in data")
         if not isinstance(data["nodes"], dict):
             raise TypeError(
-                "BaseNodes must be a dictionary. Instead got: "
-                + str(type(data["nodes"]))
+                "Nodes must be a dictionary. Instead got: " + str(type(data["nodes"]))
             )
 
     @staticmethod
     def _check_node_name(node_name: str, node_id: str):
         if node_name is None:
-            raise ValueError(f"BaseNode {node_id} has no name")
+            raise ValueError(f"Node {node_id} has no name")
         if not isinstance(node_name, str):
-            raise TypeError(f"BaseNode {node_id} name must be a string")
+            raise TypeError(f"Node {node_id} name must be a string")
 
-    @property
-    def components(self) -> typing.Dict[str, nodes.BaseNode]:
-        return self.__components
-
-    def _set_components(self, component_registry: Registry, dynamic_registry: Registry):
+    def _set_components(
+        self, nodes_registry: Registry, dynamic_nodes_registry: Registry
+    ):
         for node_id, node_metadata in self.graph_data["nodes"].items():
-            if node_id in self.__components:
+            if node_id in self.components_registry:
                 raise ValueError(f"Duplicate node id: {node_id}")
 
             node_name = node_metadata.get("name", None)
@@ -82,17 +87,19 @@ class Parser:
 
             node_name = node_name.lower()
 
-            node_factory = dynamic_registry.get(node_name)
+            node_factory = dynamic_nodes_registry.get(node_name)
 
             if node_factory is not None:
                 validation_model = node_factory(**node_metadata)
             else:
-                validation_model = component_registry.get(node_name)
+                validation_model = nodes_registry.get(node_name)
 
             if validation_model is None:
                 raise ValueError(f"Unknown node name: {node_name}")
 
-            self.__components[node_id] = validation_model(**node_metadata)
+            self.components_registry.register(
+                node_id, validation_model(**node_metadata)
+            )
 
     @property
     def edges(self) -> typing.List[typing.Tuple[str, str]]:

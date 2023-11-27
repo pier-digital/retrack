@@ -130,10 +130,10 @@ After creating the custom node, you need to register it in the nodes registry an
 import retrack
 
 # Register the custom node
-retrack.component_registry.register_node("sum", SumNode)
+retrack.nodes_registry.register_node("sum", SumNode)
 
 # Parse the rule/model
-parser = Parser(rule, component_registry=retrack.component_registry)
+parser = Parser(rule, nodes_registry=retrack.nodes_registry)
 ```
 
 ## Contributing

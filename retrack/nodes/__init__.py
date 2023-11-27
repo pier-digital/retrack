@@ -4,7 +4,7 @@ from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
 from retrack.nodes.datetime import CurrentYear
 from retrack.nodes.dynamic import BaseDynamicNode
-from retrack.nodes.dynamic import registry as dynamic_registry
+from retrack.nodes.dynamic import registry as dynamic_nodes_registry
 from retrack.nodes.endswith import EndsWith
 from retrack.nodes.endswithany import EndsWithAny
 from retrack.nodes.inputs import Input
@@ -52,4 +52,10 @@ register("CurrentYear", CurrentYear)
 register("IntervalCatV0", IntervalCatV0)
 register("LowerCase", LowerCase)
 
-__all__ = ["registry", "register", "BaseNode", "dynamic_registry", "BaseDynamicNode"]
+__all__ = [
+    "registry",
+    "register",
+    "BaseNode",
+    "dynamic_nodes_registry",
+    "BaseDynamicNode",
+]

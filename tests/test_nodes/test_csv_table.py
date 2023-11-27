@@ -2,7 +2,7 @@ import pandas as pd
 import pydantic
 import pytest
 
-from retrack.nodes import dynamic_registry
+from retrack.nodes import dynamic_nodes_registry
 
 
 @pytest.fixture
@@ -60,13 +60,13 @@ def csv_table_metadata():
 
 
 def test_get_csv_table_factory():
-    csv_table_factory = dynamic_registry().get("CSVTableV0")
+    csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
 
     assert callable(csv_table_factory)
 
 
 def test_create_model_from_factory(csv_table_metadata):
-    csv_table_factory = dynamic_registry().get("CSVTableV0")
+    csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
     CSVTableV0 = csv_table_factory(**csv_table_metadata)
 
     assert issubclass(CSVTableV0, pydantic.BaseModel)
@@ -78,7 +78,7 @@ def test_create_model_from_factory(csv_table_metadata):
 
 
 def test_csv_table_run(csv_table_metadata):
-    csv_table_factory = dynamic_registry().get("CSVTableV0")
+    csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
     CSVTableV0 = csv_table_factory(**csv_table_metadata)
 
     model = CSVTableV0(**csv_table_metadata)
