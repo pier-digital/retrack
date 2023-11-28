@@ -50,7 +50,9 @@ def flow_factory(
 
             for name, value in kwargs.items():
                 if name.startswith("input_"):
-                    inputs_in_kwargs[name[6:]] = value
+                    inputs_in_kwargs[name[len("input_") :]] = value
+                elif name.startswith("payload_"):
+                    inputs_in_kwargs[name[len("payload_") :]] = value
 
             response = runner.execute(pd.DataFrame(inputs_in_kwargs))
 

@@ -119,14 +119,14 @@ class RequestManager:
         return pandera.DataFrameSchema(
             fields,
             index=pandera.Index(int),
-            strict=True,
+            # strict=True,
             coerce=True,
         )
 
     def validate(
         self,
         payload: pd.DataFrame,
-    ) -> typing.List[pydantic.BaseModel]:
+    ) -> pd.DataFrame:
         """Validate the payload against the RequestManager's model
 
         Args:
@@ -136,7 +136,7 @@ class RequestManager:
             ValueError: If the RequestManager has no model
 
         Returns:
-            typing.List[pydantic.BaseModel]: The validated payload
+            pd.DataFrame: The validated payload
         """
         if self.model is None:
             raise ValueError("No inputs found")

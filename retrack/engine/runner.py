@@ -17,11 +17,12 @@ class Runner:
         self._parser = parser
         self._name = name
         self._internal_runners = {}
+        self._validated_payload = None
         self.reset()
         self._set_constants()
         self._set_input_columns()
-        self._request_manager = RequestManager(self._parser.get_by_kind(NodeKind.INPUT))
         self._set_internal_runners()
+        self._request_manager = RequestManager(self._parser.get_by_kind(NodeKind.INPUT))
 
     @classmethod
     def from_json(cls, data: typing.Union[str, dict], name: str = None, **kwargs):
@@ -118,13 +119,13 @@ class Runner:
         self, payload_df: pd.DataFrame
     ) -> pd.DataFrame:
         """Create initial state from payload. This is the first step of the runner."""
-        validated_payload = self.request_manager.validate(
+        self._validated_payload = self.request_manager.validate(
             payload_df.reset_index(drop=True)
         )
 
         state_df = pd.DataFrame([])
         for node_id, input_name in self.input_columns.items():
-            state_df[node_id] = validated_payload[input_name]
+            state_df[node_id] = self._validated_payload[input_name]
 
         state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
         state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
@@ -147,6 +148,8 @@ class Runner:
 
         if node_id in self._internal_runners:
             input_params["runner"] = self._internal_runners[node_id]
+            for column_name, column_value in self._validated_payload.items():
+                input_params[f"payload_{column_name}"] = column_value
 
         return input_params
 

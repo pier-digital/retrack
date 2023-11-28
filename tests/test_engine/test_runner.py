@@ -161,6 +161,36 @@ def test_flows(filename, in_values, expected_out_values):
                 {"output": 25, "message": None},
             ],
         ),
+        (
+            "connector-rule",
+            [
+                {"prediction": "1", "multiplier": "1"},
+                {"prediction": "2", "multiplier": "1"},
+                {"prediction": "3", "multiplier": "1"},
+                {"prediction": "4", "multiplier": "1"},
+            ],
+            [
+                {"output": 1.0, "message": None},
+                {"output": 2.0, "message": None},
+                {"output": 3.0, "message": None},
+                {"output": 4.0, "message": None},
+            ],
+        ),
+        (
+            "rule-of-rules-with-connector",
+            [
+                {"prediction": "1", "var": "1"},
+                {"prediction": "2", "var": "1"},
+                {"prediction": "3", "var": "1"},
+                {"prediction": "4", "var": "1"},
+            ],
+            [
+                {"output": 1.0, "message": None},
+                {"output": 2.0, "message": None},
+                {"output": 3.0, "message": None},
+                {"output": 4.0, "message": None},
+            ],
+        ),
     ],
 )
 def test_create_from_json(filename, in_values, expected_out_values):

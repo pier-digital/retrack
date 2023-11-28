@@ -15,6 +15,7 @@ from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
+from retrack.nodes.connectors import BaseConnector, VirtualConnector
 from retrack.nodes.lowercase import LowerCase
 from retrack.utils.registry import Registry
 
@@ -30,8 +31,8 @@ def register(name: str, node: BaseNode) -> None:
 
 
 register("Input", Input)
-register("Connector", Input)  # virtual node
-register("ConnectorV0", Input)  # virtual node
+register("Connector", VirtualConnector)  # By default, Connector is an Input
+register("ConnectorV0", VirtualConnector)  # By default, Connector is an Input
 register("Start", Start)
 register("Constant", Constant)
 register("List", List)
@@ -60,4 +61,5 @@ __all__ = [
     "BaseNode",
     "dynamic_nodes_registry",
     "BaseDynamicNode",
+    "BaseConnector",
 ]
