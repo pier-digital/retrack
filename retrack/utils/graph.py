@@ -64,44 +64,6 @@ def check_node_name(node_name: str, node_id: str):
         raise TypeError(f"Node {node_id} name must be a string")
 
 
-def create_component_registry(
-    graph_data: dict, nodes_registry: Registry, dynamic_nodes_registry: Registry
-) -> ComponentRegistry:
-    components_registry = ComponentRegistry()
-    graph_data = validate_data(graph_data)
-    for node_id, node_metadata in graph_data["nodes"].items():
-        if node_id in components_registry:
-            raise ValueError(f"Duplicate node id: {node_id}")
-
-        node_name = node_metadata.get("name", None)
-        check_node_name(node_name, node_id)
-
-        node_name = node_name.lower()
-
-        node_factory = dynamic_nodes_registry.get(node_name)
-
-        if node_factory is not None:
-            validation_model = node_factory(
-                **node_metadata,
-                nodes_registry=nodes_registry,
-                dynamic_nodes_registry=dynamic_nodes_registry,
-            )
-        else:
-            validation_model = nodes_registry.get(node_name)
-
-        if validation_model is None:
-            raise ValueError(f"Unknown node name: {node_name}")
-
-        component = validation_model(**node_metadata)
-
-        for input_node in component.generate_input_nodes():
-            components_registry.register(input_node.id, input_node)
-
-        components_registry.register(node_id, validation_model(**node_metadata))
-
-    return components_registry
-
-
 def walk(actual_id: str, skiped_ids: list, components_registry: ComponentRegistry):
     skiped_ids.append(actual_id)
 

@@ -1,63 +1,34 @@
+import pydantic
+from retrack.utils.component_registry import ComponentRegistry
+from retrack.utils.registry import Registry
+
+from retrack.utils import graph
+from retrack import validators
 import typing
 
-import json
 
 import numpy as np
 import pandas as pd
-import pydantic
 
-from retrack.engine.parser import Parser
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind, NodeMemoryType
-from retrack.utils import constants, registry
-from retrack import nodes
+from retrack.utils import constants
 
 
-class Runner:
-    def __init__(self, parser: Parser, name: str = None):
-        self._parser = parser
-        self._name = name
-        self._internal_runners = {}
+class RuleExecutor:
+    def __init__(self, rule: "Rule"):
+        self._rule = rule
         self._validated_payload = None
         self.reset()
         self._set_constants()
         self._set_input_columns()
-        self._set_internal_runners()
         self._request_manager = RequestManager(
-            self._parser.components_registry.get_by_kind(NodeKind.INPUT)
+            self._rule.components_registry.get_by_kind(NodeKind.INPUT)
         )
 
-    @classmethod
-    def from_json(
-        cls,
-        data: typing.Union[str, dict],
-        name: str = None,
-        nodes_registry: registry.Registry = nodes.registry(),
-        dynamic_nodes_registry: registry.Registry = nodes.dynamic_nodes_registry(),
-        **kwargs,
-    ):
-        if isinstance(data, str) and data.endswith(".json"):
-            if name is None:
-                name = data
-            data = json.loads(open(data).read())
-        elif not isinstance(data, dict):
-            raise ValueError("data must be a dict or a json file path")
-
-        parser = Parser(
-            data,
-            nodes_registry=nodes_registry,
-            dynamic_nodes_registry=dynamic_nodes_registry,
-            **kwargs,
-        )
-        return cls(parser, name=name)
-
     @property
-    def parser(self) -> Parser:
-        return self._parser
-
-    @property
-    def name(self) -> str:
-        return self._name
+    def rule(self) -> "Rule":
+        return self._rule
 
     @property
     def request_manager(self) -> RequestManager:
@@ -80,7 +51,7 @@ class Runner:
         return self._constants
 
     def _set_constants(self):
-        constant_nodes = self.parser.components_registry.get_by_memory_type(
+        constant_nodes = self.rule.components_registry.get_by_memory_type(
             NodeMemoryType.CONSTANT
         )
         self._constants = {}
@@ -88,26 +59,12 @@ class Runner:
             for output_connector_name, _ in node.outputs:
                 self._constants[f"{node.id}@{output_connector_name}"] = node.data.value
 
-    def _set_internal_runners(self):
-        for node_id in self.parser.components_registry.indexes_by_name_map.get(
-            constants.FLOW_NODE_NAME, []
-        ):
-            try:
-                node_data = self.parser.components_registry.get(node_id).data
-                self._internal_runners[node_id] = Runner.from_json(
-                    node_data.parsed_value(), name=node_data.name
-                )
-            except Exception as e:
-                raise Exception(
-                    f"Error setting internal runner for node {node_id}"
-                ) from e
-
     @property
     def input_columns(self) -> dict:
         return self._input_columns
 
     def _set_input_columns(self):
-        input_nodes = self._parser.components_registry.get_by_kind(NodeKind.INPUT)
+        input_nodes = self._rule.components_registry.get_by_kind(NodeKind.INPUT)
         self._input_columns = {
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
@@ -122,7 +79,7 @@ class Runner:
     ):
         if filter is not None:
             output_connections = (
-                self.parser.components_registry.get_node_output_connections(
+                self.rule.components_registry.get_node_output_connections(
                     node_id, connector_filter=connector_filter
                 )
             )
@@ -165,11 +122,6 @@ class Runner:
                     f"{connection['node']}@{connection['output']}", current_node_filter
                 )
 
-        if node_id in self._internal_runners:
-            input_params["runner"] = self._internal_runners[node_id]
-            for column_name, column_value in self._validated_payload.items():
-                input_params[f"payload_{column_name}"] = column_value
-
         return input_params
 
     def __set_state_data(
@@ -194,7 +146,7 @@ class Runner:
         # if there is a filter, we need to set the children nodes to receive filtered data
         self.__set_output_connection_filters(node_id, current_node_filter)
 
-        node = self.parser.components_registry.get(node_id)
+        node = self.rule.components_registry.get(node_id)
 
         if node.memory_type == NodeMemoryType.CONSTANT:
             return
@@ -237,12 +189,12 @@ class Runner:
         self.reset()
         self._states = self._create_initial_state_from_payload(payload_df)
 
-        for node_id in self.parser.execution_order:
+        for node_id in self.rule.execution_order:
             try:
                 self.__run_node(node_id)
             except Exception as e:
                 raise Exception(
-                    f"Error running node {node_id} in {self.name} with version {self.parser.version}"
+                    f"Error running node {node_id} in {self.rule.name} with version {self.rule.version}"
                 ) from e
 
             if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
@@ -257,3 +209,96 @@ class Runner:
                 constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
             ]
         ]
+
+
+class Rule(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
+    name: typing.Optional[str] = None
+    version: str
+    components_registry: ComponentRegistry
+    execution_order: typing.List[str]
+    _executor: RuleExecutor = None
+
+    @property
+    def executor(self) -> RuleExecutor:
+        if self._executor is None:
+            self._executor = RuleExecutor(self)
+        return self._executor
+
+    @classmethod
+    def create(
+        cls,
+        graph_data: dict,
+        nodes_registry: Registry,
+        dynamic_nodes_registry: Registry,
+        validator_registry: Registry = validators.registry(),
+        raise_if_null_version: bool = False,
+        validate_version: bool = True,
+        name: str = None,
+    ):
+        components_registry = create_component_registry(
+            graph_data, nodes_registry, dynamic_nodes_registry, validator_registry
+        )
+        version = graph.validate_version(
+            graph_data, raise_if_null_version, validate_version
+        )
+        graph_data = graph_data
+
+        graph.validate_with_validators(
+            graph_data,
+            components_registry.calculate_edges(),
+            validator_registry,
+        )
+
+        execution_order = graph.get_execution_order(components_registry)
+
+        return cls(
+            version=version,
+            components_registry=components_registry,
+            execution_order=execution_order,
+            name=name,
+        )
+
+
+def create_component_registry(
+    graph_data: dict,
+    nodes_registry: Registry,
+    dynamic_nodes_registry: Registry,
+    validator_registry: Registry,
+) -> ComponentRegistry:
+    components_registry = ComponentRegistry()
+    graph_data = graph.validate_data(graph_data)
+    for node_id, node_metadata in graph_data["nodes"].items():
+        if node_id in components_registry:
+            raise ValueError(f"Duplicate node id: {node_id}")
+
+        node_name = node_metadata.get("name", None)
+        graph.check_node_name(node_name, node_id)
+
+        node_name = node_name.lower()
+
+        node_factory = dynamic_nodes_registry.get(node_name)
+
+        if node_factory is not None:
+            validation_model = node_factory(
+                **node_metadata,
+                nodes_registry=nodes_registry,
+                dynamic_nodes_registry=dynamic_nodes_registry,
+                validator_registry=validator_registry,
+                rule_class=Rule,
+            )
+        else:
+            validation_model = nodes_registry.get(node_name)
+
+        if validation_model is None:
+            raise ValueError(f"Unknown node name: {node_name}")
+
+        component = validation_model(**node_metadata)
+
+        for input_node in component.generate_input_nodes():
+            components_registry.register(input_node.id, input_node)
+
+        components_registry.register(node_id, validation_model(**node_metadata))
+
+    return components_registry

@@ -7,6 +7,7 @@ import pydantic
 
 from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
+from retrack.utils.registry import Registry
 
 
 class FlowV0MetadataModel(pydantic.BaseModel):
@@ -23,8 +24,22 @@ class FlowV0OutputsModel(pydantic.BaseModel):
 
 
 def flow_factory(
-    inputs: typing.Dict[str, typing.Any], **kwargs
+    inputs: typing.Dict[str, typing.Any],
+    nodes_registry: Registry,
+    dynamic_nodes_registry: Registry,
+    validator_registry: Registry,
+    data: dict,
+    rule_class,
+    **factory_kwargs,
 ) -> typing.Type[BaseDynamicNode]:
+    graph_data = json.loads(data["value"])
+    rule_instance = rule_class.create(
+        graph_data=graph_data,
+        nodes_registry=nodes_registry,
+        dynamic_nodes_registry=dynamic_nodes_registry,
+        validator_registry=validator_registry,
+        name=data["name"],
+    )
     input_fields = {}
 
     for name in inputs.keys():
@@ -42,10 +57,6 @@ def flow_factory(
 
     class FlowV0(BaseFlowV0Model):
         def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
-            runner = kwargs.get("runner", None)
-            if runner is None:
-                raise ValueError("Missing runner")
-
             inputs_in_kwargs = {}
 
             for name, value in kwargs.items():
@@ -54,8 +65,12 @@ def flow_factory(
                 elif name.startswith("payload_"):
                     inputs_in_kwargs[name[len("payload_") :]] = value
 
-            response = runner.execute(pd.DataFrame(inputs_in_kwargs))
+            response = rule_instance.executor.execute(pd.DataFrame(inputs_in_kwargs))
 
             return {"output_value": response["output"].values}
+
+        def generate_input_nodes(self):
+            # TODO: check inputs that do not have input nodes
+            return []
 
     return FlowV0

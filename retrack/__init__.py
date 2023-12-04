@@ -1,11 +1,11 @@
-from retrack.engine.parser import Parser
-from retrack.engine.runner import Runner
+from retrack.engine.rule import Rule
+from retrack.engine.constructor import from_json
 from retrack.nodes import registry as nodes_registry
 from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 __all__ = [
-    "Parser",
-    "Runner",
+    "Rule",
+    "from_json",
     "BaseNode",
     "InputConnectionModel",
     "OutputConnectionModel",
