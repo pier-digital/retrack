@@ -51,10 +51,6 @@ class Parser:
     def components_registry(self) -> ComponentRegistry:
         return self.__components_registry
 
-    @property
-    def components(self) -> typing.Dict[str, nodes.BaseNode]:
-        return self.components_registry.data
-
     @staticmethod
     def _check_input_data(data: dict):
         if not isinstance(data, dict):
@@ -108,7 +104,7 @@ class Parser:
     def _set_edges(self):
         self.__edges = []
 
-        for node_id, node in self.components.items():
+        for node_id, node in self.components_registry.data.items():
             for _, output_connection in node.outputs:
                 for c in output_connection.connections:
                     self.__edges.append((node_id, c.node))
@@ -117,9 +113,6 @@ class Parser:
         for validator_name, validator in validator_registry.data.items():
             if not validator.validate(graph_data=self.graph_data, edges=self.edges):
                 raise ValueError(f"Invalid graph data: {validator_name}")
-
-    def get_by_id(self, id_: str) -> nodes.BaseNode:
-        return self.components.get(id_)
 
     @property
     def execution_order(self) -> typing.List[str]:

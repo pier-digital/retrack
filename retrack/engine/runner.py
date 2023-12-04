@@ -80,7 +80,7 @@ class Runner:
             constants.FLOW_NODE_NAME, []
         ):
             try:
-                node_data = self.parser.get_by_id(node_id).data
+                node_data = self.parser.components_registry.get(node_id).data
                 self._internal_runners[node_id] = Runner.from_json(
                     node_data.parsed_value(), name=node_data.name
                 )
@@ -181,7 +181,7 @@ class Runner:
         # if there is a filter, we need to set the children nodes to receive filtered data
         self.__set_output_connection_filters(node_id, current_node_filter)
 
-        node = self.parser.get_by_id(node_id)
+        node = self.parser.components_registry.get(node_id)
 
         if node.memory_type == NodeMemoryType.CONSTANT:
             return
