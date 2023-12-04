@@ -84,3 +84,6 @@ class BaseNode(pydantic.BaseModel):
 
     def memory_type(self) -> NodeMemoryType:
         return NodeMemoryType.STATE
+
+    def generate_input_nodes(self) -> typing.List["BaseNode"]:
+        return []

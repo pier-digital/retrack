@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from retrack import Parser, Runner
+from retrack import nodes
 
 
 @pytest.mark.parametrize(
@@ -29,7 +30,13 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
     with open(f"tests/resources/{filename}.json", "r") as f:
         rule = json.load(f)
 
-    runner = Runner(Parser(rule))
+    runner = Runner(
+        Parser(
+            rule,
+            nodes_registry=nodes.registry(),
+            dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+        )
+    )
     out_values = runner.execute(pd.DataFrame([in_values]))
 
     assert isinstance(out_values, pd.DataFrame)
@@ -107,7 +114,13 @@ def test_flows(filename, in_values, expected_out_values):
     with open(f"tests/resources/{filename}.json", "r") as f:
         rule = json.load(f)
 
-    runner = Runner(Parser(rule))
+    runner = Runner(
+        Parser(
+            rule,
+            nodes_registry=nodes.registry(),
+            dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+        )
+    )
     out_values = runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)

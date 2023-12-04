@@ -9,7 +9,8 @@ import pydantic
 from retrack.engine.parser import Parser
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind, NodeMemoryType
-from retrack.utils import constants
+from retrack.utils import constants, registry
+from retrack import nodes
 
 
 class Runner:
@@ -27,7 +28,14 @@ class Runner:
         )
 
     @classmethod
-    def from_json(cls, data: typing.Union[str, dict], name: str = None, **kwargs):
+    def from_json(
+        cls,
+        data: typing.Union[str, dict],
+        name: str = None,
+        nodes_registry: registry.Registry = nodes.registry(),
+        dynamic_nodes_registry: registry.Registry = nodes.dynamic_nodes_registry(),
+        **kwargs,
+    ):
         if isinstance(data, str) and data.endswith(".json"):
             if name is None:
                 name = data
@@ -35,7 +43,12 @@ class Runner:
         elif not isinstance(data, dict):
             raise ValueError("data must be a dict or a json file path")
 
-        parser = Parser(data, **kwargs)
+        parser = Parser(
+            data,
+            nodes_registry=nodes_registry,
+            dynamic_nodes_registry=dynamic_nodes_registry,
+            **kwargs,
+        )
         return cls(parser, name=name)
 
     @property

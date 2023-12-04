@@ -81,12 +81,21 @@ def create_component_registry(
         node_factory = dynamic_nodes_registry.get(node_name)
 
         if node_factory is not None:
-            validation_model = node_factory(**node_metadata)
+            validation_model = node_factory(
+                **node_metadata,
+                nodes_registry=nodes_registry,
+                dynamic_nodes_registry=dynamic_nodes_registry,
+            )
         else:
             validation_model = nodes_registry.get(node_name)
 
         if validation_model is None:
             raise ValueError(f"Unknown node name: {node_name}")
+
+        component = validation_model(**node_metadata)
+
+        for input_node in component.generate_input_nodes():
+            components_registry.register(input_node.id, input_node)
 
         components_registry.register(node_id, validation_model(**node_metadata))
 

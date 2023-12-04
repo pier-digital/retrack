@@ -1,7 +1,7 @@
 import typing
 
 
-from retrack import nodes, validators
+from retrack import validators
 from retrack.utils.registry import Registry
 from retrack.utils.component_registry import ComponentRegistry
 from retrack.nodes.base import NodeKind
@@ -12,8 +12,8 @@ class Parser:
     def __init__(
         self,
         graph_data: dict,
-        nodes_registry: Registry = nodes.registry(),
-        dynamic_nodes_registry: Registry = nodes.dynamic_nodes_registry(),
+        nodes_registry: Registry,
+        dynamic_nodes_registry: Registry,
         validator_registry: Registry = validators.registry(),
         raise_if_null_version: bool = False,
         validate_version: bool = True,
