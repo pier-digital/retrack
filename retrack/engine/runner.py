@@ -22,7 +22,9 @@ class Runner:
         self._set_constants()
         self._set_input_columns()
         self._set_internal_runners()
-        self._request_manager = RequestManager(self._parser.get_by_kind(NodeKind.INPUT))
+        self._request_manager = RequestManager(
+            self._parser.components_registry.get_by_kind(NodeKind.INPUT)
+        )
 
     @classmethod
     def from_json(cls, data: typing.Union[str, dict], name: str = None, **kwargs):
@@ -65,14 +67,16 @@ class Runner:
         return self._constants
 
     def _set_constants(self):
-        constant_nodes = self.parser.get_by_memory_type(NodeMemoryType.CONSTANT)
+        constant_nodes = self.parser.components_registry.get_by_memory_type(
+            NodeMemoryType.CONSTANT
+        )
         self._constants = {}
         for node in constant_nodes:
             for output_connector_name, _ in node.outputs:
                 self._constants[f"{node.id}@{output_connector_name}"] = node.data.value
 
     def _set_internal_runners(self):
-        for node_id in self.parser.indexes_by_name_map.get(
+        for node_id in self.parser.components_registry.indexes_by_name_map.get(
             constants.FLOW_NODE_NAME, []
         ):
             try:
@@ -90,7 +94,7 @@ class Runner:
         return self._input_columns
 
     def _set_input_columns(self):
-        input_nodes = self._parser.get_by_kind(NodeKind.INPUT)
+        input_nodes = self._parser.components_registry.get_by_kind(NodeKind.INPUT)
         self._input_columns = {
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
@@ -101,11 +105,13 @@ class Runner:
         self._filters = {}
 
     def __set_output_connection_filters(
-        self, node_id: str, filter: typing.Any, filter_by_connector=None
+        self, node_id: str, filter: typing.Any, connector_filter=None
     ):
         if filter is not None:
-            output_connections = self.parser.get_node_connections(
-                node_id, is_input=False, filter_by_connector=filter_by_connector
+            output_connections = (
+                self.parser.components_registry.get_node_output_connections(
+                    node_id, connector_filter=connector_filter
+                )
             )
             for output_connection_id in output_connections:
                 if self._filters.get(output_connection_id, None) is None:

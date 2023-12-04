@@ -27,7 +27,7 @@ def test_parser_extract(data_filename, expected_tokens):
         input_data = json.load(f)
 
     parser = Parser(input_data)
-    assert parser.indexes_by_name_map == expected_tokens
+    assert parser.components_registry.indexes_by_name_map == expected_tokens
 
 
 def test_parser_with_unknown_node():
