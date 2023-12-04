@@ -15,10 +15,44 @@ from retrack.nodes.base import NodeKind, NodeMemoryType
 from retrack.utils import constants
 
 
+class Execution:
+    def __init__(self, states: pd.DataFrame):
+        self.states = states
+
+    def set_state_data(
+        self, column: str, value: typing.Any, filter_by: typing.Any = None
+    ):
+        if filter_by is None:
+            self.states[column] = value
+        else:
+            self.states.loc[filter_by, column] = value
+
+    def get_state_data(
+        self, column: str, constants: dict, filter_by: typing.Any = None
+    ):
+        if column in constants:
+            return constants[column]
+
+        if filter_by is None:
+            return self.states[column]
+
+        return self.states.loc[filter_by, column]
+
+    @classmethod
+    def from_payload(cls, validated_payload: pd.DataFrame, input_columns: dict):
+        state_df = pd.DataFrame([])
+        for node_id, input_name in input_columns.items():
+            state_df[node_id] = validated_payload[input_name]
+
+        state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
+        state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
+
+        return cls(state_df)
+
+
 class RuleExecutor:
     def __init__(self, rule: "Rule"):
         self._rule = rule
-        self._validated_payload = None
         self.reset()
         self._set_constants()
         self._set_input_columns()
@@ -37,10 +71,6 @@ class RuleExecutor:
     @property
     def request_model(self) -> pydantic.BaseModel:
         return self._request_manager.model
-
-    @property
-    def states(self) -> pd.DataFrame:
-        return self._states
 
     @property
     def filters(self) -> dict:
@@ -71,7 +101,6 @@ class RuleExecutor:
         }
 
     def reset(self):
-        self._states = None
         self._filters = {}
 
     def __set_output_connection_filters(
@@ -91,25 +120,11 @@ class RuleExecutor:
                         self._filters[output_connection_id] & filter
                     )
 
-    def _create_initial_state_from_payload(
-        self, payload_df: pd.DataFrame
-    ) -> pd.DataFrame:
-        """Create initial state from payload. This is the first step of the runner."""
-        self._validated_payload = self.request_manager.validate(
-            payload_df.reset_index(drop=True)
-        )
-
-        state_df = pd.DataFrame([])
-        for node_id, input_name in self.input_columns.items():
-            state_df[node_id] = self._validated_payload[input_name]
-
-        state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
-        state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
-
-        return state_df
-
     def __get_input_params(
-        self, node_id: str, node_dict: dict, current_node_filter: pd.Series
+        self,
+        node_dict: dict,
+        current_node_filter: pd.Series,
+        execution: Execution,
     ) -> dict:
         input_params = {}
 
@@ -118,30 +133,15 @@ class RuleExecutor:
                 continue
 
             for connection in connections["connections"]:
-                input_params[connector_name] = self.__get_state_data(
-                    f"{connection['node']}@{connection['output']}", current_node_filter
+                input_params[connector_name] = execution.get_state_data(
+                    f"{connection['node']}@{connection['output']}",
+                    constants=self.constants,
+                    filter_by=current_node_filter,
                 )
 
         return input_params
 
-    def __set_state_data(
-        self, column: str, value: typing.Any, filter_by: typing.Any = None
-    ):
-        if filter_by is None:
-            self._states[column] = value
-        else:
-            self._states.loc[filter_by, column] = value
-
-    def __get_state_data(self, column: str, filter_by: typing.Any = None):
-        if column in self._constants:
-            return self._constants[column]
-
-        if filter_by is None:
-            return self._states[column]
-
-        return self._states.loc[filter_by, column]
-
-    def __run_node(self, node_id: str):
+    def __run_node(self, node_id: str, execution: Execution):
         current_node_filter = self._filters.get(node_id, None)
         # if there is a filter, we need to set the children nodes to receive filtered data
         self.__set_output_connection_filters(node_id, current_node_filter)
@@ -152,7 +152,9 @@ class RuleExecutor:
             return
 
         input_params = self.__get_input_params(
-            node_id, node.model_dump(by_alias=True), current_node_filter
+            node.model_dump(by_alias=True),
+            current_node_filter,
+            execution=execution,
         )
         output = node.run(**input_params)
 
@@ -161,13 +163,21 @@ class RuleExecutor:
                 output_name == constants.OUTPUT_REFERENCE_COLUMN
                 or output_name == constants.OUTPUT_MESSAGE_REFERENCE_COLUMN
             ):  # Setting output values
-                self.__set_state_data(output_name, output_value, current_node_filter)
+                execution.set_state_data(output_name, output_value, current_node_filter)
             elif output_name.endswith(constants.FILTER_SUFFIX):  # Setting filters
                 self.__set_output_connection_filters(node_id, output_value, output_name)
             else:  # Setting node outputs to be used as inputs by other nodes
-                self.__set_state_data(
-                    f"{node_id}@{output_name}", output_value, current_node_filter
+                execution.set_state_data(
+                    f"{node_id}@{output_name}",
+                    output_value,
+                    filter_by=current_node_filter,
                 )
+
+    def validate_payload(self, payload_df: pd.DataFrame):
+        if not isinstance(payload_df, pd.DataFrame):
+            raise ValueError("payload_df must be a pandas.DataFrame")
+
+        return self.request_manager.validate(payload_df.reset_index(drop=True))
 
     def execute(
         self,
@@ -183,27 +193,28 @@ class RuleExecutor:
         Returns:
             pd.DataFrame: The output of the flow.
         """
-        if not isinstance(payload_df, pd.DataFrame):
-            raise ValueError("payload_df must be a pandas.DataFrame")
-
         self.reset()
-        self._states = self._create_initial_state_from_payload(payload_df)
+
+        execution = Execution.from_payload(
+            validated_payload=self.validate_payload(payload_df),
+            input_columns=self.input_columns,
+        )
 
         for node_id in self.rule.execution_order:
             try:
-                self.__run_node(node_id)
+                self.__run_node(node_id, execution=execution)
             except Exception as e:
                 raise Exception(
                     f"Error running node {node_id} in {self.rule.name} with version {self.rule.version}"
                 ) from e
 
-            if self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
+            if execution.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
                 break
 
         if return_all_states:
-            return self.states
+            return execution.states
 
-        return self.states[
+        return execution.states[
             [
                 constants.OUTPUT_REFERENCE_COLUMN,
                 constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
