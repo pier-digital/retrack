@@ -11,7 +11,10 @@ class RuleMetadata(pydantic.BaseModel):
 
 
 class Execution:
-    def __init__(self, states: pd.DataFrame, filters: dict = None):
+    def __init__(
+        self, payload: pd.DataFrame, states: pd.DataFrame, filters: dict = None
+    ):
+        self.payload = payload
         self.states = states
         self.filters = filters or {}
 
@@ -47,9 +50,9 @@ class Execution:
     def from_payload(cls, validated_payload: pd.DataFrame, input_columns: dict):
         state_df = pd.DataFrame([])
         for node_id, input_name in input_columns.items():
-            state_df[node_id] = validated_payload[input_name]
+            state_df[node_id] = validated_payload[input_name].copy()
 
         state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
         state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
 
-        return cls(state_df)
+        return cls(payload=validated_payload, states=state_df)

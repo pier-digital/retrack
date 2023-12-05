@@ -101,9 +101,9 @@ class Rule(RuleMetadata):
 
             component = validation_model(**node_metadata)
 
-            for input_node in component.generate_input_nodes():
-                components_registry.register(input_node.id, input_node)
-
             components_registry.register(node_id, validation_model(**node_metadata))
+
+            for input_node in component.generate_input_nodes():
+                components_registry.register(input_node.id, input_node, overwrite=True)
 
         return components_registry

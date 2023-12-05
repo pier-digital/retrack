@@ -6,15 +6,12 @@ from retrack.nodes.inputs import Input
 
 class VirtualConnector(Input):
     def kind(self) -> NodeKind:
-        return NodeKind.INPUT
+        return NodeKind.CONNECTOR
 
     def generate_input_nodes(self) -> typing.List[Input]:
-        return []
+        return [Input(**self.model_dump(by_alias=True))]
 
 
 class BaseConnector(VirtualConnector):
-    def kind(self) -> NodeKind:
-        return NodeKind.CONNECTOR
-
     def generate_input_nodes(self) -> typing.List[Input]:
         raise NotImplementedError()

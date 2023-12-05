@@ -5,7 +5,7 @@ import json
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import InputConnectionModel, OutputConnectionModel, NodeKind
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 from retrack.utils.registry import Registry
 
@@ -57,20 +57,25 @@ def flow_factory(
 
     class FlowV0(BaseFlowV0Model):
         def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
-            inputs_in_kwargs = {}
-
+            print(kwargs.keys())
+            input_args = {}
             for name, value in kwargs.items():
                 if name.startswith("input_"):
-                    inputs_in_kwargs[name[len("input_") :]] = value
-                elif name.startswith("payload_"):
-                    inputs_in_kwargs[name[len("payload_") :]] = value
+                    name = name[len("input_") :]
 
-            response = rule_instance.executor.execute(pd.DataFrame(inputs_in_kwargs))
+                input_args[name] = value
+
+            response = rule_instance.executor.execute(pd.DataFrame(input_args))
 
             return {"output_value": response["output"].values}
 
         def generate_input_nodes(self):
-            # TODO: check inputs that do not have input nodes
-            return []
+            input_nodes = []
+            for component in rule_instance.components_registry.data.values():
+                input_nodes.extend(component.generate_input_nodes())
+            return input_nodes
+
+        def kind(self) -> NodeKind:
+            return NodeKind.FLOW
 
     return FlowV0

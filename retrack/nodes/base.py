@@ -17,6 +17,7 @@ class NodeKind(str, enum.Enum):
     CONNECTOR = "connector"
     START = "start"
     OTHER = "other"
+    FLOW = "flow"
 
 
 ###############################################################

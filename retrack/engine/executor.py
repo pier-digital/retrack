@@ -85,6 +85,7 @@ class RuleExecutor:
         node_dict: dict,
         current_node_filter: pd.Series,
         execution: Execution,
+        include_payload: bool = False,
     ) -> dict:
         input_params = {}
 
@@ -98,6 +99,10 @@ class RuleExecutor:
                     constants=self.constants,
                     filter_by=current_node_filter,
                 )
+
+        if include_payload:
+            for input_column in execution.payload.columns:
+                input_params[input_column] = execution.payload[input_column]
 
         return input_params
 
@@ -117,6 +122,8 @@ class RuleExecutor:
             node.model_dump(by_alias=True),
             current_node_filter,
             execution=execution,
+            include_payload=node.kind() == NodeKind.CONNECTOR
+            or node.kind() == NodeKind.FLOW,
         )
         output = node.run(**input_params)
 
