@@ -19,45 +19,44 @@ from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
 from retrack.utils.registry import Registry
 
-_registry = Registry()
-
 
 def registry() -> Registry:
+    _registry = Registry()
+
+    _registry.register("Input", Input)
+    _registry.register(
+        "Connector", VirtualConnector
+    )  # By default, Connector is an Input
+    _registry.register(
+        "ConnectorV0", VirtualConnector
+    )  # By default, Connector is an Input
+    _registry.register("Start", Start)
+    _registry.register("Constant", Constant)
+    _registry.register("List", List)
+    _registry.register("Bool", Bool)
+    _registry.register("Output", Output)
+    _registry.register("Check", Check)
+    _registry.register("If", If)
+    _registry.register("And", And)
+    _registry.register("Or", Or)
+    _registry.register("Not", Not)
+    _registry.register("Math", Math)
+    _registry.register("Round", Round)
+    _registry.register("AbsoluteValue", AbsoluteValue)
+    _registry.register("StartsWith", StartsWith)
+    _registry.register("EndsWith", EndsWith)
+    _registry.register("StartsWithAny", StartsWithAny)
+    _registry.register("EndsWithAny", EndsWithAny)
+    _registry.register("Contains", Contains)
+    _registry.register("CurrentYear", CurrentYear)
+    _registry.register("IntervalCatV0", IntervalCatV0)
+    _registry.register("LowerCase", LowerCase)
+
     return _registry
 
 
-def register(name: str, node: BaseNode) -> None:
-    registry().register(name, node)
-
-
-register("Input", Input)
-register("Connector", VirtualConnector)  # By default, Connector is an Input
-register("ConnectorV0", VirtualConnector)  # By default, Connector is an Input
-register("Start", Start)
-register("Constant", Constant)
-register("List", List)
-register("Bool", Bool)
-register("Output", Output)
-register("Check", Check)
-register("If", If)
-register("And", And)
-register("Or", Or)
-register("Not", Not)
-register("Math", Math)
-register("Round", Round)
-register("AbsoluteValue", AbsoluteValue)
-register("StartsWith", StartsWith)
-register("EndsWith", EndsWith)
-register("StartsWithAny", StartsWithAny)
-register("EndsWithAny", EndsWithAny)
-register("Contains", Contains)
-register("CurrentYear", CurrentYear)
-register("IntervalCatV0", IntervalCatV0)
-register("LowerCase", LowerCase)
-
 __all__ = [
     "registry",
-    "register",
     "BaseNode",
     "dynamic_nodes_registry",
     "BaseDynamicNode",

@@ -15,3 +15,6 @@ class VirtualConnector(Input):
 class BaseConnector(VirtualConnector):
     def generate_input_nodes(self) -> typing.List[Input]:
         raise NotImplementedError()
+
+    def run(self, **kwargs):  # Keep the kwargs in the signature
+        raise NotImplementedError()
