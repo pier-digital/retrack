@@ -1,5 +1,3 @@
-import typing
-
 from retrack.nodes.dynamic.base import BaseDynamicNode
 from retrack.nodes.dynamic.csv_table import csv_table_factory
 from retrack.nodes.dynamic.flow import flow_factory
