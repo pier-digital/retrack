@@ -1,9 +1,10 @@
+import hashlib
 import json
 
 from unidecode import unidecode
-import hashlib
-from retrack.utils.registry import Registry
+
 from retrack.utils.component_registry import ComponentRegistry
+from retrack.utils.registry import Registry
 
 
 def validate_version(

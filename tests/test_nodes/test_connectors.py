@@ -1,5 +1,6 @@
-from retrack.nodes.connectors import BaseConnector
 import pytest
+
+from retrack.nodes.connectors import BaseConnector
 
 
 @pytest.fixture

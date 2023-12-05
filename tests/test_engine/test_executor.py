@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import pytest
 
-from retrack import Rule, nodes, from_json
+from retrack import Rule, from_json, nodes
 
 
 @pytest.mark.parametrize(

@@ -1,11 +1,10 @@
-import typing
-
 import json
+import typing
 
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, OutputConnectionModel, NodeKind
+from retrack.nodes.base import InputConnectionModel, NodeKind, OutputConnectionModel
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 from retrack.utils.registry import Registry
 

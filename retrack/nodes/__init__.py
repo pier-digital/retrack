@@ -1,5 +1,6 @@
 from retrack.nodes.base import BaseNode
 from retrack.nodes.check import Check
+from retrack.nodes.connectors import BaseConnector, VirtualConnector
 from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
 from retrack.nodes.datetime import CurrentYear
@@ -9,14 +10,13 @@ from retrack.nodes.endswith import EndsWith
 from retrack.nodes.endswithany import EndsWithAny
 from retrack.nodes.inputs import Input
 from retrack.nodes.logic import And, Not, Or
+from retrack.nodes.lowercase import LowerCase
 from retrack.nodes.match import If
 from retrack.nodes.math import AbsoluteValue, Math, Round
 from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
-from retrack.nodes.connectors import BaseConnector, VirtualConnector
-from retrack.nodes.lowercase import LowerCase
 from retrack.utils.registry import Registry
 
 _registry = Registry()

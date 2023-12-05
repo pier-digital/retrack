@@ -1,4 +1,5 @@
 import typing
+
 from retrack.nodes.base import BaseNode
 from retrack.utils.registry import Registry
 

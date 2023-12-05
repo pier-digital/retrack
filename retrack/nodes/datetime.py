@@ -1,6 +1,5 @@
-import typing
-
 import datetime as dt
+import typing
 
 import pandas as pd
 import pydantic

@@ -1,15 +1,13 @@
-import pydantic
-from retrack.utils.component_registry import ComponentRegistry
-
 import typing
 
-
 import pandas as pd
+import pydantic
 
+from retrack.engine.base import Execution, RuleMetadata
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind, NodeMemoryType
 from retrack.utils import constants
-from retrack.engine.base import Execution, RuleMetadata
+from retrack.utils.component_registry import ComponentRegistry
 
 
 class RuleExecutor:

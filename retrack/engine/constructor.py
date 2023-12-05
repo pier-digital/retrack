@@ -1,10 +1,9 @@
+import json
 import typing
 
-import json
-
+from retrack import nodes
 from retrack.engine.rule import Rule, RuleExecutor
 from retrack.utils import registry
-from retrack import nodes
 
 
 def from_json(
