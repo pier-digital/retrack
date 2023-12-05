@@ -16,8 +16,9 @@ from retrack.utils import constants
 
 
 class Execution:
-    def __init__(self, states: pd.DataFrame):
+    def __init__(self, states: pd.DataFrame, filters: dict = None):
         self.states = states
+        self.filters = filters or {}
 
     def set_state_data(
         self, column: str, value: typing.Any, filter_by: typing.Any = None
@@ -38,6 +39,15 @@ class Execution:
 
         return self.states.loc[filter_by, column]
 
+    def update_filters(self, filter_value, output_connections: typing.List[str] = None):
+        for output_connection_id in output_connections:
+            if self.filters.get(output_connection_id, None) is None:
+                self.filters[output_connection_id] = filter_value
+            else:
+                self.filters[output_connection_id] = (
+                    self.filters[output_connection_id] & filter_value
+                )
+
     @classmethod
     def from_payload(cls, validated_payload: pd.DataFrame, input_columns: dict):
         state_df = pd.DataFrame([])
@@ -53,7 +63,6 @@ class Execution:
 class RuleExecutor:
     def __init__(self, rule: "Rule"):
         self._rule = rule
-        self.reset()
         self._set_constants()
         self._set_input_columns()
         self._request_manager = RequestManager(
@@ -71,10 +80,6 @@ class RuleExecutor:
     @property
     def request_model(self) -> pydantic.BaseModel:
         return self._request_manager.model
-
-    @property
-    def filters(self) -> dict:
-        return self._filters
 
     @property
     def constants(self) -> dict:
@@ -100,25 +105,20 @@ class RuleExecutor:
             for node in input_nodes
         }
 
-    def reset(self):
-        self._filters = {}
-
     def __set_output_connection_filters(
-        self, node_id: str, filter: typing.Any, connector_filter=None
+        self,
+        node_id: str,
+        filter_value: typing.Any,
+        execution: Execution,
+        connector_filter=None,
     ):
-        if filter is not None:
-            output_connections = (
-                self.rule.components_registry.get_node_output_connections(
-                    node_id, connector_filter=connector_filter
-                )
-            )
-            for output_connection_id in output_connections:
-                if self._filters.get(output_connection_id, None) is None:
-                    self._filters[output_connection_id] = filter
-                else:
-                    self._filters[output_connection_id] = (
-                        self._filters[output_connection_id] & filter
-                    )
+        if filter_value is None:
+            return
+
+        output_connections = self.rule.components_registry.get_node_output_connections(
+            node_id, connector_filter=connector_filter
+        )
+        execution.update_filters(filter_value, output_connections=output_connections)
 
     def __get_input_params(
         self,
@@ -142,9 +142,11 @@ class RuleExecutor:
         return input_params
 
     def __run_node(self, node_id: str, execution: Execution):
-        current_node_filter = self._filters.get(node_id, None)
+        current_node_filter = execution.filters.get(node_id, None)
         # if there is a filter, we need to set the children nodes to receive filtered data
-        self.__set_output_connection_filters(node_id, current_node_filter)
+        self.__set_output_connection_filters(
+            node_id, current_node_filter, execution=execution
+        )
 
         node = self.rule.components_registry.get(node_id)
 
@@ -165,7 +167,12 @@ class RuleExecutor:
             ):  # Setting output values
                 execution.set_state_data(output_name, output_value, current_node_filter)
             elif output_name.endswith(constants.FILTER_SUFFIX):  # Setting filters
-                self.__set_output_connection_filters(node_id, output_value, output_name)
+                self.__set_output_connection_filters(
+                    node_id,
+                    output_value,
+                    execution=execution,
+                    connector_filter=output_name,
+                )
             else:  # Setting node outputs to be used as inputs by other nodes
                 execution.set_state_data(
                     f"{node_id}@{output_name}",
@@ -193,8 +200,6 @@ class RuleExecutor:
         Returns:
             pd.DataFrame: The output of the flow.
         """
-        self.reset()
-
         execution = Execution.from_payload(
             validated_payload=self.validate_payload(payload_df),
             input_columns=self.input_columns,
