@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import pytest
 
-from retrack import Rule, from_json, nodes
+from retrack import Rule, from_json, nodes, RuleExecutor
 
 
 @pytest.mark.parametrize(
@@ -243,3 +243,11 @@ def test_csv_table_with_if():
         "then",
         "then",
     ]
+
+
+def test_create_from_json_with_dict():
+    with open("tests/resources/multiple-ifs.json", "r") as f:
+        graph_data = json.load(f)
+
+    assert isinstance(from_json(graph_data), RuleExecutor)
+    assert isinstance(from_json(graph_data, return_executor=False), Rule)

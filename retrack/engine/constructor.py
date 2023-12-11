@@ -7,31 +7,33 @@ from retrack.utils import registry
 
 
 def from_json(
-    data: typing.Union[str, dict],
+    graph_data: typing.Union[str, dict],
     name: str = None,
     nodes_registry: registry.Registry = nodes.registry(),
     dynamic_nodes_registry: registry.Registry = nodes.dynamic_nodes_registry(),
+    return_executor: bool = True,
     **kwargs,
-) -> RuleExecutor:
-    """Create a Rule Executor from a json file or a dict.
+) -> typing.Union[Rule, RuleExecutor]:
+    """Create a rule from a json file or a dict.
 
     Args:
-        data (typing.Union[str, dict]): json file path or a dict.
+        graph_data (typing.Union[str, dict]): Graph data.
         name (str, optional): Rule name. Defaults to None.
         nodes_registry (registry.Registry, optional): Nodes registry. Defaults to nodes.registry().
         dynamic_nodes_registry (registry.Registry, optional): Dynamic nodes registry. Defaults to nodes.dynamic_nodes_registry().
+        return_executor (bool, optional): Whether to return the executor or the rule. Defaults to True.
 
     Raises:
-        ValueError: If data is not a dict or a json file path.
+        ValueError: If the data is not a dict or a json file path.
 
     Returns:
-        RuleExecutor: Rule executor.
+        typing.Union[Rule, RuleExecutor]: Rule or RuleExecutor depending on return_executor.
     """
-    if isinstance(data, str) and data.endswith(".json"):
+    if isinstance(graph_data, str) and graph_data.endswith(".json"):
         if name is None:
-            name = data
-        graph_data = json.loads(open(data).read())
-    elif not isinstance(data, dict):
+            name = graph_data
+        graph_data = json.loads(open(graph_data).read())
+    elif not isinstance(graph_data, dict):
         raise ValueError("data must be a dict or a json file path")
 
     rule = Rule.create(
@@ -41,4 +43,4 @@ def from_json(
         dynamic_nodes_registry=dynamic_nodes_registry,
         **kwargs,
     )
-    return rule.executor
+    return rule.executor if return_executor else rule
