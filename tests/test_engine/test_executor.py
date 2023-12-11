@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import pytest
 
-from retrack import Parser, Runner
+from retrack import Rule, from_json, nodes
 
 
 @pytest.mark.parametrize(
@@ -27,10 +27,15 @@ from retrack import Parser, Runner
 )
 def test_flows_with_single_element(filename, in_values, expected_out_values):
     with open(f"tests/resources/{filename}.json", "r") as f:
-        rule = json.load(f)
+        graph_data = json.load(f)
 
-    runner = Runner(Parser(rule))
-    out_values = runner.execute(pd.DataFrame([in_values]))
+    executor = Rule.create(
+        graph_data,
+        nodes_registry=nodes.registry(),
+        dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+    ).executor
+
+    out_values = executor.execute(pd.DataFrame([in_values]))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
@@ -105,10 +110,15 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
 )
 def test_flows(filename, in_values, expected_out_values):
     with open(f"tests/resources/{filename}.json", "r") as f:
-        rule = json.load(f)
+        graph_data = json.load(f)
 
-    runner = Runner(Parser(rule))
-    out_values = runner.execute(pd.DataFrame(in_values))
+    executor = Rule.create(
+        graph_data,
+        nodes_registry=nodes.registry(),
+        dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+    ).executor
+
+    out_values = executor.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
@@ -161,10 +171,40 @@ def test_flows(filename, in_values, expected_out_values):
                 {"output": 25, "message": None},
             ],
         ),
+        (
+            "connector-rule",
+            [
+                {"prediction": "1", "multiplier": "1"},
+                {"prediction": "2", "multiplier": "1"},
+                {"prediction": "3", "multiplier": "1"},
+                {"prediction": "4", "multiplier": "1"},
+            ],
+            [
+                {"output": 1.0, "message": None},
+                {"output": 2.0, "message": None},
+                {"output": 3.0, "message": None},
+                {"output": 4.0, "message": None},
+            ],
+        ),
+        (
+            "rule-of-rules-with-connector",
+            [
+                {"prediction": "1", "var": "1"},
+                {"prediction": "2", "var": "1"},
+                {"prediction": "3", "var": "1"},
+                {"prediction": "4", "var": "1"},
+            ],
+            [
+                {"output": 1.0, "message": None},
+                {"output": 2.0, "message": None},
+                {"output": 3.0, "message": None},
+                {"output": 4.0, "message": None},
+            ],
+        ),
     ],
 )
 def test_create_from_json(filename, in_values, expected_out_values):
-    runner = Runner.from_json(f"tests/resources/{filename}.json")
+    runner = from_json(f"tests/resources/{filename}.json")
     out_values = runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
@@ -173,11 +213,11 @@ def test_create_from_json(filename, in_values, expected_out_values):
 
 def test_create_from_json_with_invalid_type():
     with pytest.raises(ValueError):
-        Runner.from_json(1)
+        from_json(1)
 
 
 def test_csv_table_with_if():
-    runner = Runner.from_json("tests/resources/csv-table-with-if.json")
+    runner = from_json("tests/resources/csv-table-with-if.json")
 
     in_values = [
         {"in_a": 0, "in_b": 0, "in_d": 0, "in_e": 0},

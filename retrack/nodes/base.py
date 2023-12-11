@@ -1,6 +1,5 @@
-import typing
-
 import enum
+import typing
 
 import pydantic
 
@@ -17,6 +16,7 @@ class NodeKind(str, enum.Enum):
     CONNECTOR = "connector"
     START = "start"
     OTHER = "other"
+    FLOW = "flow"
 
 
 ###############################################################
@@ -84,3 +84,6 @@ class BaseNode(pydantic.BaseModel):
 
     def memory_type(self) -> NodeMemoryType:
         return NodeMemoryType.STATE
+
+    def generate_input_nodes(self) -> typing.List["BaseNode"]:
+        return []

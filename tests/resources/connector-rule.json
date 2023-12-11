@@ -1,0 +1,171 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 5,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": [
+						{
+							"node": 10,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				36.999198273089995,
+				200.90571277556646
+			],
+			"name": "Start"
+		},
+		"4": {
+			"id": 4,
+			"data": {
+				"message": null
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 9,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				945.7727887309584,
+				74.29575409540634
+			],
+			"name": "Output"
+		},
+		"5": {
+			"id": 5,
+			"data": {
+				"name": "prediction",
+				"service": "service-name",
+				"identifier": "ml-model-name",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 9,
+							"input": "input_value_0",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				395.07074381698476,
+				-177.8616133049862
+			],
+			"name": "ConnectorV0"
+		},
+		"9": {
+			"id": 9,
+			"data": {
+				"operator": "*"
+			},
+			"inputs": {
+				"input_value_0": {
+					"connections": [
+						{
+							"node": 5,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_value_1": {
+					"connections": [
+						{
+							"node": 10,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				693.0432160700918,
+				41.0955985999175
+			],
+			"name": "Math"
+		},
+		"10": {
+			"id": 10,
+			"data": {
+				"name": "multiplier",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_down_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 9,
+							"input": "input_value_1",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				401.3893004299958,
+				231.106029062272
+			],
+			"name": "Input"
+		}
+	},
+	"version": "5e44160271.2023-11-27"
+}

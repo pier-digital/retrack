@@ -10,6 +10,9 @@ formatting:
 check-formatting:
 	poetry run ruff check .
 
+.PHONY: linting
+linting: formatting check-formatting
+
 .PHONY: tests
 tests:
 	poetry run pytest | tee pytest-coverage.txt

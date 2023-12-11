@@ -31,6 +31,10 @@ class RequestManager:
     def inputs(self) -> typing.List[BaseNode]:
         return self._inputs
 
+    @property
+    def input_names(self) -> typing.List[str]:
+        return [input.data.name for input in self.inputs]
+
     @inputs.setter
     def inputs(self, inputs: typing.List[BaseNode]):
         if not isinstance(inputs, list):
@@ -119,14 +123,14 @@ class RequestManager:
         return pandera.DataFrameSchema(
             fields,
             index=pandera.Index(int),
-            strict=True,
+            # strict=True,
             coerce=True,
         )
 
     def validate(
         self,
         payload: pd.DataFrame,
-    ) -> typing.List[pydantic.BaseModel]:
+    ) -> pd.DataFrame:
         """Validate the payload against the RequestManager's model
 
         Args:
@@ -136,7 +140,7 @@ class RequestManager:
             ValueError: If the RequestManager has no model
 
         Returns:
-            typing.List[pydantic.BaseModel]: The validated payload
+            pd.DataFrame: The validated payload
         """
         if self.model is None:
             raise ValueError("No inputs found")

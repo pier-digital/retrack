@@ -29,10 +29,8 @@ This will run the tests with [pytest](https://docs.pytest.org/en/latest/) and sh
 To format the code, you can use the command:
 
 ```bash
-make formatting
+make linting
 ```
-
-This will run the [isort](https://github.com/PyCQA/isort) and [black](https://github.com/psf/black) commands.
 
 ### Releasing a new version
 
