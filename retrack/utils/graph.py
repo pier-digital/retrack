@@ -5,6 +5,7 @@ from unidecode import unidecode
 
 from retrack.utils.component_registry import ComponentRegistry
 from retrack.utils.registry import Registry
+from retrack.utils import exceptions
 
 
 def validate_version(
@@ -13,26 +14,28 @@ def validate_version(
     version = graph_data.get("version", None)
 
     graph_json_content = (
-        json.dumps(graph_data["nodes"], ensure_ascii=False)
-        .replace(": ", ":")
+        json.dumps(graph_data["nodes"], ensure_ascii=False, separators=(",", ":"))
         .replace("\\", "")
         .replace('"', "")
-        .replace(", ", ",")
     )
     graph_json_content = unidecode(graph_json_content, errors="strict")
     calculated_hash = hashlib.sha256(graph_json_content.encode()).hexdigest()[:10]
 
     if version is None:
         if raise_if_null_version:
-            raise ValueError("Missing version")
+            raise exceptions.InvalidVersionException(
+                "Missing version. "
+                + "Make sure to set a version in the graph data or set raise_if_null_version to False."
+            )
 
         return f"{calculated_hash}.dynamic"
 
     file_version_hash = version.split(".")[0]
 
     if file_version_hash != calculated_hash and validate_version:
-        raise ValueError(
-            f"Invalid version. Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
+        raise exceptions.InvalidVersionException(
+            "Invalid version. "
+            + f"Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
         )
 
     return version

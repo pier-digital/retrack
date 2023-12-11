@@ -58,3 +58,37 @@ class Execution:
         state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
 
         return cls(payload=validated_payload, states=state_df)
+
+    @property
+    def result(self) -> pd.DataFrame:
+        return self.states[
+            [
+                constants.OUTPUT_REFERENCE_COLUMN,
+                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+            ]
+        ]
+
+    def has_ended(self) -> bool:
+        return self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0
+
+    def to_dict(self) -> dict:
+        return {
+            "payload": self.payload.to_dict(),
+            "states": self.states.to_dict(),
+            "filters": {k: v.to_dict() for k, v in self.filters.items()},
+            "result": self.result.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            payload=pd.DataFrame(data["payload"]),
+            states=pd.DataFrame(data["states"]),
+            filters={k: pd.DataFrame(v) for k, v in data["filters"].items()},
+        )
+
+    def __repr__(self) -> str:
+        return f"Execution({self.to_dict()})"
+
+    def __str__(self) -> str:
+        return self.__repr__()

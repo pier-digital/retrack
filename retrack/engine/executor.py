@@ -6,7 +6,7 @@ import pydantic
 from retrack.engine.base import Execution, RuleMetadata
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind, NodeMemoryType
-from retrack.utils import constants
+from retrack.utils import constants, exceptions
 from retrack.utils.component_registry import ComponentRegistry
 
 
@@ -147,14 +147,23 @@ class RuleExecutor:
 
     def validate_payload(self, payload_df: pd.DataFrame):
         if not isinstance(payload_df, pd.DataFrame):
-            raise ValueError("payload_df must be a pandas.DataFrame")
+            raise exceptions.ValidationException(
+                f"payload_df must be a pandas.DataFrame instead of {type(payload_df)}"
+            )
 
-        return self.request_manager.validate(payload_df.reset_index(drop=True))
+        try:
+            validated = self.request_manager.validate(payload_df.reset_index(drop=True))
+        except Exception as e:
+            raise exceptions.ValidationException.from_metadata(
+                self.metadata, payload_df
+            ) from e
+
+        return validated
 
     def execute(
         self,
         payload_df: pd.DataFrame,
-        return_all_states: bool = False,
+        return_execution: bool = False,
     ) -> pd.DataFrame:
         """Executes the flow with the given payload.
 
@@ -174,19 +183,14 @@ class RuleExecutor:
             try:
                 self.__run_node(node_id, execution=execution)
             except Exception as e:
-                raise Exception(
-                    f"Error running node {node_id} in {self.metadata.name} with version {self.metadata.version}"
+                raise exceptions.ExecutionException.from_metadata(
+                    self.metadata, node_id
                 ) from e
 
-            if execution.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0:
+            if execution.has_ended():
                 break
 
-        if return_all_states:
-            return execution.states
+        if return_execution:
+            return execution
 
-        return execution.states[
-            [
-                constants.OUTPUT_REFERENCE_COLUMN,
-                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
-            ]
-        ]
+        return execution.result

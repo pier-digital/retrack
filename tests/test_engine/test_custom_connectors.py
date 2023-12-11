@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from retrack import from_json, BaseConnector, nodes_registry
 from retrack.nodes.inputs import Input
-import pandera as pa
+from retrack.utils import exceptions
 
 
 @pytest.fixture
@@ -80,7 +80,7 @@ def test_missing_input_for_custom_connectors(custom_connector):
     custom_registry.register("Connector", custom_connector, overwrite=True)
     custom_registry.register("ConnectorV0", custom_connector, overwrite=True)
 
-    with pytest.raises(pa.errors.SchemaError):
+    with pytest.raises(exceptions.ValidationException):
         runner = from_json(
             "tests/resources/connector-rule.json",
             nodes_registry=custom_registry,

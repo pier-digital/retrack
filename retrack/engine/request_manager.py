@@ -31,6 +31,10 @@ class RequestManager:
     def inputs(self) -> typing.List[BaseNode]:
         return self._inputs
 
+    @property
+    def input_names(self) -> typing.List[str]:
+        return [input.data.name for input in self.inputs]
+
     @inputs.setter
     def inputs(self, inputs: typing.List[BaseNode]):
         if not isinstance(inputs, list):
