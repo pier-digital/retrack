@@ -21,6 +21,7 @@ from retrack.utils.registry import Registry
 
 
 def registry() -> Registry:
+    """Create a registry with all the nodes available in the library."""
     _registry = Registry()
 
     _registry.register("Input", Input)

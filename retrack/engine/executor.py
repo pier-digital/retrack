@@ -17,6 +17,17 @@ class RuleExecutor:
         execution_order: typing.List[str],
         metadata: RuleMetadata,
     ):
+        """Class that executes a rule.
+
+        Args:
+            components_registry (ComponentRegistry): Components registry.
+            execution_order (typing.List[str]): Execution order.
+            metadata (RuleMetadata): Rule metadata.
+
+        Raises:
+            exceptions.ExecutionException: If there is an error during execution.
+            exceptions.ValidationException: If there is an error during validation.
+        """
         self._components_registry = components_registry
         self._execution_order = execution_order
         self._metadata = metadata
@@ -146,6 +157,17 @@ class RuleExecutor:
                 )
 
     def validate_payload(self, payload_df: pd.DataFrame):
+        """Validates the payload.
+
+        Args:
+            payload_df (pd.DataFrame): The payload to be validated.
+
+        Raises:
+            exceptions.ValidationException: If there is an error during validation.
+
+        Returns:
+            pd.DataFrame: The validated payload.
+        """
         if not isinstance(payload_df, pd.DataFrame):
             raise exceptions.ValidationException(
                 f"payload_df must be a pandas.DataFrame instead of {type(payload_df)}"
@@ -164,15 +186,19 @@ class RuleExecutor:
         self,
         payload_df: pd.DataFrame,
         return_execution: bool = False,
-    ) -> pd.DataFrame:
-        """Executes the flow with the given payload.
+    ) -> typing.Union[pd.DataFrame, Execution]:
+        """Executes the rule.
 
         Args:
-            payload_df (pd.DataFrame): The payload to be used as input.
-            return_all_states (bool, optional): If True, returns all states. Defaults to False.
+            payload_df (pd.DataFrame): The payload to be executed.
+            return_execution (bool, optional): If True, returns the execution object. Defaults to False.
+
+        Raises:
+            exceptions.ExecutionException: If there is an error during execution.
+            exceptions.ValidationException: If there is an error during validation.
 
         Returns:
-            pd.DataFrame: The output of the flow.
+            typing.Union[pd.DataFrame, Execution]: The execution result.
         """
         execution = Execution.from_payload(
             validated_payload=self.validate_payload(payload_df),
