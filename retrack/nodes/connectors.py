@@ -1,7 +1,12 @@
 import typing
 
 from retrack.nodes.base import NodeKind
-from retrack.nodes.inputs import Input
+from retrack.nodes.inputs import Input, InputMetadataModel
+
+
+class ConnectorMetadataModel(InputMetadataModel):
+    service: str
+    identifier: str
 
 
 class VirtualConnector(Input):
@@ -13,6 +18,8 @@ class VirtualConnector(Input):
 
 
 class BaseConnector(VirtualConnector):
+    data: ConnectorMetadataModel
+
     def generate_input_nodes(self) -> typing.List[Input]:
         raise NotImplementedError()
 
