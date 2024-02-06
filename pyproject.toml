@@ -2,11 +2,11 @@
 name = "retrack"
 version = "2.1.0"
 description = "A business rules engine"
-authors = ["Gabriel Guarisa <gabrielguarisa@gmail.com>", "Nathalia Trotte <nathaliatrotte@gmail.com>"]
+authors = ["Gabriel Guarisa <gabriel.guarisa@pier.digital>", "Nathalia Trotte <nathaliatrotte@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/gabrielguarisa/retrack"
-homepage = "https://github.com/gabrielguarisa/retrack"
+repository = "https://github.com/pier-digital/retrack"
+homepage = "https://github.com/pier-digital/retrack"
 keywords = ["rules", "models", "business", "node", "graph"]
 
 [tool.poetry.dependencies]
