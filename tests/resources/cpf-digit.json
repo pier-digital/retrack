@@ -1,0 +1,120 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 3,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": []
+				}
+			},
+			"position": [
+				-4.642856729770428,
+				-45.19809865718219
+			],
+			"name": "Start"
+		},
+		"3": {
+			"id": 3,
+			"data": {
+				"name": "cpf",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 6,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				268.43361436937045,
+				-76.26621551528325
+			],
+			"name": "Input"
+		},
+		"5": {
+			"id": 5,
+			"data": {
+				"message": null
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 6,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				800.3208382386567,
+				-63.50671604428523
+			],
+			"name": "Output"
+		},
+		"6": {
+			"id": 6,
+			"data": {
+				"index": "8"
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 3,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 5,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				533.5,
+				-60.3671875
+			],
+			"name": "GetChar"
+		}
+	},
+	"version": "f3a6b12dca.2024-02-13"
+}

@@ -119,6 +119,17 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
                 {"message": None, "output": True},
             ],
         ),
+        (
+            "cpf-digit",
+            [
+                {"cpf": "53154432770"},
+                {"cpf": "22222222122"},
+            ],
+            [
+                {"message": None, "output": "7"},
+                {"message": None, "output": "1"},
+            ],
+        ),
     ],
 )
 def test_flows(filename, in_values, expected_out_values):
