@@ -1,0 +1,166 @@
+{
+	"id": "demo@0.1.0",
+	"nodes": {
+		"0": {
+			"id": 0,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{
+							"node": 4,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				},
+				"output_down_void": {
+					"connections": [
+						{
+							"node": 3,
+							"input": "input_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				-4.642856729770428,
+				-45.19809865718219
+			],
+			"name": "Start"
+		},
+		"2": {
+			"id": 2,
+			"data": {},
+			"inputs": {
+				"input_value_0": {
+					"connections": [
+						{
+							"node": 4,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				},
+				"input_value_1": {
+					"connections": [
+						{
+							"node": 3,
+							"output": "output_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_bool": {
+					"connections": [
+						{
+							"node": 5,
+							"input": "input_value",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				540.8487681017376,
+				-73.91795990443393
+			],
+			"name": "IsSubStringOf"
+		},
+		"3": {
+			"id": 3,
+			"data": {
+				"name": "input_var",
+				"default": null
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_down_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_value_1",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				267.1797079241348,
+				47.69474128567686
+			],
+			"name": "Input"
+		},
+		"4": {
+			"id": 4,
+			"data": {
+				"value": "foo"
+			},
+			"inputs": {
+				"input_void": {
+					"connections": [
+						{
+							"node": 0,
+							"output": "output_up_void",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [
+						{
+							"node": 2,
+							"input": "input_value_0",
+							"data": {}
+						}
+					]
+				}
+			},
+			"position": [
+				267.2634119810716,
+				-163.1311394973684
+			],
+			"name": "Constant"
+		},
+		"5": {
+			"id": 5,
+			"data": {
+				"message": null
+			},
+			"inputs": {
+				"input_value": {
+					"connections": [
+						{
+							"node": 2,
+							"output": "output_bool",
+							"data": {}
+						}
+					]
+				}
+			},
+			"outputs": {},
+			"position": [
+				810.7622444886567,
+				-75.42468479428523
+			],
+			"name": "Output"
+		}
+	},
+	"version": "d44327256b.2024-02-13"
+}

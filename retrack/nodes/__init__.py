@@ -17,6 +17,8 @@ from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
+from retrack.nodes.substring import IsSubStringOf
+from retrack.nodes.getchar import GetChar
 from retrack.utils.registry import Registry
 
 
@@ -52,6 +54,8 @@ def registry() -> Registry:
     _registry.register("CurrentYear", CurrentYear)
     _registry.register("IntervalCatV0", IntervalCatV0)
     _registry.register("LowerCase", LowerCase)
+    _registry.register("IsSubStringOf", IsSubStringOf)
+    _registry.register("GetChar", GetChar)
 
     return _registry
 

@@ -106,6 +106,30 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
                 {"message": None, "output": "200"},
             ],
         ),
+        (
+            "issubstringof",
+            [
+                {"input_var": "EXAMPLE"},
+                {"input_var": "test foo numbers 120"},
+                {"input_var": "foodsadsafoodsadas"},
+            ],
+            [
+                {"message": None, "output": False},
+                {"message": None, "output": True},
+                {"message": None, "output": True},
+            ],
+        ),
+        (
+            "cpf-digit",
+            [
+                {"cpf": "53154432770"},
+                {"cpf": "22222222122"},
+            ],
+            [
+                {"message": None, "output": "7"},
+                {"message": None, "output": "1"},
+            ],
+        ),
     ],
 )
 def test_flows(filename, in_values, expected_out_values):
