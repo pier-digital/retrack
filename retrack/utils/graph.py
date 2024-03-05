@@ -1,11 +1,19 @@
 import hashlib
 import json
 
-from unidecode import unidecode
+import unicodedata
 
 from retrack.utils.component_registry import ComponentRegistry
 from retrack.utils.registry import Registry
 from retrack.utils import exceptions
+
+
+def normalize_string(some_string: str) -> str:
+    return (
+        unicodedata.normalize("NFKD", some_string)
+        .encode("ascii", "ignore")
+        .decode("utf-8")
+    )
 
 
 def validate_version(
@@ -18,7 +26,7 @@ def validate_version(
         .replace("\\", "")
         .replace('"', "")
     )
-    graph_json_content = unidecode(graph_json_content, errors="strict")
+    graph_json_content = normalize_string(graph_json_content)
     calculated_hash = hashlib.sha256(graph_json_content.encode()).hexdigest()[:10]
 
     if version is None:
