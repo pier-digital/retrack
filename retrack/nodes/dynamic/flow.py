@@ -56,7 +56,6 @@ def flow_factory(
 
     class FlowV0(BaseFlowV0Model):
         def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
-            print(kwargs.keys())
             input_args = {}
             for name, value in kwargs.items():
                 if name.startswith("input_"):
