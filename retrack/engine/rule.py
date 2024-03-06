@@ -3,7 +3,7 @@ import typing
 import pydantic
 
 from retrack import validators
-from retrack.engine.base import RuleMetadata
+from retrack.engine.schemas import RuleMetadata
 from retrack.engine.executor import RuleExecutor
 from retrack.utils import graph
 from retrack.utils.component_registry import ComponentRegistry

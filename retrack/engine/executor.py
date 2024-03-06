@@ -3,7 +3,8 @@ import typing
 import pandas as pd
 import pydantic
 
-from retrack.engine.base import Execution, RuleMetadata
+from retrack.engine.base import Execution
+from retrack.engine.schemas import RuleMetadata
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind, NodeMemoryType
 from retrack.utils import constants, exceptions
@@ -185,20 +186,22 @@ class RuleExecutor:
     def execute(
         self,
         payload_df: pd.DataFrame,
-        return_execution: bool = False,
-    ) -> typing.Union[pd.DataFrame, Execution]:
+        debug_mode: bool = False,
+    ) -> typing.Union[
+        pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]
+    ]:
         """Executes the rule.
 
         Args:
             payload_df (pd.DataFrame): The payload to be executed.
-            return_execution (bool, optional): If True, returns the execution object. Defaults to False.
+            debug_mode (bool, optional): If True, runs the rule in debug mode and returns the exception, if any. Defaults to False.
 
         Raises:
             exceptions.ExecutionException: If there is an error during execution.
             exceptions.ValidationException: If there is an error during validation.
 
         Returns:
-            typing.Union[pd.DataFrame, Execution]: The execution result.
+            typing.Union[pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]]: The result of the execution or a tuple with the execution and the exception, if any.
         """
         execution = Execution.from_payload(
             validated_payload=self.validate_payload(payload_df),
@@ -209,14 +212,16 @@ class RuleExecutor:
             try:
                 self.__run_node(node_id, execution=execution)
             except Exception as e:
-                raise exceptions.ExecutionException.from_metadata(
-                    self.metadata, node_id
-                ) from e
+                exception = exceptions.ExecutionException(self.metadata, node_id, e, execution)
+                if debug_mode:
+                    return execution, exception
+
+                raise exception from e
 
             if execution.has_ended():
                 break
 
-        if return_execution:
-            return execution
+        if debug_mode:
+            return execution, None
 
         return execution.result

@@ -2,14 +2,8 @@ import typing
 
 import numpy as np
 import pandas as pd
-import pydantic
 
 from retrack.utils import constants
-
-
-class RuleMetadata(pydantic.BaseModel):
-    name: typing.Optional[str] = None
-    version: str
 
 
 class Execution:
@@ -77,6 +71,7 @@ class Execution:
             "states": self.states.to_dict(),
             "filters": {k: v.to_dict() for k, v in self.filters.items()},
             "result": self.result.to_dict(),
+            "has_ended": self.has_ended(),
         }
 
     @classmethod
