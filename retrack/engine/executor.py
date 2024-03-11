@@ -228,10 +228,6 @@ class RuleExecutor:
                     msg = "Error executing a sub-rule node {} from rule {} version {}".format(
                         node_id, self.metadata.name, self.metadata.version
                     )
-                elif self.metadata.name is None:
-                    msg = "Error executing node {} in the sub-rule with version {}".format(
-                        node_id, self.metadata.version
-                    )
 
                 exception = exceptions.ExecutionException(
                     rule_metadata=self.metadata,
