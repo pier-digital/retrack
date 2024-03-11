@@ -225,8 +225,12 @@ class RuleExecutor:
             except Exception as e:
                 msg = None
                 if isinstance(e, exceptions.ExecutionException):
-                    msg = "Error executing sub-rule in node {} from rule {} version {}".format(
+                    msg = "Error executing a sub-rule node {} from rule {} version {}".format(
                         node_id, self.metadata.name, self.metadata.version
+                    )
+                elif self.metadata.name is None:
+                    msg = "Error executing node {} in the sub-rule with version {}".format(
+                        node_id, self.metadata.version
                     )
 
                 exception = exceptions.ExecutionException(
