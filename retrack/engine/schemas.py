@@ -6,19 +6,27 @@ class RuleMetadata(pydantic.BaseModel):
     name: typing.Optional[str] = pydantic.Field(
         None, description="The name of the rule"
     )
-    version: str = pydantic.Field(..., description="The version of the rule")
+    version: typing.Optional[str] = pydantic.Field(
+        ..., description="The version of the rule"
+    )
 
 
 class ExecutionSchema(pydantic.BaseModel):
-    payload: typing.Any = pydantic.Field(
-        ..., description="The payload of the execution"
+    payload: typing.Optional[typing.Any] = pydantic.Field(
+        None, description="The payload of the execution"
     )
-    states: typing.Any = pydantic.Field(..., description="The states of the execution")
-    filters: typing.Dict[str, typing.Any] = pydantic.Field(
-        ..., description="The filters of the execution"
+    states: typing.Optional[typing.Any] = pydantic.Field(
+        None, description="The states of the execution"
     )
-    result: typing.Any = pydantic.Field(..., description="The result of the execution")
-    has_ended: bool = pydantic.Field(..., description="If the execution has ended")
+    filters: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        None, description="The filters of the execution"
+    )
+    result: typing.Optional[typing.Any] = pydantic.Field(
+        None, description="The result of the execution"
+    )
+    has_ended: typing.Optional[bool] = pydantic.Field(
+        None, description="If the execution has ended"
+    )
 
 
 class ExecutionMetadata(RuleMetadata):
@@ -29,9 +37,11 @@ class ExecutionMetadata(RuleMetadata):
 
 
 class ExceptionSchema(pydantic.BaseModel):
-    msg: str = pydantic.Field(..., description="The exception message")
+    msg: typing.Any = pydantic.Field(..., description="The exception message")
     exception_type: str = pydantic.Field(..., description="The exception type")
-    traceback: typing.Any = pydantic.Field(..., description="The exception traceback")
+    traceback: typing.Optional[typing.Any] = pydantic.Field(
+        None, description="The exception traceback", exclude=True
+    )
 
 
 class DetailSchema(pydantic.BaseModel):

@@ -45,7 +45,7 @@ class Rule(RuleMetadata):
             graph_data, nodes_registry, dynamic_nodes_registry, validator_registry
         )
         version = graph.validate_version(
-            graph_data, raise_if_null_version, validate_version
+            graph_data, raise_if_null_version, validate_version, name
         )
         graph_data = graph_data
 

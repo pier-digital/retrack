@@ -6,6 +6,7 @@ import unicodedata
 from retrack.utils.component_registry import ComponentRegistry
 from retrack.utils.registry import Registry
 from retrack.utils import exceptions
+from retrack.engine.schemas import RuleMetadata
 
 
 def normalize_string(some_string: str) -> str:
@@ -17,7 +18,7 @@ def normalize_string(some_string: str) -> str:
 
 
 def validate_version(
-    graph_data: dict, raise_if_null_version: bool, validate_version: bool
+    graph_data: dict, raise_if_null_version: bool, validate_version: bool, name: str
 ) -> str:
     version = graph_data.get("version", None)
 
@@ -32,8 +33,9 @@ def validate_version(
     if version is None:
         if raise_if_null_version:
             raise exceptions.InvalidVersionException(
-                "Missing version. "
-                + "Make sure to set a version in the graph data or set raise_if_null_version to False."
+                rule_metadata=RuleMetadata(name=name, version=None),
+                raised_exception=ValueError("Version is null"),
+                msg="Version is null",
             )
 
         return f"{calculated_hash}.dynamic"
@@ -42,8 +44,11 @@ def validate_version(
 
     if file_version_hash != calculated_hash and validate_version:
         raise exceptions.InvalidVersionException(
-            "Invalid version. "
-            + f"Graph data has changed and the hash is different: {calculated_hash} != {file_version_hash}"
+            rule_metadata=RuleMetadata(name=name, version=version),
+            raised_exception=ValueError(
+                f"Version hash {file_version_hash} does not match calculated hash {calculated_hash}"
+            ),
+            msg="Version hash does not match calculated hash",
         )
 
     return version

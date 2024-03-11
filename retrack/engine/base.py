@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from retrack.utils import constants
+from retrack.engine.schemas import ExecutionSchema
 
 
 class Execution:
@@ -73,6 +74,9 @@ class Execution:
             "result": self.result.to_dict(),
             "has_ended": self.has_ended(),
         }
+
+    def to_model(self) -> ExecutionSchema:
+        return ExecutionSchema(**self.to_dict())
 
     @classmethod
     def from_dict(cls, data: dict):
