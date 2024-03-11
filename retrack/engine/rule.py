@@ -3,7 +3,7 @@ import typing
 import pydantic
 
 from retrack import validators
-from retrack.engine.base import RuleMetadata
+from retrack.engine.schemas import RuleMetadata
 from retrack.engine.executor import RuleExecutor
 from retrack.utils import graph
 from retrack.utils.component_registry import ComponentRegistry
@@ -45,7 +45,7 @@ class Rule(RuleMetadata):
             graph_data, nodes_registry, dynamic_nodes_registry, validator_registry
         )
         version = graph.validate_version(
-            graph_data, raise_if_null_version, validate_version
+            graph_data, raise_if_null_version, validate_version, name
         )
         graph_data = graph_data
 
