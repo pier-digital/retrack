@@ -13,23 +13,19 @@ class ExecutionSchema(pydantic.BaseModel):
     payload: typing.Any = pydantic.Field(
         ..., description="The payload of the execution"
     )
-    states: typing.Any = pydantic.Field(
-        ..., description="The states of the execution"
-    )
+    states: typing.Any = pydantic.Field(..., description="The states of the execution")
     filters: typing.Dict[str, typing.Any] = pydantic.Field(
         ..., description="The filters of the execution"
     )
-    result: typing.Any = pydantic.Field(
-        ..., description="The result of the execution"
-    )
-    has_ended: bool = pydantic.Field(
-        ..., description="If the execution has ended"
-    )
+    result: typing.Any = pydantic.Field(..., description="The result of the execution")
+    has_ended: bool = pydantic.Field(..., description="If the execution has ended")
 
 
 class ExecutionMetadata(RuleMetadata):
     node_id: typing.Optional[str] = pydantic.Field(None, description="The node id")
-    execution: typing.Optional[ExecutionSchema] = pydantic.Field(None, description="Metadata of the rule execution")
+    execution: typing.Optional[ExecutionSchema] = pydantic.Field(
+        None, description="Metadata of the rule execution"
+    )
 
 
 class ExceptionSchema(pydantic.BaseModel):
@@ -64,6 +60,4 @@ class ErrorSchema(pydantic.BaseModel):
         ...,
         description="The HTTP status code applicable to this problem, expressed as a string value",
     )
-    metadata: ExecutionMetadata = pydantic.Field(
-        ..., description="Rule metadata"
-    )
+    metadata: ExecutionMetadata = pydantic.Field(..., description="Rule metadata")

@@ -25,7 +25,10 @@ class ExecutionException(Exception):
                 ),
             ),
             metadata=ExecutionMetadata(
-                name=rule_metadata.name, version=rule_metadata.version, node_id=node_id, execution=execution.to_dict()
+                name=rule_metadata.name,
+                version=rule_metadata.version,
+                node_id=node_id,
+                execution=execution.to_dict(),
             ),
         )
 

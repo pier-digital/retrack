@@ -212,7 +212,9 @@ class RuleExecutor:
             try:
                 self.__run_node(node_id, execution=execution)
             except Exception as e:
-                exception = exceptions.ExecutionException(self.metadata, node_id, e, execution)
+                exception = exceptions.ExecutionException(
+                    self.metadata, node_id, e, execution
+                )
                 if debug_mode:
                     return execution, exception
 
