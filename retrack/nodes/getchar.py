@@ -27,4 +27,4 @@ class GetChar(BaseNode):
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
-        return {"output_value": input_value.apply(lambda x: str(x)[self.data.index + 1])}
+        return {"output_value": input_value.apply(lambda x: str(x)[self.data.index - 1])}
