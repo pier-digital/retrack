@@ -189,7 +189,7 @@ class RuleExecutor:
     def execute(
         self,
         payload_df: pd.DataFrame,
-        debug_mode: int = False,
+        debug_mode: bool = False,
     ) -> typing.Union[
         pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]
     ]:
