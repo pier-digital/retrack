@@ -1,5 +1,3 @@
-import typing
-
 from retrack.nodes.base import NodeKind
 from retrack.nodes.inputs import Input, InputMetadataModel
 
