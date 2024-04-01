@@ -14,6 +14,3 @@ class BaseConnector(Input):
 
     def kind(self) -> NodeKind:
         return NodeKind.CONNECTOR
-
-    def generate_input_nodes(self) -> typing.List[Input]:
-        return [Input(**self.model_dump(by_alias=True))]
