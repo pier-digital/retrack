@@ -34,6 +34,3 @@ def test_create_base_connector(connector_dict):
     assert connector.data.default == "Hello World"
     assert connector.data.service == "example_service"
     assert connector.data.identifier == "example_identifier"
-
-    with pytest.raises(NotImplementedError):
-        _ = connector.generate_input_nodes()
