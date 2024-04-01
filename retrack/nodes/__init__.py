@@ -1,6 +1,6 @@
 from retrack.nodes.base import BaseNode
 from retrack.nodes.check import Check
-from retrack.nodes.connectors import BaseConnector, VirtualConnector
+from retrack.nodes.connectors import BaseConnector
 from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
 from retrack.nodes.datetime import CurrentYear
@@ -27,11 +27,9 @@ def registry() -> Registry:
     _registry = Registry()
 
     _registry.register("Input", Input)
+    _registry.register("Connector", BaseConnector)  # By default, Connector is an Input
     _registry.register(
-        "Connector", VirtualConnector
-    )  # By default, Connector is an Input
-    _registry.register(
-        "ConnectorV0", VirtualConnector
+        "ConnectorV0", BaseConnector
     )  # By default, Connector is an Input
     _registry.register("Start", Start)
     _registry.register("Constant", Constant)
