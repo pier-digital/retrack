@@ -46,7 +46,7 @@ class RequestManager:
         for i in range(len(inputs)):
             if not isinstance(inputs[i], BaseNode):
                 raise TypeError(
-                    f"inputs[{i}] must be a dict or an InputModel, not {type(inputs[i])}"
+                    f"inputs[{i}] must be an InputModel, not {type(inputs[i])}"
                 )
 
             if inputs[i].kind() != NodeKind.INPUT:
