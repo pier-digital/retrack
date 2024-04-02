@@ -34,6 +34,8 @@ class RuleExecutor:
         self._metadata = metadata
 
         input_nodes = self._components_registry.get_by_kind(NodeKind.INPUT)
+        input_nodes.extend(self._components_registry.get_by_kind(NodeKind.CONNECTOR))
+
         self._input_columns = {
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
@@ -132,8 +134,7 @@ class RuleExecutor:
             node.model_dump(by_alias=True),
             current_node_filter,
             execution=execution,
-            include_payload=node.kind() == NodeKind.CONNECTOR
-            or node.kind() == NodeKind.FLOW,
+            include_payload=node.kind() == NodeKind.FLOW,
         )
         output = node.run(**input_params)
 

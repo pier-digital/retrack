@@ -49,7 +49,10 @@ class RequestManager:
                     f"inputs[{i}] must be an InputModel, not {type(inputs[i])}"
                 )
 
-            if inputs[i].kind() != NodeKind.INPUT:
+            if (
+                inputs[i].kind() != NodeKind.INPUT
+                and inputs[i].kind() != NodeKind.CONNECTOR
+            ):
                 raise TypeError(
                     f"inputs[{i}] must be an InputModel, not {type(inputs[i])}"
                 )
