@@ -7,6 +7,7 @@ from retrack.nodes.base import (
     InputConnectionModel,
     NodeKind,
     OutputConnectionModel,
+    OptionalCastedToNoneStringType,
 )
 
 ################################################
@@ -16,7 +17,7 @@ from retrack.nodes.base import (
 
 class InputMetadataModel(pydantic.BaseModel):
     name: str
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
 
 
 ################################################

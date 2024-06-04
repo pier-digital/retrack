@@ -3,7 +3,12 @@ import typing
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import BaseNode, InputConnectionModel, NodeKind
+from retrack.nodes.base import (
+    BaseNode,
+    InputConnectionModel,
+    NodeKind,
+    OptionalCastedToNoneStringType,
+)
 from retrack.utils import constants
 
 ################################################
@@ -12,7 +17,7 @@ from retrack.utils import constants
 
 
 class OutputMetadataModel(pydantic.BaseModel):
-    message: typing.Optional[str] = None
+    message: OptionalCastedToNoneStringType = None
 
 
 ################################################

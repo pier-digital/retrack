@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def valid_input_dict_before_validation() -> dict:
     return {
         "id": 1,
