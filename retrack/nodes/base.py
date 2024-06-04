@@ -50,8 +50,8 @@ def cast_empty_string_to_none(v: str, info: pydantic.ValidationInfo) -> typing.A
     return v
 
 
-CastedToNoneStringType = typing.Annotated[
-    str, pydantic.BeforeValidator(cast_empty_string_to_none)
+OptionalCastedToNoneStringType = typing.Annotated[
+    typing.Optional[str], pydantic.BeforeValidator(cast_empty_string_to_none)
 ]
 
 

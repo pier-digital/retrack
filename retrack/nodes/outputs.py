@@ -7,7 +7,7 @@ from retrack.nodes.base import (
     BaseNode,
     InputConnectionModel,
     NodeKind,
-    CastedToNoneStringType,
+    OptionalCastedToNoneStringType,
 )
 from retrack.utils import constants
 
@@ -17,7 +17,7 @@ from retrack.utils import constants
 
 
 class OutputMetadataModel(pydantic.BaseModel):
-    message: typing.Optional[CastedToNoneStringType] = None
+    message: OptionalCastedToNoneStringType = None
 
 
 ################################################
