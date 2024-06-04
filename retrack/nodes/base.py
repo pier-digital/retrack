@@ -44,6 +44,17 @@ CastedToStringType = typing.Annotated[
 ]
 
 
+def cast_empty_string_to_none(v: str, info: pydantic.ValidationInfo) -> typing.Any:
+    if v == "":
+        return None
+    return v
+
+
+CastedToNoneStringType = typing.Annotated[
+    str, pydantic.BeforeValidator(cast_empty_string_to_none)
+]
+
+
 class OutputConnectionItemModel(pydantic.BaseModel):
     node: CastedToStringType
     input_: str = pydantic.Field(alias="input")
