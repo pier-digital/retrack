@@ -37,7 +37,7 @@ def flow_factory(
         nodes_registry=nodes_registry,
         dynamic_nodes_registry=dynamic_nodes_registry,
         validator_registry=validator_registry,
-        name=data["name"],
+        name=data.get("name"),
     )
     input_fields = {}
 
