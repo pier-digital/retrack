@@ -210,6 +210,23 @@ def test_flows(filename, in_values, expected_out_values):
                 {"output": 4.0, "message": None},
             ],
         ),
+        (
+            "rule-of-rules-with-different-names",
+            [
+                {"first_name": "1"},
+                {"first_name": "2"},
+                {"first_name": "3"},
+                {"first_name": "4"},
+                {"first_name": "example"},
+            ],
+            [
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+            ],
+        ),
     ],
 )
 def test_create_from_json(filename, in_values, expected_out_values):
