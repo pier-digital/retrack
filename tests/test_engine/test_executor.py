@@ -211,18 +211,20 @@ def test_flows(filename, in_values, expected_out_values):
             ],
         ),
         (
-            "rule-of-rules-with-connector",
+            "rule-of-rules-with-different-names",
             [
-                {"prediction": "1", "var": "1"},
-                {"prediction": "2", "var": "1"},
-                {"prediction": "3", "var": "1"},
-                {"prediction": "4", "var": "1"},
+                {"first_name": "1"},
+                {"first_name": "2"},
+                {"first_name": "3"},
+                {"first_name": "4"},
+                {"first_name": "example"},
             ],
             [
-                {"output": 1.0, "message": None},
-                {"output": 2.0, "message": None},
-                {"output": 3.0, "message": None},
-                {"output": 4.0, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
+                {"output": True, "message": None},
             ],
         ),
     ],
@@ -233,6 +235,11 @@ def test_create_from_json(filename, in_values, expected_out_values):
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
+
+
+def test_create_invalid_rule_of_rules_with_connector():
+    with pytest.raises(ValueError):
+        from_json("tests/resources/invalid-rule-of-rules-with-connector.json")
 
 
 def test_create_from_json_with_invalid_type():

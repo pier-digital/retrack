@@ -37,9 +37,16 @@ def flow_factory(
         nodes_registry=nodes_registry,
         dynamic_nodes_registry=dynamic_nodes_registry,
         validator_registry=validator_registry,
-        name=data["name"],
+        name=data.get("name"),
     )
     input_fields = {}
+
+    connector_nodes = rule_instance.components_registry.get_by_kind(NodeKind.CONNECTOR)
+
+    if len(connector_nodes) > 0:
+        raise ValueError(
+            f"Flow nodes cannot have connector nodes. Found {len(connector_nodes)} connector nodes."
+        )
 
     for name in inputs.keys():
         input_fields[name] = BaseDynamicNode.create_sub_field(InputConnectionModel)
