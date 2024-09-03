@@ -40,8 +40,7 @@ class RequestManager:
         if not isinstance(inputs, list):
             raise TypeError(f"inputs must be a list, not {type(inputs)}")
 
-        input_names = set()
-        formated_inputs = []
+        formated_inputs = {}
 
         for i in range(len(inputs)):
             if not isinstance(inputs[i], BaseNode):
@@ -57,11 +56,12 @@ class RequestManager:
                     f"inputs[{i}] must be an InputModel, not {type(inputs[i])}"
                 )
 
-            if inputs[i].data.name not in input_names:
-                input_names.add(inputs[i].data.name)
-                formated_inputs.append(inputs[i])
+            if inputs[i].data.name not in formated_inputs:
+                formated_inputs[inputs[i].data.name] = inputs[i]
+            elif inputs[i].data.default is not None:
+                formated_inputs[inputs[i].data.name] = inputs[i]
 
-        self._inputs = formated_inputs
+        self._inputs = formated_inputs.values()
 
         if len(self.inputs) > 0:
             self._model = self.__create_model()
