@@ -104,6 +104,6 @@ def walk(actual_id: str, skiped_ids: list, components_registry: ComponentRegistr
 
 
 def get_execution_order(components_registry: ComponentRegistry):
-    start_nodes = components_registry.get_by_name("start")
+    start_nodes = components_registry.get_by_class("start")
 
     return walk(start_nodes[0].id, [], components_registry)
