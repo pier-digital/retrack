@@ -21,6 +21,7 @@ def valid_input_dict_before_validation() -> dict:
 def valid_input_dict_after_validation() -> dict:
     return {
         "id": "1",
+        "name": "Input",
         "data": {"name": "example", "default": "Hello World"},
         "inputs": {"input_void": None},
         "outputs": {

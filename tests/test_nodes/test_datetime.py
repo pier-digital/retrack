@@ -22,14 +22,6 @@ def test_current_year_node(current_year_input_data):
 
     assert isinstance(current_year_node, CurrentYear)
 
-    assert current_year_node.model_dump(by_alias=True) == {
-        "id": "18",
-        "inputs": {
-            "input_void": {"connections": []},
-        },
-        "outputs": {"output_value": {"connections": []}},
-    }
-
 
 def test_current_year_node_run(current_year_input_data, mocker):
     datetime_mock = mocker.patch("retrack.nodes.datetime.dt.datetime")

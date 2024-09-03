@@ -1,24 +1,31 @@
 import pandas as pd
-
+import pytest
 from retrack.nodes.startswithany import StartsWithAny
 
-input_data = {
-    "id": 13,
-    "data": {},
-    "inputs": {"input_value": {"connections": []}, "input_list": {"connections": []}},
-    "outputs": {"output_bool": {"connections": []}},
-    "position": [1178.650051545976, 855.8644837700068],
-    "name": "StartsWithAny",
-}
+
+@pytest.fixture
+def input_data():
+    return {
+        "id": 13,
+        "data": {},
+        "inputs": {
+            "input_value": {"connections": []},
+            "input_list": {"connections": []},
+        },
+        "outputs": {"output_bool": {"connections": []}},
+        "position": [1178.650051545976, 855.8644837700068],
+        "name": "StartsWithAny",
+    }
 
 
-def test_StartsWithAny_node():
-    StartsWithAny_node = StartsWithAny(**input_data)
+def test_starts_with_any_node(input_data):
+    starts_with_any_node = StartsWithAny(**input_data)
 
-    assert isinstance(StartsWithAny_node, StartsWithAny)
+    assert isinstance(starts_with_any_node, StartsWithAny)
 
-    assert StartsWithAny_node.model_dump(by_alias=True) == {
+    assert starts_with_any_node.model_dump(by_alias=True) == {
         "id": "13",
+        "name": "StartsWithAny",
         "inputs": {
             "input_value": {"connections": []},
             "input_list": {"connections": []},
@@ -27,10 +34,10 @@ def test_StartsWithAny_node():
     }
 
 
-def test_StartsWithAny_node_run():
-    StartsWithAny_node = StartsWithAny(**input_data)
+def test_starts_with_any_node_run(input_data):
+    starts_with_any_node = StartsWithAny(**input_data)
 
-    output = StartsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
+    output = starts_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
     assert (output["output_bool"] == pd.Series([True])).all()
-    output = StartsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "3"]))
+    output = starts_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "3"]))
     assert (output["output_bool"] == pd.Series([False])).all()

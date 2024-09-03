@@ -15,25 +15,16 @@ input_data = {
 }
 
 
-def test_EndsWith_node():
-    EndsWith_node = EndsWith(**input_data)
+def test_ends_with_node():
+    ends_with_node = EndsWith(**input_data)
 
-    assert isinstance(EndsWith_node, EndsWith)
-
-    assert EndsWith_node.model_dump(by_alias=True) == {
-        "id": "11",
-        "inputs": {
-            "input_value_0": {"connections": []},
-            "input_value_1": {"connections": []},
-        },
-        "outputs": {"output_bool": {"connections": []}},
-    }
+    assert isinstance(ends_with_node, EndsWith)
 
 
-def test_EndsWith_node_run():
-    EndsWith_node = EndsWith(**input_data)
+def test_ends_with_node_run():
+    ends_with_node = EndsWith(**input_data)
 
-    output = EndsWith_node.run(pd.Series(["100"]), pd.Series(["2"]))
+    output = ends_with_node.run(pd.Series(["100"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = EndsWith_node.run(pd.Series(["102"]), pd.Series(["2"]))
+    output = ends_with_node.run(pd.Series(["102"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([True])).all()

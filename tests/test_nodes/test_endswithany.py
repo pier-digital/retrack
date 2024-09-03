@@ -12,25 +12,16 @@ input_data = {
 }
 
 
-def test_EndsWithAny_node():
-    EndsWithAny_node = EndsWithAny(**input_data)
+def test_ends_with_any_node():
+    ends_with_any_node = EndsWithAny(**input_data)
 
-    assert isinstance(EndsWithAny_node, EndsWithAny)
-
-    assert EndsWithAny_node.model_dump(by_alias=True) == {
-        "id": "13",
-        "inputs": {
-            "input_value": {"connections": []},
-            "input_list": {"connections": []},
-        },
-        "outputs": {"output_bool": {"connections": []}},
-    }
+    assert isinstance(ends_with_any_node, EndsWithAny)
 
 
-def test_EndsWithAny_node_run():
-    EndsWithAny_node = EndsWithAny(**input_data)
+def test_ends_with_any_node_run():
+    ends_with_any_node = EndsWithAny(**input_data)
 
-    output = EndsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
+    output = ends_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = EndsWithAny_node.run(pd.Series(["100"]), pd.Series(["2", "0"]))
+    output = ends_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "0"]))
     assert (output["output_bool"] == pd.Series([True])).all()

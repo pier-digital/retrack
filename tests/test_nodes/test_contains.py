@@ -1,24 +1,33 @@
 import pandas as pd
-
 from retrack.nodes.contains import Contains
 
-input_data = {
-    "id": 9,
-    "data": {},
-    "inputs": {"input_list": {"connections": []}, "input_value": {"connections": []}},
-    "outputs": {"output_bool": {"connections": []}},
-    "position": [1597.1904571362154, 628.6495284260166],
-    "name": "Contains",
-}
+
+import pytest
 
 
-def test_Contains_node():
-    Contains_node = Contains(**input_data)
+@pytest.fixture
+def input_data():
+    return {
+        "id": 9,
+        "data": {},
+        "inputs": {
+            "input_list": {"connections": []},
+            "input_value": {"connections": []},
+        },
+        "outputs": {"output_bool": {"connections": []}},
+        "position": [1597.1904571362154, 628.6495284260166],
+        "name": "Contains",
+    }
 
-    assert isinstance(Contains_node, Contains)
 
-    assert Contains_node.model_dump(by_alias=True) == {
+def test_contains_node(input_data):
+    contains_node = Contains(**input_data)
+
+    assert isinstance(contains_node, Contains)
+
+    assert contains_node.model_dump(by_alias=True) == {
         "id": "9",
+        "name": "Contains",
         "inputs": {
             "input_list": {"connections": []},
             "input_value": {"connections": []},
@@ -27,10 +36,10 @@ def test_Contains_node():
     }
 
 
-def test_Contains_node_run():
-    Contains_node = Contains(**input_data)
+def test_contains_node_run(input_data):
+    contains_node = Contains(**input_data)
 
-    output = Contains_node.run(pd.Series(["1", "2"]), pd.Series(["2"]))
+    output = contains_node.run(pd.Series(["1", "2"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([True])).all()
-    output = Contains_node.run(pd.Series(["1", "2"]), pd.Series(["3"]))
+    output = contains_node.run(pd.Series(["1", "2"]), pd.Series(["3"]))
     assert (output["output_bool"] == pd.Series([False])).all()
