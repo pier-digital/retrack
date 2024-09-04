@@ -13,7 +13,8 @@ def conditional_connector_metadata():
             "name": "example",
             "source": "source_name",
             "resource": "resource_name",
-            "headers_map": ["example_input_name", "another_input_name"],
+            "headers": ["example_input_name", "another_input_name"],
+            "headers_map": ["input_value_0", "input_value_1"],
         },
         "outputs": {
             "output_value": {
