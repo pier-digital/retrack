@@ -12,6 +12,7 @@ class ConditionalConnectorMetadataModel(pydantic.BaseModel):
     source: str
     resource: str
     default: typing.Optional[str] = None
+    headers: typing.List[str]
     headers_map: typing.List[str]
 
 
