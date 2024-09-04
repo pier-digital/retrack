@@ -3,6 +3,7 @@ import typing
 import pandas as pd
 import pydantic
 
+from retrack.nodes import BaseNode
 from retrack.engine.base import Execution
 from retrack.engine.schemas import RuleMetadata
 from retrack.engine.request_manager import RequestManager
@@ -33,16 +34,14 @@ class RuleExecutor:
         self._execution_order = execution_order
         self._metadata = metadata
 
-        input_nodes = self._components_registry.get_by_kind(NodeKind.INPUT)
-        input_nodes.extend(self._components_registry.get_by_kind(NodeKind.CONNECTOR))
+        input_nodes = self.components_registry.get_by_kind(NodeKind.INPUT)
+        input_nodes.extend(self.components_registry.get_by_kind(NodeKind.CONNECTOR))
 
-        self._input_columns = {
-            f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
-            for node in input_nodes
-        }
-        self._request_manager = RequestManager(input_nodes)
+        self.reset_request_manager(input_nodes)
 
-        self._set_constants()
+    @property
+    def components_registry(self) -> ComponentRegistry:
+        return self._components_registry
 
     @property
     def execution_order(self) -> typing.List[str]:
@@ -65,7 +64,7 @@ class RuleExecutor:
         return self._constants
 
     def _set_constants(self):
-        constant_nodes = self._components_registry.get_by_memory_type(
+        constant_nodes = self.components_registry.get_by_memory_type(
             NodeMemoryType.CONSTANT
         )
         self._constants = {}
@@ -87,7 +86,7 @@ class RuleExecutor:
         if filter_value is None:
             return
 
-        output_connections = self._components_registry.get_node_output_connections(
+        output_connections = self.components_registry.get_node_output_connections(
             node_id, connector_filter=connector_filter
         )
         execution.update_filters(filter_value, output_connections=output_connections)
@@ -117,7 +116,7 @@ class RuleExecutor:
             node_id, current_node_filter, execution=execution
         )
 
-        node = self._components_registry.get(node_id)
+        node = self.components_registry.get(node_id)
 
         if node.memory_type == NodeMemoryType.CONSTANT:
             return
@@ -147,7 +146,21 @@ class RuleExecutor:
                     filter_by=current_node_filter,
                 )
 
-    def validate_payload(self, payload_df: pd.DataFrame):
+    def reset_request_manager(self, input_nodes: typing.List[BaseNode]) -> None:
+        """Resets the request manager. This method should be called when the input nodes change.
+
+        Args:
+            input_nodes (typing.List[BaseNode]): The input nodes to be used.
+        """
+        self._input_columns = {
+            f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
+            for node in input_nodes
+        }
+        self._request_manager = RequestManager(input_nodes)
+
+        self._set_constants()
+
+    def validate_payload(self, payload_df: pd.DataFrame) -> pd.DataFrame:
         """Validates the payload.
 
         Args:

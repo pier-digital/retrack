@@ -26,6 +26,7 @@ def test_start_node():
 
     assert start_node.model_dump(by_alias=True) == {
         "id": "0",
+        "name": "Start",
         "outputs": {
             "output_up_void": {
                 "connections": [

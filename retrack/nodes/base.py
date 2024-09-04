@@ -80,6 +80,7 @@ class InputConnectionModel(pydantic.BaseModel):
 
 class BaseNode(pydantic.BaseModel):
     id: CastedToStringType
+    name: str
     inputs: typing.Optional[
         typing.Dict[CastedToStringType, InputConnectionModel]
     ] = None

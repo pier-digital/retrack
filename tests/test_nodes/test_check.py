@@ -27,6 +27,7 @@ def test_check_node(node_schema):
 
     assert check_node.model_dump(by_alias=True) == {
         "id": "8",
+        "name": "Check",
         "data": {"operator": CheckOperator.EQUAL},
         "inputs": {
             "input_value_0": {"connections": []},

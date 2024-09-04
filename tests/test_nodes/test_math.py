@@ -41,6 +41,7 @@ def test_math_node(math_operator_input_data):
 
     assert math_node.model_dump(by_alias=True) == {
         "id": "18",
+        "name": "Math",
         "data": {"operator": MathOperator.SUM},
         "inputs": {
             "input_value_0": {"connections": []},
