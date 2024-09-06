@@ -8,7 +8,7 @@ from retrack.engine.base import Execution
 from retrack.engine.schemas import RuleMetadata
 from retrack.engine.request_manager import RequestManager
 from retrack.nodes.base import NodeKind, NodeMemoryType
-from retrack.utils import constants, exceptions
+from retrack.utils import constants, exceptions, registry
 from retrack.utils.component_registry import ComponentRegistry
 
 
@@ -124,6 +124,11 @@ class RuleExecutor:
         input_params = self.__get_input_params(
             node.model_dump(by_alias=True), current_node_filter, execution=execution
         )
+
+        # TODO: Remove this condition after adding support for kwargs in the run method for all nodes
+        if node.kind() == NodeKind.CONNECTOR:
+            input_params["global_constants"] = execution.global_constants
+
         output = node.run(**input_params)
 
         for output_name, output_value in output.items():
@@ -193,6 +198,7 @@ class RuleExecutor:
         self,
         payload_df: pd.DataFrame,
         debug_mode: bool = False,
+        global_constants: typing.Optional[registry.Registry] = None,
     ) -> typing.Union[
         pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]
     ]:
@@ -201,6 +207,7 @@ class RuleExecutor:
         Args:
             payload_df (pd.DataFrame): The payload to be executed.
             debug_mode (bool, optional): If True, runs the rule in debug mode and returns the exception, if any. Defaults to False.
+            global_constants (registry.Registry, optional): Global constants to be used during execution. Defaults to None.
 
         Raises:
             exceptions.ExecutionException: If there is an error during execution.
@@ -220,6 +227,7 @@ class RuleExecutor:
         execution = Execution.from_payload(
             validated_payload=validated_payload,
             input_columns=self.input_columns,
+            global_constants=global_constants,
         )
 
         for node_id in self.execution_order:

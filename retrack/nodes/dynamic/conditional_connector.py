@@ -43,7 +43,7 @@ def conditional_connector_factory(
     class ConditionalConnector(BaseModel):
         def kind(self) -> NodeKind:
             return NodeKind.CONNECTOR
-        
+
         def run(self, **kwargs):
             return {}
 
