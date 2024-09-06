@@ -3,17 +3,22 @@ import typing
 import numpy as np
 import pandas as pd
 
-from retrack.utils import constants
+from retrack.utils import constants, registry
 from retrack.engine.schemas import ExecutionSchema
 
 
 class Execution:
     def __init__(
-        self, payload: pd.DataFrame, states: pd.DataFrame, filters: dict = None
+        self,
+        payload: pd.DataFrame,
+        states: pd.DataFrame,
+        filters: dict = None,
+        global_constants: registry.Registry = None,
     ):
         self.payload = payload
         self.states = states
         self.filters = filters or {}
+        self.global_constants = global_constants
 
     def set_state_data(
         self, column: str, value: typing.Any, filter_by: typing.Any = None
@@ -44,7 +49,12 @@ class Execution:
                 )
 
     @classmethod
-    def from_payload(cls, validated_payload: pd.DataFrame, input_columns: dict):
+    def from_payload(
+        cls,
+        validated_payload: pd.DataFrame,
+        input_columns: dict,
+        global_constants: registry.Registry = None,
+    ):
         state_df = pd.DataFrame([])
         for node_id, input_name in input_columns.items():
             state_df[node_id] = validated_payload[input_name].copy()
@@ -52,7 +62,11 @@ class Execution:
         state_df[constants.OUTPUT_REFERENCE_COLUMN] = np.nan
         state_df[constants.OUTPUT_MESSAGE_REFERENCE_COLUMN] = np.nan
 
-        return cls(payload=validated_payload, states=state_df)
+        return cls(
+            payload=validated_payload,
+            states=state_df,
+            global_constants=global_constants,
+        )
 
     @property
     def result(self) -> pd.DataFrame:

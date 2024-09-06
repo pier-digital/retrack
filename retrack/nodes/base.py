@@ -57,7 +57,7 @@ OptionalCastedToNoneStringType = typing.Annotated[
 
 class OutputConnectionItemModel(pydantic.BaseModel):
     node: CastedToStringType
-    input_: str = pydantic.Field(alias="input")
+    input: str = pydantic.Field(alias="input")
 
 
 class InputConnectionItemModel(pydantic.BaseModel):

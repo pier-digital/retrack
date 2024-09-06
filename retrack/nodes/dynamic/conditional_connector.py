@@ -44,4 +44,7 @@ def conditional_connector_factory(
         def kind(self) -> NodeKind:
             return NodeKind.CONNECTOR
 
+        def run(self, **kwargs):
+            return {}
+
     return ConditionalConnector
