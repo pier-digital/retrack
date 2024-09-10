@@ -13,12 +13,12 @@ class Execution:
         payload: pd.DataFrame,
         states: pd.DataFrame,
         filters: dict = None,
-        global_constants: registry.Registry = None,
+        context: registry.Registry = None,
     ):
         self.payload = payload
         self.states = states
         self.filters = filters or {}
-        self.global_constants = global_constants
+        self.context = context
 
     def set_state_data(
         self, column: str, value: typing.Any, filter_by: typing.Any = None
@@ -53,7 +53,7 @@ class Execution:
         cls,
         validated_payload: pd.DataFrame,
         input_columns: dict,
-        global_constants: registry.Registry = None,
+        context: registry.Registry = None,
     ):
         state_df = pd.DataFrame([])
         for node_id, input_name in input_columns.items():
@@ -65,7 +65,7 @@ class Execution:
         return cls(
             payload=validated_payload,
             states=state_df,
-            global_constants=global_constants,
+            context=context,
         )
 
     @property
