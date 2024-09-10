@@ -126,11 +126,6 @@ class RuleExecutor:
             node.model_dump(by_alias=True), current_node_filter, execution=execution
         )
 
-        if input_params is None or (
-            hasattr(input_params, "empty") and input_params.empty
-        ):
-            return
-
         # TODO: Remove this condition after adding support for kwargs in the run method for all nodes
         if node.kind() == NodeKind.CONNECTOR:
             input_params["context"] = execution.context

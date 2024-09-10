@@ -38,7 +38,7 @@ class Rule(RuleMetadata):
         dynamic_nodes_registry: Registry,
         validator_registry: Registry = validators.registry(),
         raise_if_null_version: bool = False,
-        validate_version: bool = True,
+        validate_version: bool = False,
         name: str = None,
     ):
         components_registry = Rule.create_component_registry(

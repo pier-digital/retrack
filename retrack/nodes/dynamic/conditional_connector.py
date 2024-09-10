@@ -29,7 +29,7 @@ def conditional_connector_factory(
         input_fields[name] = BaseDynamicNode.create_sub_field(InputConnectionModel)
 
     inputs_model = BaseDynamicIOModel.with_fields(
-        "CSVTableV0InputsModel", **input_fields
+        "ConditionalConnectorInputsModel", **input_fields
     )
 
     models = {

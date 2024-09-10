@@ -1,0 +1,417 @@
+{
+    "id": "demo@0.1.0",
+    "nodes": {
+        "79c91efb5fc8e23e": {
+            "id": "79c91efb5fc8e23e",
+            "name": "Start",
+            "data": {},
+            "outputs": {
+                "output_up_void": {
+                    "connections": [
+                        {
+                            "node": "6690e619d640e884",
+                            "input": "input_void"
+                        }
+                    ]
+                },
+                "output_down_void": {
+                    "connections": [
+                        {
+                            "node": "e81e103583abac29",
+                            "input": "input_void"
+                        }
+                    ]
+                }
+            },
+            "inputs": {}
+        },
+        "5dc2fa95808ff994": {
+            "id": "5dc2fa95808ff994",
+            "name": "Input",
+            "data": {
+                "name": "cpf",
+                "default": ""
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "4a18c47f529ad26b",
+                            "input": "input_value_0"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "92fe051396102987",
+                            "output": "output_then_filter"
+                        }
+                    ]
+                }
+            }
+        },
+        "7be7fcca32dbbf02": {
+            "id": "7be7fcca32dbbf02",
+            "name": "Input",
+            "data": {
+                "name": "license_plate",
+                "default": ""
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "288c0a42cefd7dd4",
+                            "input": "input_value_0"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "92fe051396102987",
+                            "output": "output_then_filter"
+                        }
+                    ]
+                }
+            }
+        },
+        "288c0a42cefd7dd4": {
+            "id": "288c0a42cefd7dd4",
+            "name": "BureauConnector",
+            "data": {
+                "name": "rcf",
+                "source": "vehicle_claims:rns",
+                "resource": "qtd_sinistros_rcf",
+                "headers": [
+                    "license_plate"
+                ],
+                "headers_map": [
+                    "input_value_0"
+                ]
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "8e17dcc63de89878",
+                            "input": "input_value_1"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_value_0": {
+                    "connections": [
+                        {
+                            "node": "7be7fcca32dbbf02",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "4a18c47f529ad26b": {
+            "id": "4a18c47f529ad26b",
+            "name": "BureauConnector",
+            "data": {
+                "name": "indefinido",
+                "source": "person_claims:rns",
+                "resource": "qtd_sinistros_indefinido",
+                "headers": [
+                    "cpf"
+                ],
+                "headers_map": [
+                    "input_value_0"
+                ]
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "8e17dcc63de89878",
+                            "input": "input_value_0"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_value_0": {
+                    "connections": [
+                        {
+                            "node": "5dc2fa95808ff994",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "8e17dcc63de89878": {
+            "id": "8e17dcc63de89878",
+            "name": "Math",
+            "data": {
+                "operator": "+"
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "a4a18ab637c3946b",
+                            "input": "input_value"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_value_0": {
+                    "connections": [
+                        {
+                            "node": "4a18c47f529ad26b",
+                            "output": "output_value"
+                        }
+                    ]
+                },
+                "input_value_1": {
+                    "connections": [
+                        {
+                            "node": "288c0a42cefd7dd4",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "a4a18ab637c3946b": {
+            "id": "a4a18ab637c3946b",
+            "name": "Output",
+            "data": {
+                "message": "rns"
+            },
+            "outputs": {},
+            "inputs": {
+                "input_value": {
+                    "connections": [
+                        {
+                            "node": "8e17dcc63de89878",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "6690e619d640e884": {
+            "id": "6690e619d640e884",
+            "name": "Input",
+            "data": {
+                "name": "age",
+                "default": ""
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "07f7c745c5f436da",
+                            "input": "input_value_0"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "79c91efb5fc8e23e",
+                            "output": "output_up_void"
+                        }
+                    ]
+                }
+            }
+        },
+        "07f7c745c5f436da": {
+            "id": "07f7c745c5f436da",
+            "name": "Check",
+            "data": {
+                "operator": ">"
+            },
+            "outputs": {
+                "output_bool": {
+                    "connections": [
+                        {
+                            "node": "92fe051396102987",
+                            "input": "input_bool"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_value_0": {
+                    "connections": [
+                        {
+                            "node": "6690e619d640e884",
+                            "output": "output_value"
+                        }
+                    ]
+                },
+                "input_value_1": {
+                    "connections": [
+                        {
+                            "node": "e81e103583abac29",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "e81e103583abac29": {
+            "id": "e81e103583abac29",
+            "name": "Constant",
+            "data": {
+                "value": "30"
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "07f7c745c5f436da",
+                            "input": "input_value_1"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "79c91efb5fc8e23e",
+                            "output": "output_down_void"
+                        }
+                    ]
+                }
+            }
+        },
+        "92fe051396102987": {
+            "id": "92fe051396102987",
+            "name": "If",
+            "data": {},
+            "outputs": {
+                "output_then_filter": {
+                    "connections": [
+                        {
+                            "node": "5dc2fa95808ff994",
+                            "input": "input_void"
+                        },
+                        {
+                            "node": "7be7fcca32dbbf02",
+                            "input": "input_void"
+                        }
+                    ]
+                },
+                "output_else_filter": {
+                    "connections": [
+                        {
+                            "node": "79d8f8754d754c3d",
+                            "input": "input_void"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_bool": {
+                    "connections": [
+                        {
+                            "node": "07f7c745c5f436da",
+                            "output": "output_bool"
+                        }
+                    ]
+                }
+            }
+        },
+        "36396444b9fc8dfa": {
+            "id": "36396444b9fc8dfa",
+            "name": "BureauConnector",
+            "data": {
+                "name": "is_defandant",
+                "source": "lawsuits:bigdatacorp",
+                "resource": "is_defendant_and_court_type",
+                "headers": [
+                    "cpf"
+                ],
+                "headers_map": [
+                    "input_value_0"
+                ]
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "b29f49c2d84b2688",
+                            "input": "input_value"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_value_0": {
+                    "connections": [
+                        {
+                            "node": "79d8f8754d754c3d",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "79d8f8754d754c3d": {
+            "id": "79d8f8754d754c3d",
+            "name": "Input",
+            "data": {
+                "name": "cpf",
+                "default": ""
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "36396444b9fc8dfa",
+                            "input": "input_value_0"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "92fe051396102987",
+                            "output": "output_else_filter"
+                        }
+                    ]
+                }
+            }
+        },
+        "b29f49c2d84b2688": {
+            "id": "b29f49c2d84b2688",
+            "name": "Output",
+            "data": {
+                "message": "bdc"
+            },
+            "outputs": {},
+            "inputs": {
+                "input_value": {
+                    "connections": [
+                        {
+                            "node": "36396444b9fc8dfa",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "version": "981088f3d1.2024-09-10"
+}
