@@ -204,6 +204,7 @@ class RuleExecutor:
         self,
         payload_df: pd.DataFrame,
         debug_mode: bool = False,
+        raise_raw_exception: bool = False,
         context: typing.Optional[registry.Registry] = None,
     ) -> typing.Union[
         pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]
@@ -213,6 +214,7 @@ class RuleExecutor:
         Args:
             payload_df (pd.DataFrame): The payload to be executed.
             debug_mode (bool, optional): If True, runs the rule in debug mode and returns the exception, if any. Defaults to False.
+            raise_raw_exception (bool, optional): If True, raises the raw exception. Defaults to False.
             context (registry.Registry, optional): Global constants to be used during execution. Defaults to None.
 
         Raises:
@@ -240,6 +242,9 @@ class RuleExecutor:
             try:
                 self.__run_node(node_id, execution=execution)
             except Exception as e:
+                if raise_raw_exception:
+                    raise e
+
                 msg = None
                 if isinstance(e, exceptions.ExecutionException):
                     msg = "Error executing a sub-rule node {} from rule {} version {}".format(

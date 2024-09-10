@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "retrack"
-version = "2.9.0a2"
+version = "2.9.0a3"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabriel.guarisa@pier.digital>"]
 license = "MIT"
