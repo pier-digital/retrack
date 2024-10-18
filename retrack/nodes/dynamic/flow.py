@@ -76,7 +76,7 @@ def flow_factory(
 
         def generate_input_nodes(self):
             input_nodes = []
-            for component in rule_instance.components_registry.data.values():
+            for component in rule_instance.components_registry.memory.values():
                 input_nodes.extend(component.generate_input_nodes())
             return input_nodes
 

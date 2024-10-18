@@ -1,5 +1,4 @@
 import typing
-import warnings
 
 
 class Registry:
@@ -32,15 +31,6 @@ class Registry:
             key = key.lower()
 
         return self._memory.get(key, default)
-
-    @property
-    def data(self) -> typing.Dict[str, typing.Any]:
-        """Return the registry memory."""
-        warnings.warn(
-            "The 'data' property is deprecated, use 'memory' instead.",
-            DeprecationWarning,
-        )
-        return self._memory
 
     @property
     def keys(self) -> typing.List[str]:

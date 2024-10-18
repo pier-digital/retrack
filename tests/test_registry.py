@@ -5,13 +5,13 @@ from retrack.utils.registry import Registry
 
 def test_create_registry():
     registry = Registry()
-    assert registry.data == {}
+    assert registry.memory == {}
 
 
 def test_register_model():
     registry = Registry()
     registry.register("test", "example")
-    assert registry.data == {"test": "example"}
+    assert registry.memory == {"test": "example"}
 
 
 def test_get_model():
