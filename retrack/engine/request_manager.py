@@ -102,7 +102,9 @@ class RequestManager:
                     default=Ellipsis
                     if input_field.data.default is None
                     else input_field.data.default,
-                    optional=input_field.data.default is not None,
+                    json_schema_extra={
+                        "optional": input_field.data.default is not None
+                    },
                     validate_default=False,
                 ),
             )
