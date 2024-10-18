@@ -69,7 +69,7 @@ def validate_data(data: dict) -> dict:
 def validate_with_validators(
     graph_data: dict, edges: dict, validator_registry: Registry
 ):
-    for validator_name, validator in validator_registry.data.items():
+    for validator_name, validator in validator_registry.memory.items():
         if not validator.validate(graph_data=graph_data, edges=edges):
             raise ValueError(f"Invalid graph data: {validator_name}")
 

@@ -3,9 +3,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
-      - '**/*.md'
-      - '**/*.png'
-      - '**/*.json'
+      - "**/*.md"
+      - "**/*.png"
+      - "**/*.json"
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, 3.11]
+        python-version: [3.9, 3.12]
         poetry-version: [1.4.2]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}

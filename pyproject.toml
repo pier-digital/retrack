@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "retrack"
-version = "2.9.0"
+version = "2.10.0"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabriel.guarisa@pier.digital>"]
 license = "MIT"
@@ -11,16 +11,16 @@ keywords = ["rules", "models", "business", "node", "graph"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0.0"
-pandas = "^1.2.0"
-numpy = "^1.19.5"
-pydantic = "2.4.2"
-networkx = "^2.6.3"
-pandera = "^0.17.2"
+pandas = ">=1.2.0,~2"
+numpy = ">=1.19.5,<2"
+pydantic = "~2"
+networkx = "~3"
+pandera = "~0.20"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
 pytest-cov = "*"
-ruff = "^0.1.2"
+ruff = "*"
 pytest-mock = "*"
 
 [tool.pytest.ini_options]

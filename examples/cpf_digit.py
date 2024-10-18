@@ -1,4 +1,4 @@
-""" Example of rule to get the eighth digit of a CPF."""
+"""Example of rule to get the eighth digit of a CPF."""
 
 import retrack
 import pandas as pd
