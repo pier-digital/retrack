@@ -81,12 +81,12 @@ class InputConnectionModel(pydantic.BaseModel):
 class BaseNode(pydantic.BaseModel):
     id: CastedToStringType
     name: str
-    inputs: typing.Optional[
-        typing.Dict[CastedToStringType, InputConnectionModel]
-    ] = None
-    outputs: typing.Optional[
-        typing.Dict[CastedToStringType, OutputConnectionModel]
-    ] = None
+    inputs: typing.Optional[typing.Dict[CastedToStringType, InputConnectionModel]] = (
+        None
+    )
+    outputs: typing.Optional[typing.Dict[CastedToStringType, OutputConnectionModel]] = (
+        None
+    )
 
     def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {}

@@ -6,7 +6,11 @@ from retrack.nodes.dynamic.conditional_connector import conditional_connector_fa
 import pandas as pd
 import pytest
 
-VALUES = {"qtd_sinistros_rcf": 1, "qtd_sinistros_indefinido": 10, "is_defendant_and_court_type": False}
+VALUES = {
+    "qtd_sinistros_rcf": 1,
+    "qtd_sinistros_indefinido": 10,
+    "is_defendant_and_court_type": False,
+}
 
 
 def bureau_connector_factory(
@@ -24,11 +28,13 @@ def bureau_connector_factory(
                     raise ValueError(
                         f"Missing input {in_node_key} in BureauConnector node"
                     )
-                
+
                 if node_inputs[in_node_key].empty:
                     return {"output_value": None}
 
-                parsed_inputs[self.data.headers[i]] = node_inputs[in_node_key].to_list()[0]
+                parsed_inputs[self.data.headers[i]] = node_inputs[
+                    in_node_key
+                ].to_list()[0]
 
             return {"output_value": VALUES[self.data.resource]}
 
