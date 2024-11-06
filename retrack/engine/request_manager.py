@@ -112,6 +112,9 @@ class RequestManager:
         return pydantic.create_model(
             model_name,
             **fields,
+            __config__=pydantic.ConfigDict(
+                from_attributes=True, use_enum_values=True, protected_namespaces={}
+            ),
         )
 
     def __create_dataframe_model(self) -> pandera.DataFrameSchema:
