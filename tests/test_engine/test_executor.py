@@ -3,7 +3,8 @@ import json
 import pandas as pd
 import pytest
 
-from retrack import Rule, from_json, nodes, RuleExecutor
+from retrack import Rule, from_json, nodes, RuleExecutor, RequestManager
+from retrack.nodes.base import NodeKind
 
 
 @pytest.mark.parametrize(
@@ -282,3 +283,33 @@ def test_create_from_json_with_dict():
 
     assert isinstance(from_json(graph_data), RuleExecutor)
     assert isinstance(from_json(graph_data, return_executor=False), Rule)
+
+
+def test_request_manager_lifecycle():
+    rule_executor = from_json("tests/resources/multiple-ifs.json", return_executor=True)
+
+    assert isinstance(rule_executor, RuleExecutor)
+    assert rule_executor.request_manager is not None
+    assert isinstance(rule_executor.request_manager, RequestManager)
+
+    rule_executor.erase_request_manager()
+
+    with pytest.raises(ValueError):
+        rule_executor.request_manager
+
+    rule_executor.set_request_manager_from_components_registry()
+
+    assert rule_executor.request_manager is not None
+    assert isinstance(rule_executor.request_manager, RequestManager)
+
+    rule_executor.erase_request_manager()
+
+    with pytest.raises(ValueError):
+        rule_executor.request_manager
+
+    input_nodes = rule_executor.components_registry.get_by_kind(NodeKind.INPUT)
+
+    rule_executor.reset_request_manager(input_nodes)
+
+    assert rule_executor.request_manager is not None
+    assert isinstance(rule_executor.request_manager, RequestManager)

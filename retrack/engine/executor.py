@@ -33,11 +33,11 @@ class RuleExecutor:
         self._components_registry = components_registry
         self._execution_order = execution_order
         self._metadata = metadata
+        self._input_columns = {}
+        self._constants = {}
+        self._request_manager = None
 
-        input_nodes = self.components_registry.get_by_kind(NodeKind.INPUT)
-        input_nodes.extend(self.components_registry.get_by_kind(NodeKind.CONNECTOR))
-
-        self.reset_request_manager(input_nodes)
+        self.set_request_manager_from_components_registry()
 
     @property
     def components_registry(self) -> ComponentRegistry:
@@ -53,6 +53,14 @@ class RuleExecutor:
 
     @property
     def request_manager(self) -> RequestManager:
+        if self._request_manager is None:
+            raise ValueError(
+                "Request manager is not set. "
+                + "Please call reset_request_manager or "
+                + "set_request_manager_from_components_registry "
+                + "before executing the rule.",
+            )
+
         return self._request_manager
 
     @property
@@ -152,6 +160,9 @@ class RuleExecutor:
                     filter_by=current_node_filter,
                 )
 
+    def erase_request_manager(self) -> None:
+        self._request_manager = None
+
     def reset_request_manager(self, input_nodes: typing.List[BaseNode]) -> None:
         """Resets the request manager. This method should be called when the input nodes change.
 
@@ -165,6 +176,12 @@ class RuleExecutor:
         self._request_manager = RequestManager(input_nodes)
 
         self._set_constants()
+
+    def set_request_manager_from_components_registry(self) -> None:
+        input_nodes = self.components_registry.get_by_kind(NodeKind.INPUT)
+        input_nodes.extend(self.components_registry.get_by_kind(NodeKind.CONNECTOR))
+
+        self.reset_request_manager(input_nodes)
 
     def validate_payload(self, payload_df: pd.DataFrame) -> pd.DataFrame:
         """Validates the payload.

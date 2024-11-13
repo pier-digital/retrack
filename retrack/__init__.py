@@ -5,6 +5,7 @@ from retrack.engine.base import Execution
 from retrack.nodes import registry as nodes_registry, dynamic_nodes_registry
 from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 from retrack.nodes.connectors import BaseConnector
+from retrack.engine.request_manager import RequestManager
 
 __all__ = [
     "Rule",
@@ -17,4 +18,5 @@ __all__ = [
     "InputConnectionModel",
     "OutputConnectionModel",
     "BaseConnector",
+    "RequestManager",
 ]
