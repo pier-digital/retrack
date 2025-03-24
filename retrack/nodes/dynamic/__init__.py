@@ -15,6 +15,8 @@ def registry() -> Registry:
     _registry.register("FlowV0", flow_factory)
     _registry.register("ConditionalConnector", conditional_connector_factory)
     _registry.register("BureauConnector", conditional_connector_factory)
+    _registry.register("ModelConnector", conditional_connector_factory)
+    _registry.register("FeatureConnector", conditional_connector_factory)
 
     return _registry
 
