@@ -23,6 +23,13 @@ from retrack import Rule, from_json, nodes, RuleExecutor
                 {"message": "underage", "output": False},
             ],
         ),
+        (
+            "glm",
+            {"a": 1, "b": 4},
+            [
+                {"message": None, "output": 5},
+            ],
+        ),
     ],
 )
 def test_flows_with_single_element(filename, in_values, expected_out_values):
@@ -128,6 +135,19 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
             [
                 {"message": None, "output": "2"},
                 {"message": None, "output": "4"},
+            ],
+        ),
+        (
+            "glm",
+            [
+                {"a": 1, "b": 4},
+                {"a": 2, "b": 3},
+                {"a": -1, "b": -1},
+            ],
+            [
+                {"message": None, "output": 5},
+                {"message": None, "output": 6.5},
+                {"message": None, "output": -1.5},
             ],
         ),
     ],

@@ -1,0 +1,144 @@
+{
+    "id": "demo@0.1.0",
+    "nodes": {
+        "ca92e17555b98b9a": {
+            "id": "ca92e17555b98b9a",
+            "name": "Start",
+            "data": {},
+            "outputs": {
+                "output_up_void": {
+                    "connections": [
+                        {
+                            "node": "e3ff3420e884087e",
+                            "input": "input_void"
+                        }
+                    ]
+                },
+                "output_down_void": {
+                    "connections": [
+                        {
+                            "node": "a59c1209bf437061",
+                            "input": "input_void"
+                        }
+                    ]
+                }
+            },
+            "inputs": {}
+        },
+        "53e6fe5413a32be7": {
+            "id": "53e6fe5413a32be7",
+            "name": "GLM",
+            "data": {
+                "value": "{\"a\":2,\"b\":0.5,\"intercept\":1}",
+                "link": "identity",
+                "headers_map": {
+                    "a": 0,
+                    "b": 1
+                }
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "9c7b5cca67565955",
+                            "input": "input_value"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_value_0": {
+                    "connections": [
+                        {
+                            "node": "e3ff3420e884087e",
+                            "output": "output_value"
+                        }
+                    ]
+                },
+                "input_value_1": {
+                    "connections": [
+                        {
+                            "node": "a59c1209bf437061",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        },
+        "e3ff3420e884087e": {
+            "id": "e3ff3420e884087e",
+            "name": "Input",
+            "data": {
+                "name": "a",
+                "default": ""
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "53e6fe5413a32be7",
+                            "input": "input_value_0"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "ca92e17555b98b9a",
+                            "output": "output_up_void"
+                        }
+                    ]
+                }
+            }
+        },
+        "a59c1209bf437061": {
+            "id": "a59c1209bf437061",
+            "name": "Input",
+            "data": {
+                "name": "b",
+                "default": ""
+            },
+            "outputs": {
+                "output_value": {
+                    "connections": [
+                        {
+                            "node": "53e6fe5413a32be7",
+                            "input": "input_value_1"
+                        }
+                    ]
+                }
+            },
+            "inputs": {
+                "input_void": {
+                    "connections": [
+                        {
+                            "node": "ca92e17555b98b9a",
+                            "output": "output_down_void"
+                        }
+                    ]
+                }
+            }
+        },
+        "9c7b5cca67565955": {
+            "id": "9c7b5cca67565955",
+            "name": "Output",
+            "data": {
+                "message": ""
+            },
+            "outputs": {},
+            "inputs": {
+                "input_value": {
+                    "connections": [
+                        {
+                            "node": "53e6fe5413a32be7",
+                            "output": "output_value"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "version": "6970f3e01d.2025-05-26"
+}
