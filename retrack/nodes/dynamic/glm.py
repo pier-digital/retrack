@@ -27,7 +27,7 @@ class GLMMetadataModel(pydantic.BaseModel):
 
     def parsed_value(self) -> typing.Dict[str, typing.Any]:
         return json.loads(self.value)
-    
+
     def intercept(self) -> float:
         parsed = self.parsed_value()
         return float(parsed.get("intercept", 0.0))
