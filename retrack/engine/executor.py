@@ -127,7 +127,7 @@ class RuleExecutor:
         )
 
         # TODO: Remove this condition after adding support for kwargs in the run method for all nodes
-        if node.kind() == NodeKind.CONNECTOR:
+        if node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW:
             input_params["context"] = execution.context
 
         output = node.run(**input_params)

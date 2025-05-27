@@ -257,11 +257,6 @@ def test_create_from_json(filename, in_values, expected_out_values):
     assert out_values.to_dict(orient="records") == expected_out_values
 
 
-def test_create_invalid_rule_of_rules_with_connector():
-    with pytest.raises(ValueError):
-        from_json("tests/resources/invalid-rule-of-rules-with-connector.json")
-
-
 def test_create_from_json_with_invalid_type():
     with pytest.raises(ValueError):
         from_json(1)
