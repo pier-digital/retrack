@@ -84,3 +84,40 @@ def test_glm_run_without_intercept(glm_metadata):
 
     response = model.run(**payload)
     assert response["output_value"].equals(expected)
+
+
+def test_glm_run_with_missing_input(glm_metadata):
+    with pytest.raises(ValueError) as excinfo:
+        glm_factory = dynamic_nodes_registry().get("GLM")
+        GLM = glm_factory(**glm_metadata)
+
+        model = GLM(**glm_metadata)
+
+        payload = {
+            "input_value_0": pd.Series([1, 2, -1]),
+        }
+
+        expected = f"Missing input input_value_1 in GLM node"
+
+        response = model.run(**payload)
+    assert excinfo.value.args[0] in expected
+
+
+def test_glm_run_with_missing_weight(glm_metadata):
+    with pytest.raises(ValueError) as excinfo:
+        glm_metadata["data"]["value"] = '{"intercept":1}'
+
+        glm_factory = dynamic_nodes_registry().get("GLM")
+        GLM = glm_factory(**glm_metadata)
+
+        model = GLM(**glm_metadata)
+
+        payload = {
+            "input_value_0": pd.Series([1, 2, -1]),
+            "input_value_1": pd.Series(["4", "3", "-1"]),
+        }
+
+        expected = f"Missing weight for feature a in GLM node"
+
+        response = model.run(**payload)
+    assert excinfo.value.args[0] in expected
