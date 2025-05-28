@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from retrack import Rule, from_json, nodes, RuleExecutor
+from retrack.utils.exceptions import ExecutionException
 
 
 @pytest.mark.parametrize(
@@ -21,6 +22,13 @@ from retrack import Rule, from_json, nodes, RuleExecutor
             {"age": 10},
             [
                 {"message": "underage", "output": False},
+            ],
+        ),
+        (
+            "glm",
+            {"a": 1, "b": 4},
+            [
+                {"message": None, "output": 5},
             ],
         ),
     ],
@@ -130,6 +138,19 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
                 {"message": None, "output": "4"},
             ],
         ),
+        (
+            "glm",
+            [
+                {"a": 1, "b": 4},
+                {"a": 2, "b": 3},
+                {"a": -1, "b": -1},
+            ],
+            [
+                {"message": None, "output": 5},
+                {"message": None, "output": 6.5},
+                {"message": None, "output": -1.5},
+            ],
+        ),
     ],
 )
 def test_flows(filename, in_values, expected_out_values):
@@ -237,14 +258,31 @@ def test_create_from_json(filename, in_values, expected_out_values):
     assert out_values.to_dict(orient="records") == expected_out_values
 
 
-def test_create_invalid_rule_of_rules_with_connector():
-    with pytest.raises(ValueError):
-        from_json("tests/resources/invalid-rule-of-rules-with-connector.json")
-
-
 def test_create_from_json_with_invalid_type():
     with pytest.raises(ValueError):
         from_json(1)
+
+
+def test_subflow_with_connector():
+    _input_df = pd.DataFrame(
+        {
+            "sepal_length": [1, 2, 3],
+            "sepal_width": [1, 2, 3],
+            "petal_length": [1, 2, 3],
+            "petal_width": [1, 2, 3],
+        }
+    )
+    filename = "tests/resources/subrule-with-connector.json"
+    rule = from_json(filename)
+
+    with pytest.raises(ExecutionException):
+        rule.execute(_input_df)
+
+    _input_df["prediction"] = [1, 2, 3]
+    out_df = rule.execute(_input_df)
+    assert isinstance(out_df, pd.DataFrame)
+    assert len(out_df) == len(_input_df)
+    assert out_df["output"].values.tolist() == ["1", "2", "3"]
 
 
 def test_csv_table_with_if():

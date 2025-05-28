@@ -41,13 +41,6 @@ def flow_factory(
     )
     input_fields = {}
 
-    connector_nodes = rule_instance.components_registry.get_by_kind(NodeKind.CONNECTOR)
-
-    if len(connector_nodes) > 0:
-        raise ValueError(
-            f"Flow nodes cannot have connector nodes. Found {len(connector_nodes)} connector nodes."
-        )
-
     for name in inputs.keys():
         input_fields[name] = BaseDynamicNode.create_sub_field(InputConnectionModel)
 
@@ -64,13 +57,19 @@ def flow_factory(
     class FlowV0(BaseFlowV0Model):
         def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
             input_args = {}
+            executor_kwargs = {}
             for name, value in kwargs.items():
                 if name.startswith("input_"):
                     name = name[len("input_") :]
 
                 input_args[name] = value
 
-            response = rule_instance.executor.execute(pd.DataFrame(input_args))
+            if "context" in kwargs:
+                executor_kwargs["context"] = kwargs["context"]
+
+            response = rule_instance.executor.execute(
+                pd.DataFrame(input_args), **executor_kwargs
+            )
 
             return {"output_value": response["output"].values}
 

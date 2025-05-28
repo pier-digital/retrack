@@ -127,8 +127,14 @@ class RuleExecutor:
         )
 
         # TODO: Remove this condition after adding support for kwargs in the run method for all nodes
-        if node.kind() == NodeKind.CONNECTOR:
+        if node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW:
             input_params["context"] = execution.context
+
+            if node.kind() == NodeKind.FLOW:
+                for column in execution.payload.columns:
+                    input_name = f"input_{column}"
+                    if input_name not in input_params:
+                        input_params[f"input_{column}"] = execution.payload[column]
 
         output = node.run(**input_params)
 
@@ -162,6 +168,7 @@ class RuleExecutor:
             f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
             for node in input_nodes
         }
+
         self._request_manager = RequestManager(input_nodes)
 
         self._set_constants()

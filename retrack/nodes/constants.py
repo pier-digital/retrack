@@ -135,9 +135,12 @@ class IntervalCatV0(BaseConstant):
 
         for _, row in self.data.df().iterrows():
             output.loc[
-                (values >= row[self.data.start_interval_column])
+                (values >= float(row[self.data.start_interval_column]))
                 & (values < float(row[self.data.end_interval_column])),
             ] = row[self.data.category_column]
+
+        replace_value_tag = output == "{value}"
+        output.loc[replace_value_tag] = input_value[replace_value_tag]
 
         if self.data.default is not None:
             output.fillna(self.data.default, inplace=True)
