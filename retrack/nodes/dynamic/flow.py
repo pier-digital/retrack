@@ -29,6 +29,7 @@ def flow_factory(
     validator_registry: Registry,
     data: dict,
     rule_class,
+    connectors_as_inputs: bool,
     **factory_kwargs,
 ) -> typing.Type[BaseDynamicNode]:
     graph_data = json.loads(data["value"])
@@ -38,6 +39,7 @@ def flow_factory(
         dynamic_nodes_registry=dynamic_nodes_registry,
         validator_registry=validator_registry,
         name=data.get("name"),
+        connectors_as_inputs=connectors_as_inputs,
     )
     input_fields = {}
 
