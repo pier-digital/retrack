@@ -12,6 +12,7 @@ def from_json(
     nodes_registry: registry.Registry = nodes.registry(),
     dynamic_nodes_registry: registry.Registry = nodes.dynamic_nodes_registry(),
     return_executor: bool = True,
+    connectors_as_inputs: bool = True,
     **kwargs,
 ) -> typing.Union[Rule, RuleExecutor]:
     """Create a rule from a json file or a dict.
@@ -22,6 +23,7 @@ def from_json(
         nodes_registry (registry.Registry, optional): Nodes registry. Defaults to nodes.registry().
         dynamic_nodes_registry (registry.Registry, optional): Dynamic nodes registry. Defaults to nodes.dynamic_nodes_registry().
         return_executor (bool, optional): Whether to return the executor or the rule. Defaults to True.
+        connectors_as_inputs (bool, optional): Whether to consider connectors as inputs. Defaults to True.
 
     Raises:
         ValueError: If the data is not a dict or a json file path.
@@ -41,6 +43,7 @@ def from_json(
         name=name,
         nodes_registry=nodes_registry,
         dynamic_nodes_registry=dynamic_nodes_registry,
+        connectors_as_inputs=connectors_as_inputs,
         **kwargs,
     )
     return rule.executor if return_executor else rule

@@ -13,6 +13,7 @@ from retrack.utils.registry import Registry
 class Rule(RuleMetadata):
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
+    connectors_as_inputs: bool
     components_registry: ComponentRegistry
     execution_order: typing.List[str]
     _executor: RuleExecutor = None
@@ -24,6 +25,7 @@ class Rule(RuleMetadata):
                 self.components_registry,
                 self.execution_order,
                 self.as_metadata(),
+                connectors_as_inputs=self.connectors_as_inputs,
             )
         return self._executor
 
@@ -39,10 +41,15 @@ class Rule(RuleMetadata):
         validator_registry: Registry = validators.registry(),
         raise_if_null_version: bool = False,
         validate_version: bool = False,
+        connectors_as_inputs: bool = True,
         name: str = None,
     ):
         components_registry = Rule.create_component_registry(
-            graph_data, nodes_registry, dynamic_nodes_registry, validator_registry
+            graph_data,
+            nodes_registry,
+            dynamic_nodes_registry,
+            validator_registry,
+            connectors_as_inputs=connectors_as_inputs,
         )
         version = graph.validate_version(
             graph_data, raise_if_null_version, validate_version, name
@@ -62,6 +69,7 @@ class Rule(RuleMetadata):
             components_registry=components_registry,
             execution_order=execution_order,
             name=name,
+            connectors_as_inputs=connectors_as_inputs,
         )
 
     @staticmethod
@@ -70,6 +78,7 @@ class Rule(RuleMetadata):
         nodes_registry: Registry,
         dynamic_nodes_registry: Registry,
         validator_registry: Registry,
+        connectors_as_inputs: bool,
     ) -> ComponentRegistry:
         components_registry = ComponentRegistry()
         graph_data = graph.validate_data(graph_data)
@@ -91,6 +100,7 @@ class Rule(RuleMetadata):
                     dynamic_nodes_registry=dynamic_nodes_registry,
                     validator_registry=validator_registry,
                     rule_class=Rule,
+                    connectors_as_inputs=connectors_as_inputs,
                 )
             else:
                 validation_model = nodes_registry.get(node_name)

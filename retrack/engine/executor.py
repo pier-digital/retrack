@@ -18,6 +18,7 @@ class RuleExecutor:
         components_registry: ComponentRegistry,
         execution_order: typing.List[str],
         metadata: RuleMetadata,
+        connectors_as_inputs: bool,
     ):
         """Class that executes a rule.
 
@@ -35,7 +36,8 @@ class RuleExecutor:
         self._metadata = metadata
 
         input_nodes = self.components_registry.get_by_kind(NodeKind.INPUT)
-        input_nodes.extend(self.components_registry.get_by_kind(NodeKind.CONNECTOR))
+        if connectors_as_inputs:
+            input_nodes.extend(self.components_registry.get_by_kind(NodeKind.CONNECTOR))
 
         self.reset_request_manager(input_nodes)
 
