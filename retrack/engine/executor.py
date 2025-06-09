@@ -95,7 +95,12 @@ class RuleExecutor:
         execution.update_filters(filter_value, output_connections=output_connections)
 
     def __get_input_params(
-        self, node_dict: dict, current_node_filter: pd.Series, execution: Execution
+        self,
+        node_dict: dict,
+        current_node_filter: pd.Series,
+        execution: Execution,
+        include_context: bool = False,
+        include_inputs: bool = False,
     ) -> dict:
         input_params = {}
 
@@ -109,6 +114,20 @@ class RuleExecutor:
                     constants=self.constants,
                     filter_by=current_node_filter,
                 )
+
+        if include_context:
+            input_params["context"] = execution.context
+
+        if include_inputs:
+            for column in execution.payload.columns:
+                input_name = f"input_{column}"
+                if input_name not in input_params:
+                    if current_node_filter is None:
+                        input_params[input_name] = execution.payload[column]
+                    else:
+                        input_params[f"input_{column}"] = execution.payload.loc[
+                            current_node_filter, column
+                        ]
 
         return input_params
 
@@ -124,19 +143,17 @@ class RuleExecutor:
         if node.memory_type == NodeMemoryType.CONSTANT:
             return
 
-        input_params = self.__get_input_params(
-            node.model_dump(by_alias=True), current_node_filter, execution=execution
+        include_context = (
+            node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW
         )
-
-        # TODO: Remove this condition after adding support for kwargs in the run method for all nodes
-        if node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW:
-            input_params["context"] = execution.context
-
-            if node.kind() == NodeKind.FLOW:
-                for column in execution.payload.columns:
-                    input_name = f"input_{column}"
-                    if input_name not in input_params:
-                        input_params[f"input_{column}"] = execution.payload[column]
+        include_inputs = node.kind() == NodeKind.FLOW
+        input_params = self.__get_input_params(
+            node.model_dump(by_alias=True),
+            current_node_filter=current_node_filter,
+            execution=execution,
+            include_context=include_context,
+            include_inputs=include_inputs,
+        )
 
         output = node.run(**input_params)
 
