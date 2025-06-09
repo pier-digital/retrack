@@ -320,3 +320,30 @@ def test_create_from_json_with_dict():
 
     assert isinstance(from_json(graph_data), RuleExecutor)
     assert isinstance(from_json(graph_data, return_executor=False), Rule)
+
+
+def test_rules_with_subrules_with_conditions():
+    with open("tests/resources/rules-with-subrules-with-conditions.json", "r") as f:
+        graph_data = json.load(f)
+
+    executor = Rule.create(
+        graph_data,
+        nodes_registry=nodes.registry(),
+        dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+    ).executor
+
+    in_values = [
+        {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+            "d": 4,
+        }
+    ]
+
+    out_values = executor.execute(pd.DataFrame(in_values))
+
+    assert isinstance(out_values, pd.DataFrame)
+    assert out_values.to_dict(orient="records") == [
+        {"message": "< ten", "output": "10"},
+    ]
