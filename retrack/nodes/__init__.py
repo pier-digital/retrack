@@ -3,7 +3,7 @@ from retrack.nodes.check import Check
 from retrack.nodes.connectors import BaseConnector
 from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
-from retrack.nodes.datetime import CurrentYear
+from retrack.nodes.datetime import CurrentYear, DaysBetweenDates
 from retrack.nodes.dynamic import BaseDynamicNode
 from retrack.nodes.dynamic import registry as dynamic_nodes_registry
 from retrack.nodes.endswith import EndsWith
@@ -27,7 +27,8 @@ def registry() -> Registry:
     _registry = Registry()
 
     _registry.register("Input", Input)
-    _registry.register("Connector", BaseConnector)  # By default, Connector is an Input
+    # By default, Connector is an Input
+    _registry.register("Connector", BaseConnector)
     _registry.register(
         "ConnectorV0", BaseConnector
     )  # By default, Connector is an Input
@@ -50,6 +51,7 @@ def registry() -> Registry:
     _registry.register("EndsWithAny", EndsWithAny)
     _registry.register("Contains", Contains)
     _registry.register("CurrentYear", CurrentYear)
+    _registry.register("DaysBetweenDates", DaysBetweenDates)
     _registry.register("IntervalCatV0", IntervalCatV0)
     _registry.register("LowerCase", LowerCase)
     _registry.register("IsSubStringOf", IsSubStringOf)
