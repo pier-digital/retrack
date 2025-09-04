@@ -15,7 +15,6 @@ pandas = ">=1.2.0,~2"
 numpy = ">=1.19.5,<2"
 pydantic = "~2"
 networkx = "~3"
-pandera = "~0.20"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
