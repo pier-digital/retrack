@@ -131,7 +131,7 @@ class RuleExecutor:
 
         return input_params
 
-    def __run_node(self, node_id: str, execution: Execution):
+    async def __run_node(self, node_id: str, execution: Execution):
         current_node_filter = execution.filters.get(node_id, None)
 
         self.__set_output_connection_filters(
@@ -155,7 +155,7 @@ class RuleExecutor:
             include_inputs=include_inputs,
         )
 
-        output = node.run(**input_params)
+        output = await node.run(**input_params)
 
         for output_name, output_value in output.items():
             if (
@@ -221,7 +221,7 @@ class RuleExecutor:
 
         return validated
 
-    def execute(
+    async def execute(
         self,
         payload_df: pd.DataFrame,
         debug_mode: bool = False,
@@ -261,7 +261,7 @@ class RuleExecutor:
 
         for node_id in self.execution_order:
             try:
-                self.__run_node(node_id, execution=execution)
+                await self.__run_node(node_id, execution=execution)
             except Exception as e:
                 if raise_raw_exception:
                     raise e

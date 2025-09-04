@@ -56,30 +56,31 @@ def test_logic_node(input_data_and, input_data_or, input_data_not):
     assert isinstance(not_node, Not)
 
 
-def test_and_node_run(input_data_and, input_data_or, input_data_not):
+@pytest.mark.asyncio
+async def test_and_node_run(input_data_and, input_data_or, input_data_not):
     and_node = And(**input_data_and)
     or_node = Or(**input_data_or)
     not_node = Not(**input_data_not)
 
-    output = and_node.run(pd.Series([True]), pd.Series([False]))
+    output = await and_node.run(pd.Series([True]), pd.Series([False]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = and_node.run(pd.Series([False]), pd.Series([True]))
+    output = await and_node.run(pd.Series([False]), pd.Series([True]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = and_node.run(pd.Series([False]), pd.Series([False]))
+    output = await and_node.run(pd.Series([False]), pd.Series([False]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = and_node.run(pd.Series([True]), pd.Series([True]))
+    output = await and_node.run(pd.Series([True]), pd.Series([True]))
     assert (output["output_bool"] == pd.Series([True])).all()
 
-    output = or_node.run(pd.Series([True]), pd.Series([False]))
+    output = await or_node.run(pd.Series([True]), pd.Series([False]))
     assert (output["output_bool"] == pd.Series([True])).all()
-    output = or_node.run(pd.Series([True]), pd.Series([True]))
+    output = await or_node.run(pd.Series([True]), pd.Series([True]))
     assert (output["output_bool"] == pd.Series([True])).all()
-    output = or_node.run(pd.Series([False]), pd.Series([True]))
+    output = await or_node.run(pd.Series([False]), pd.Series([True]))
     assert (output["output_bool"] == pd.Series([True])).all()
-    output = or_node.run(pd.Series([False]), pd.Series([False]))
+    output = await or_node.run(pd.Series([False]), pd.Series([False]))
     assert (output["output_bool"] == pd.Series([False])).all()
 
-    output = not_node.run(pd.Series([True]))
+    output = await not_node.run(pd.Series([True]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = not_node.run(pd.Series([False]))
+    output = await not_node.run(pd.Series([False]))
     assert (output["output_bool"] == pd.Series([True])).all()

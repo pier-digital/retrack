@@ -23,6 +23,9 @@ pytest-cov = "*"
 ruff = "*"
 pytest-mock = "*"
 
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^1.1.0"
+
 [tool.pytest.ini_options]
 addopts = "-vv --junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
 

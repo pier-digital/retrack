@@ -37,7 +37,7 @@ class If(BaseNode):
     def kind(self) -> NodeKind:
         return NodeKind.FILTER
 
-    def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
+    async def run(self, input_bool: pd.Series) -> typing.Dict[str, pd.Series]:
         return {
             "output_then_filter": input_bool.astype(bool),
             "output_else_filter": ~input_bool.astype(bool),

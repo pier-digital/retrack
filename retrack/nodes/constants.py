@@ -101,7 +101,7 @@ class Constant(BaseConstant):
     data: ConstantMetadataModel
     outputs: ConstantOutputsModel
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {"output_value": self.data.value}
 
 
@@ -109,7 +109,7 @@ class List(BaseConstant):
     data: ListMetadataModel
     outputs: ListOutputsModel
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {}  # {"output_list": self.data.value}
 
     def memory_type(self) -> NodeMemoryType:
@@ -120,7 +120,7 @@ class Bool(BaseConstant):
     data: BoolMetadataModel = BoolMetadataModel(value=False)
     outputs: BoolOutputsModel
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {"output_bool": self.data.value}
 
 
@@ -129,7 +129,7 @@ class IntervalCatV0(BaseConstant):
     inputs: ConstantInputsValueModel
     outputs: ConstantOutputsModel
 
-    def run(self, input_value: pd.Series) -> typing.Dict[str, typing.Any]:
+    async def run(self, input_value: pd.Series) -> typing.Dict[str, typing.Any]:
         values = input_value.astype(float).copy()
         output = pd.Series(np.nan, index=input_value.index, dtype="object")
 

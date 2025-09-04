@@ -36,10 +36,11 @@ def test_contains_node(input_data):
     }
 
 
-def test_contains_node_run(input_data):
+@pytest.mark.asyncio
+async def test_contains_node_run(input_data):
     contains_node = Contains(**input_data)
 
-    output = contains_node.run(pd.Series(["1", "2"]), pd.Series(["2"]))
+    output = await contains_node.run(pd.Series(["1", "2"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([True])).all()
-    output = contains_node.run(pd.Series(["1", "2"]), pd.Series(["3"]))
+    output = await contains_node.run(pd.Series(["1", "2"]), pd.Series(["3"]))
     assert (output["output_bool"] == pd.Series([False])).all()

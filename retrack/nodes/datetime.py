@@ -28,7 +28,7 @@ class CurrentYear(BaseNode):
     inputs: CurrentYearInputsModel
     outputs: CurrentYearOutputsModel
 
-    def run(
+    async def run(
         self,
         input_void: typing.Optional[pd.Series] = None,
     ) -> typing.Dict[str, str]:

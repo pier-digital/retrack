@@ -23,7 +23,7 @@ class GetChar(BaseNode):
     outputs: GetCharOutputsModel
     data: GetCharMetadataModel
 
-    def run(
+    async def run(
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:

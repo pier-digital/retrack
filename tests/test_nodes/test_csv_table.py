@@ -77,7 +77,8 @@ def test_create_model_from_factory(csv_table_metadata):
     assert hasattr(model, "run")
 
 
-def test_csv_table_run(csv_table_metadata):
+@pytest.mark.asyncio
+async def test_csv_table_run(csv_table_metadata):
     csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
     CSVTableV0 = csv_table_factory(**csv_table_metadata)
 
@@ -91,5 +92,5 @@ def test_csv_table_run(csv_table_metadata):
 
     expected = pd.Series(["472", "535", "622", "606", model.data.default])
 
-    response = model.run(**payload)
+    response = await model.run(**payload)
     assert response["output_value"].equals(expected)

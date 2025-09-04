@@ -1,5 +1,5 @@
 import pandas as pd
-
+import pytest
 from retrack.nodes.endswithany import EndsWithAny
 
 input_data = {
@@ -18,10 +18,11 @@ def test_ends_with_any_node():
     assert isinstance(ends_with_any_node, EndsWithAny)
 
 
-def test_ends_with_any_node_run():
+@pytest.mark.asyncio
+async def test_ends_with_any_node_run():
     ends_with_any_node = EndsWithAny(**input_data)
 
-    output = ends_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
+    output = await ends_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "1"]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = ends_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "0"]))
+    output = await ends_with_any_node.run(pd.Series(["100"]), pd.Series(["2", "0"]))
     assert (output["output_bool"] == pd.Series([True])).all()
