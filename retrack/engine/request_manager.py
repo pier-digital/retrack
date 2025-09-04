@@ -1,24 +1,8 @@
 import typing
 
 import pandas as pd
-import pandera
-import pydantic
 
 from retrack.nodes.base import BaseNode, NodeKind
-
-
-class StrFieldValidator:
-    def __init__(self, default: typing.Optional[typing.Any] = None):
-        self.default = default
-
-    def __call__(self, value: typing.Any) -> typing.Any:
-        if value in [None, "None", "", "null"]:
-            if self.default is None:
-                raise ValueError("value cannot be None")
-            else:
-                return self.default
-
-        return str(value) if not isinstance(value, str) else value
 
 
 class RequestManager:
@@ -63,78 +47,6 @@ class RequestManager:
 
         self._inputs = formated_inputs.values()
 
-        if len(self.inputs) > 0:
-            self._model = self.__create_model()
-            self._dataframe_model = self.__create_dataframe_model()
-        else:
-            self._model = None
-            self._dataframe_model = None
-
-    @property
-    def model(self) -> typing.Type[pydantic.BaseModel]:
-        return self._model
-
-    @property
-    def dataframe_model(self) -> pandera.DataFrameSchema:
-        return self._dataframe_model
-
-    def __create_model(
-        self, model_name: str = "RequestModel"
-    ) -> typing.Type[pydantic.BaseModel]:
-        """Create a pydantic model from the RequestManager's inputs
-
-        Args:
-            model_name (str, optional): The name of the model. Defaults to "RequestModel".
-
-        Returns:
-            typing.Type[pydantic.BaseModel]: The pydantic model
-        """
-        fields = {}
-        for input_field in self.inputs:
-            fields[input_field.data.name] = (
-                typing.Annotated[
-                    str if input_field.data.default is None else typing.Optional[str],
-                    pydantic.BeforeValidator(
-                        StrFieldValidator(input_field.data.default)
-                    ),
-                ],
-                pydantic.Field(
-                    default=Ellipsis
-                    if input_field.data.default is None
-                    else input_field.data.default,
-                    json_schema_extra={
-                        "optional": input_field.data.default is not None
-                    },
-                    validate_default=False,
-                ),
-            )
-
-        return pydantic.create_model(
-            model_name,
-            **fields,
-            __config__=pydantic.ConfigDict(
-                from_attributes=True, use_enum_values=True, protected_namespaces={}
-            ),
-        )
-
-    def __create_dataframe_model(self) -> pandera.DataFrameSchema:
-        """Create a pydantic model from the RequestManager's inputs"""
-        fields = {}
-        for input_field in self.inputs:
-            fields[input_field.data.name] = pandera.Column(
-                str,
-                nullable=input_field.data.default is not None,
-                coerce=True,
-                default=input_field.data.default,
-            )
-
-        return pandera.DataFrameSchema(
-            fields,
-            index=pandera.Index(int),
-            # strict=True,
-            coerce=True,
-        )
-
     def validate(
         self,
         payload: pd.DataFrame,
@@ -150,10 +62,18 @@ class RequestManager:
         Returns:
             pd.DataFrame: The validated payload
         """
-        if self.model is None:
-            raise ValueError("No inputs found")
-
         if not isinstance(payload, pd.DataFrame):
             raise TypeError(f"payload must be a pandas.DataFrame, not {type(payload)}")
 
-        return self.dataframe_model.validate(payload)
+        for input_node in self.inputs:
+            if input_node.data.name not in payload.columns:
+                if input_node.data.default is not None:
+                    payload[input_node.data.name] = input_node.data.default
+                else:
+                    raise ValueError(f"Missing required input: {input_node.data.name}")
+
+        payload.replace(
+            {pd.NA: None, "None": None, "": None, "null": None}, inplace=True
+        )
+
+        return payload

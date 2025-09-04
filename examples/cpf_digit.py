@@ -4,6 +4,7 @@ import retrack
 import pandas as pd
 import asyncio
 
+
 async def run():
     rule = retrack.from_json("examples/cpf-digit.json", validate_version=False)
 
@@ -11,6 +12,8 @@ async def run():
 
     print(await rule.execute(input_df))
 
+
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(run())

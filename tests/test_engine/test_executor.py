@@ -286,7 +286,7 @@ async def test_subflow_with_connector():
     out_df = await rule.execute(_input_df)
     assert isinstance(out_df, pd.DataFrame)
     assert len(out_df) == len(_input_df)
-    assert out_df["output"].values.tolist() == ["1", "2", "3"]
+    assert out_df["output"].values.tolist() == [1, 2, 3]
 
 
 @pytest.mark.asyncio
