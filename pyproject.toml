@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "retrack"
-version = "3.0.0a2"
+version = "3.0.0"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabriel.guarisa@pier.digital>"]
 license = "MIT"
@@ -17,14 +17,12 @@ pydantic = "~2"
 networkx = "~3"
 pandera = "~0.20"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^1.1.0"
 pytest = "*"
 pytest-cov = "*"
 ruff = "*"
 pytest-mock = "*"
-
-[tool.poetry.group.dev.dependencies]
-pytest-asyncio = "^1.1.0"
 
 [tool.pytest.ini_options]
 addopts = "-vv --junitxml=pytest.xml -p no:warnings --cov-report term-missing:skip-covered --cov=retrack"
