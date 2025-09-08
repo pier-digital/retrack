@@ -39,7 +39,7 @@ class And(BaseNode):
     inputs: AndOrInputsModel
     outputs: AndOrOutputsModel
 
-    def run(self, input_bool_0: pd.Series, input_bool_1: pd.Series) -> pd.Series:
+    async def run(self, input_bool_0: pd.Series, input_bool_1: pd.Series) -> pd.Series:
         return {"output_bool": input_bool_0 & input_bool_1}
 
 
@@ -47,7 +47,7 @@ class Or(BaseNode):
     inputs: AndOrInputsModel
     outputs: AndOrOutputsModel
 
-    def run(self, input_bool_0: pd.Series, input_bool_1: pd.Series) -> pd.Series:
+    async def run(self, input_bool_0: pd.Series, input_bool_1: pd.Series) -> pd.Series:
         return {"output_bool": input_bool_0 | input_bool_1}
 
 
@@ -60,5 +60,5 @@ class Not(BaseNode):
     inputs: NotInputsModel
     outputs: NotOutputsModel
 
-    def run(self, input_bool: pd.Series) -> pd.Series:
+    async def run(self, input_bool: pd.Series) -> pd.Series:
         return {"output_bool": ~input_bool}

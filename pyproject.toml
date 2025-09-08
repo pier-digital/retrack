@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "retrack"
-version = "2.11.3"
+version = "3.0.0"
 description = "A business rules engine"
 authors = ["Gabriel Guarisa <gabriel.guarisa@pier.digital>"]
 license = "MIT"
@@ -17,7 +17,8 @@ pydantic = "~2"
 networkx = "~3"
 pandera = "~0.20"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^1.1.0"
 pytest = "*"
 pytest-cov = "*"
 ruff = "*"

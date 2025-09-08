@@ -26,7 +26,9 @@ class IsSubStringOf(BaseNode):
     inputs: IsSubStringOfInputsModel
     outputs: IsSubStringOfOutputsModel
 
-    def run(self, input_value_0: pd.Series, input_value_1: pd.Series) -> pd.Series:
+    async def run(
+        self, input_value_0: pd.Series, input_value_1: pd.Series
+    ) -> pd.Series:
         tmp_df = pd.DataFrame(
             {"input_value_0": input_value_0, "input_value_1": input_value_1}
         )

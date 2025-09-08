@@ -45,7 +45,7 @@ def csv_table_factory(
     BaseCSVTableV0Model = BaseDynamicNode.with_fields("CSVTableV0", **models)
 
     class CSVTableV0(BaseCSVTableV0Model):
-        def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+        async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
             csv_df = self.data.df()
 
             response_df = {}

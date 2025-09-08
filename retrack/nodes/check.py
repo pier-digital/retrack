@@ -54,7 +54,7 @@ class Check(BaseNode):
     inputs: CheckInputsModel
     outputs: CheckOutputsModel
 
-    def run(
+    async def run(
         self,
         input_value_0: pd.Series,
         input_value_1: pd.Series,

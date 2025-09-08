@@ -49,7 +49,8 @@ def test_create_glm_from_factory(glm_metadata):
     assert hasattr(model, "run")
 
 
-def test_glm_run(glm_metadata):
+@pytest.mark.asyncio
+async def test_glm_run(glm_metadata):
     glm_factory = dynamic_nodes_registry().get("GLM")
     GLM = glm_factory(**glm_metadata)
 
@@ -62,11 +63,12 @@ def test_glm_run(glm_metadata):
 
     expected = pd.Series([5, 6.5, -1.5])
 
-    response = model.run(**payload)
+    response = await model.run(**payload)
     assert response["output_value"].equals(expected)
 
 
-def test_glm_run_without_intercept(glm_metadata):
+@pytest.mark.asyncio
+async def test_glm_run_without_intercept(glm_metadata):
     glm_metadata["data"]["value"] = '{"a":2,"b":0.5}'
     glm_metadata["data"]["intercept"] = None
 
@@ -82,11 +84,12 @@ def test_glm_run_without_intercept(glm_metadata):
 
     expected = pd.Series([4, 5.5, -2.5])
 
-    response = model.run(**payload)
+    response = await model.run(**payload)
     assert response["output_value"].equals(expected)
 
 
-def test_glm_run_with_missing_input(glm_metadata):
+@pytest.mark.asyncio
+async def test_glm_run_with_missing_input(glm_metadata):
     with pytest.raises(ValueError, match="Missing input input_value_1 in GLM node"):
         glm_factory = dynamic_nodes_registry().get("GLM")
         GLM = glm_factory(**glm_metadata)
@@ -97,10 +100,11 @@ def test_glm_run_with_missing_input(glm_metadata):
             "input_value_0": pd.Series([1, 2, -1]),
         }
 
-        _ = model.run(**payload)
+        _ = await model.run(**payload)
 
 
-def test_glm_run_with_missing_weight(glm_metadata):
+@pytest.mark.asyncio
+async def test_glm_run_with_missing_weight(glm_metadata):
     with pytest.raises(ValueError, match="Missing weight for feature a in GLM node"):
         glm_metadata["data"]["value"] = '{"intercept":1}'
 
@@ -114,4 +118,4 @@ def test_glm_run_with_missing_weight(glm_metadata):
             "input_value_1": pd.Series(["4", "3", "-1"]),
         }
 
-        _ = model.run(**payload)
+        _ = await model.run(**payload)

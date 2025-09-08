@@ -57,7 +57,7 @@ def glm_factory(
     BaseGLMModel = BaseDynamicNode.with_fields("GLM", **models)
 
     class GLM(BaseGLMModel):
-        def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+        async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
             weights = self.data.parsed_value()
 
             intercept = self.data.intercept()

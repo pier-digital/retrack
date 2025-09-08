@@ -13,5 +13,5 @@ class BaseConnector(Input):
     def kind(self) -> NodeKind:
         return NodeKind.CONNECTOR
 
-    def run(self, **kwargs):
+    async def run(self, **kwargs):
         return {}

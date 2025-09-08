@@ -36,10 +36,11 @@ def test_starts_with_node(input_data):
     }
 
 
-def test_starts_with_node_run(input_data):
+@pytest.mark.asyncio
+async def test_starts_with_node_run(input_data):
     starts_with_node = StartsWith(**input_data)
 
-    output = starts_with_node.run(pd.Series(["100"]), pd.Series(["2"]))
+    output = await starts_with_node.run(pd.Series(["100"]), pd.Series(["2"]))
     assert (output["output_bool"] == pd.Series([False])).all()
-    output = starts_with_node.run(pd.Series(["100"]), pd.Series(["1"]))
+    output = await starts_with_node.run(pd.Series(["100"]), pd.Series(["1"]))
     assert (output["output_bool"] == pd.Series([True])).all()

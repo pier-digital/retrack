@@ -39,7 +39,7 @@ class Output(BaseNode):
     def kind(self) -> NodeKind:
         return NodeKind.OUTPUT
 
-    def run(self, input_value: pd.Series) -> typing.Dict[str, pd.Series]:
+    async def run(self, input_value: pd.Series) -> typing.Dict[str, pd.Series]:
         return {
             constants.OUTPUT_REFERENCE_COLUMN: input_value,
             constants.OUTPUT_MESSAGE_REFERENCE_COLUMN: self.data.message,

@@ -28,7 +28,7 @@ import retrack
 
 rule = retrack.from_json("rule.json")
 
-result = rule.execute(your_data_df)
+result = await rule.execute(your_data_df)
 ```
 
 ### Creating a rule/model
@@ -96,7 +96,7 @@ class SumNode(retrack.BaseNode):
     inputs: SumInputsModel
     outputs: SumOutputsModel
 
-    def run(self, input_value_0: pd.Series,
+    async def run(self, input_value_0: pd.Series,
         input_value_1: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
         output_value = input_value_0.astype(float) + input_value_1.astype(float)

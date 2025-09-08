@@ -88,7 +88,7 @@ class BaseNode(pydantic.BaseModel):
         None
     )
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {}
 
     def kind(self) -> NodeKind:

@@ -27,5 +27,5 @@ class Contains(BaseNode):
     inputs: ContainsInputsModel
     outputs: ContainsOutputsModel
 
-    def run(self, input_list: pd.Series, input_value: pd.Series) -> pd.Series:
+    async def run(self, input_list: pd.Series, input_value: pd.Series) -> pd.Series:
         return {"output_bool": input_value.isin(transformers.to_list(input_list))}

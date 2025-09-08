@@ -46,7 +46,7 @@ class Math(BaseNode):
     inputs: MathInputsModel
     outputs: MathOutputsModel
 
-    def run(
+    async def run(
         self,
         input_value_0: pd.Series,
         input_value_1: pd.Series,
@@ -88,7 +88,7 @@ class AbsoluteValue(BaseNode):
     inputs: AbsoluteValueInputsModel
     outputs: MathOutputsModel
 
-    def run(
+    async def run(
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
@@ -104,7 +104,7 @@ class Round(BaseNode):
     inputs: AbsoluteValueInputsModel
     outputs: MathOutputsModel
 
-    def run(
+    async def run(
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
