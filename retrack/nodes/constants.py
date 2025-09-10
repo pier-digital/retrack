@@ -51,7 +51,7 @@ class IntervalCatMetadataModel(pydantic.BaseModel):
     separator: typing.Optional[str] = pydantic.Field(",")
     default: typing.Optional[str] = None
 
-    def df(self) -> pd.DataFrame:    
+    def df(self) -> pd.DataFrame:
         csv_str = "\n".join(self.value[1:])
         buffer = io.StringIO(csv_str)
 
@@ -60,8 +60,10 @@ class IntervalCatMetadataModel(pydantic.BaseModel):
             header=None,
             names=self.headers,
             sep=self.separator,
-            dtype={self.start_interval_column: "float64",
-                   self.end_interval_column: "float64"}
+            dtype={
+                self.start_interval_column: "float64",
+                self.end_interval_column: "float64",
+            },
         )
 
         return df
@@ -140,8 +142,12 @@ class IntervalCatV0(BaseConstant):
         values = pd.to_numeric(input_value, errors="coerce").to_numpy()
 
         df = self.data.df()
-        starts = pd.to_numeric(df[self.data.start_interval_column], errors="coerce").to_numpy()
-        ends   = pd.to_numeric(df[self.data.end_interval_column],   errors="coerce").to_numpy()
+        starts = pd.to_numeric(
+            df[self.data.start_interval_column], errors="coerce"
+        ).to_numpy()
+        ends = pd.to_numeric(
+            df[self.data.end_interval_column], errors="coerce"
+        ).to_numpy()
         cats_s = df[self.data.category_column]
         intervals = pd.IntervalIndex.from_arrays(starts, ends, closed="left")
         idx = intervals.get_indexer(values)
