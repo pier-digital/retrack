@@ -19,7 +19,7 @@ def bureau_connector_factory(
     node_class = conditional_connector_factory(inputs=inputs, **kwargs)
 
     class ExampleConditionalConnectorNode(node_class):
-        def run(
+        async def run(
             self, context: typing.Optional[Registry] = None, **node_inputs
         ) -> typing.Dict[str, typing.Any]:
             parsed_inputs = {}
@@ -41,6 +41,7 @@ def bureau_connector_factory(
     return ExampleConditionalConnectorNode
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "age, cpf, license_plate, expected_result, expected_message",
     [
@@ -48,7 +49,7 @@ def bureau_connector_factory(
         (17, "12345678900", "ABC1234", False, "bdc"),
     ],
 )
-def test_bureau_connector_factory(
+async def test_bureau_connector_factory(
     age, cpf, license_plate, expected_result, expected_message
 ):
     dynamic_nodes_registry = dynamic_nodes_registry_factory()
@@ -72,6 +73,6 @@ def test_bureau_connector_factory(
 
     df = pd.DataFrame({"age": [age], "cpf": [cpf], "license_plate": [license_plate]})
 
-    result = rule_executor.execute(df, raise_raw_exception=True)
+    result = await rule_executor.execute(df, raise_raw_exception=True)
     assert result["output"].to_list()[0] == expected_result
     assert result["message"].to_list()[0] == expected_message

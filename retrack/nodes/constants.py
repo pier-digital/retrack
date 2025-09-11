@@ -1,3 +1,4 @@
+import io
 import typing
 
 import numpy as np
@@ -51,11 +52,19 @@ class IntervalCatMetadataModel(pydantic.BaseModel):
     default: typing.Optional[str] = None
 
     def df(self) -> pd.DataFrame:
-        rows = [values.split(self.separator) for values in self.value[1:]]
-        df = pd.DataFrame(rows, columns=self.headers)
+        csv_str = "\n".join(self.value[1:])
+        buffer = io.StringIO(csv_str)
 
-        df[self.start_interval_column] = df[self.start_interval_column].astype(float)
-        df[self.end_interval_column] = df[self.end_interval_column].astype(float)
+        df = pd.read_csv(
+            buffer,
+            header=None,
+            names=self.headers,
+            sep=self.separator,
+            dtype={
+                self.start_interval_column: "float64",
+                self.end_interval_column: "float64",
+            },
+        )
 
         return df
 
@@ -101,7 +110,7 @@ class Constant(BaseConstant):
     data: ConstantMetadataModel
     outputs: ConstantOutputsModel
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {"output_value": self.data.value}
 
 
@@ -109,7 +118,7 @@ class List(BaseConstant):
     data: ListMetadataModel
     outputs: ListOutputsModel
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {}  # {"output_list": self.data.value}
 
     def memory_type(self) -> NodeMemoryType:
@@ -120,7 +129,7 @@ class Bool(BaseConstant):
     data: BoolMetadataModel = BoolMetadataModel(value=False)
     outputs: BoolOutputsModel
 
-    def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+    async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
         return {"output_bool": self.data.value}
 
 
@@ -129,20 +138,37 @@ class IntervalCatV0(BaseConstant):
     inputs: ConstantInputsValueModel
     outputs: ConstantOutputsModel
 
-    def run(self, input_value: pd.Series) -> typing.Dict[str, typing.Any]:
-        values = input_value.astype(float).copy()
-        output = pd.Series(np.nan, index=input_value.index, dtype="object")
+    async def run(self, input_value: pd.Series) -> typing.Dict[str, typing.Any]:
+        values = pd.to_numeric(input_value, errors="coerce").to_numpy()
 
-        for _, row in self.data.df().iterrows():
-            output.loc[
-                (values >= float(row[self.data.start_interval_column]))
-                & (values < float(row[self.data.end_interval_column])),
-            ] = row[self.data.category_column]
+        df = self.data.df()
+        starts = pd.to_numeric(
+            df[self.data.start_interval_column], errors="coerce"
+        ).to_numpy()
+        ends = pd.to_numeric(
+            df[self.data.end_interval_column], errors="coerce"
+        ).to_numpy()
+        cats_s = df[self.data.category_column]
+        intervals = pd.IntervalIndex.from_arrays(starts, ends, closed="left")
+        idx = intervals.get_indexer(values)
+        cats = cats_s.to_numpy(dtype=object)
+        out = np.full(values.shape, np.nan, dtype=object)
 
-        replace_value_tag = output == "{value}"
-        output.loc[replace_value_tag] = input_value[replace_value_tag]
+        found_mask = idx != -1
+        if found_mask.any():
+            mapped = cats[idx[found_mask]]
+            out[found_mask] = mapped
+
+            pass_mask = mapped == "{value}"
+            if pass_mask.any():
+                ii = np.where(found_mask)[0][pass_mask]
+                out[ii] = input_value.iloc[ii]
 
         if self.data.default is not None:
-            output.fillna(self.data.default, inplace=True)
+            nan_mask = pd.isna(out)
+            if nan_mask.any():
+                out[nan_mask] = self.data.default
+
+        output = pd.Series(out, index=input_value.index, dtype="object")
 
         return {"output_value": output}

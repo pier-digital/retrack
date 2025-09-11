@@ -27,6 +27,6 @@ class StartsWithAny(BaseNode):
     inputs: StartsWithAnyInputsModel
     outputs: StartsWithAnyOutputsModel
 
-    def run(self, input_value: pd.Series, input_list: pd.Series) -> pd.Series:
+    async def run(self, input_value: pd.Series, input_list: pd.Series) -> pd.Series:
         input_list = transformers.to_list(input_list)
         return {"output_bool": input_value.str.startswith(tuple(input_list))}

@@ -42,11 +42,12 @@ def test_interval_cat_v0(interval_cat_dict):
     assert hasattr(interval_cat, "run")
 
 
-def test_interval_cat_v0_run(interval_cat_dict):
+@pytest.mark.asyncio
+async def test_interval_cat_v0_run(interval_cat_dict):
     interval_cat = IntervalCatV0(**interval_cat_dict)
 
     input_series = pd.Series([-1000, 1, 450, 451, 900, 1001, 320000])
-    output = interval_cat.run(input_value=input_series)
+    output = await interval_cat.run(input_value=input_series)
 
     expected_output = pd.Series([0, 0, 0, 451, 900, 1000, 1000])
     assert (output["output_value"].astype(str) == expected_output.astype(str)).all()

@@ -26,11 +26,12 @@ def test_current_year_node(current_year_input_data):
     assert isinstance(current_year_node, CurrentYear)
 
 
-def test_current_year_node_run(current_year_input_data, mocker):
+@pytest.mark.asyncio
+async def test_current_year_node_run(current_year_input_data, mocker):
     datetime_mock = mocker.patch("retrack.nodes.datetime.dt.datetime")
     datetime_mock.now.return_value = mocker.MagicMock(year=2021)
     current_year_node = CurrentYear(**current_year_input_data)
-    output = current_year_node.run()
+    output = await current_year_node.run()
     assert output["output_value"] == 2021
 
 

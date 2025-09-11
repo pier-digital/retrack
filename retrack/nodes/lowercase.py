@@ -18,7 +18,7 @@ class LowerCase(BaseNode):
     inputs: LowerCaseInputsModel
     outputs: LowerCaseOutputsModel
 
-    def run(
+    async def run(
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:

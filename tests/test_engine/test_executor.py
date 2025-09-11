@@ -7,6 +7,7 @@ from retrack import Rule, from_json, nodes, RuleExecutor
 from retrack.utils.exceptions import ExecutionException
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "filename, in_values, expected_out_values",
     [
@@ -33,7 +34,7 @@ from retrack.utils.exceptions import ExecutionException
         ),
     ],
 )
-def test_flows_with_single_element(filename, in_values, expected_out_values):
+async def test_flows_with_single_element(filename, in_values, expected_out_values):
     with open(f"tests/resources/{filename}.json", "r") as f:
         graph_data = json.load(f)
 
@@ -43,12 +44,13 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
         dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
     ).executor
 
-    out_values = executor.execute(pd.DataFrame([in_values]))
+    out_values = await executor.execute(pd.DataFrame([in_values]))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "filename, in_values, expected_out_values",
     [
@@ -153,7 +155,7 @@ def test_flows_with_single_element(filename, in_values, expected_out_values):
         ),
     ],
 )
-def test_flows(filename, in_values, expected_out_values):
+async def test_flows(filename, in_values, expected_out_values):
     with open(f"tests/resources/{filename}.json", "r") as f:
         graph_data = json.load(f)
 
@@ -163,12 +165,13 @@ def test_flows(filename, in_values, expected_out_values):
         dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
     ).executor
 
-    out_values = executor.execute(pd.DataFrame(in_values))
+    out_values = await executor.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "filename, in_values, expected_out_values",
     [
@@ -250,9 +253,9 @@ def test_flows(filename, in_values, expected_out_values):
         ),
     ],
 )
-def test_create_from_json(filename, in_values, expected_out_values):
+async def test_create_from_json(filename, in_values, expected_out_values):
     runner = from_json(f"tests/resources/{filename}.json")
-    out_values = runner.execute(pd.DataFrame(in_values))
+    out_values = await runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == expected_out_values
@@ -263,7 +266,8 @@ def test_create_from_json_with_invalid_type():
         from_json(1)
 
 
-def test_subflow_with_connector():
+@pytest.mark.asyncio
+async def test_subflow_with_connector():
     _input_df = pd.DataFrame(
         {
             "sepal_length": [1, 2, 3],
@@ -276,16 +280,17 @@ def test_subflow_with_connector():
     rule = from_json(filename)
 
     with pytest.raises(ExecutionException):
-        rule.execute(_input_df)
+        _ = await rule.execute(_input_df)
 
     _input_df["prediction"] = [1, 2, 3]
-    out_df = rule.execute(_input_df)
+    out_df = await rule.execute(_input_df)
     assert isinstance(out_df, pd.DataFrame)
     assert len(out_df) == len(_input_df)
     assert out_df["output"].values.tolist() == ["1", "2", "3"]
 
 
-def test_csv_table_with_if():
+@pytest.mark.asyncio
+async def test_csv_table_with_if():
     runner = from_json("tests/resources/csv-table-with-if.json")
 
     in_values = [
@@ -298,7 +303,7 @@ def test_csv_table_with_if():
         {"in_a": 1, "in_b": 1, "in_d": -1, "in_e": 0},
     ]
 
-    out_values = runner.execute(pd.DataFrame(in_values))
+    out_values = await runner.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert len(out_values) == len(in_values)
@@ -322,7 +327,8 @@ def test_create_from_json_with_dict():
     assert isinstance(from_json(graph_data, return_executor=False), Rule)
 
 
-def test_rules_with_subrules_with_conditions():
+@pytest.mark.asyncio
+async def test_rules_with_subrules_with_conditions():
     with open("tests/resources/rules-with-subrules-with-conditions.json", "r") as f:
         graph_data = json.load(f)
 
@@ -341,7 +347,7 @@ def test_rules_with_subrules_with_conditions():
         }
     ]
 
-    out_values = executor.execute(pd.DataFrame(in_values))
+    out_values = await executor.execute(pd.DataFrame(in_values))
 
     assert isinstance(out_values, pd.DataFrame)
     assert out_values.to_dict(orient="records") == [
