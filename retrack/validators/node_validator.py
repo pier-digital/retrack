@@ -35,13 +35,19 @@ class IntervalCatV0Validator(BaseValidator):
                 df = pd.read_csv(io.StringIO(csv_data))
 
                 if start_col not in df.columns or end_col not in df.columns:
-                    return False, f"Missing required columns: {start_col}, {end_col} in node {node_id}"
+                    return (
+                        False,
+                        f"Missing required columns: {start_col}, {end_col} in node {node_id}",
+                    )
 
-                df[start_col] = pd.to_numeric(df[start_col], errors='coerce')
-                df[end_col] = pd.to_numeric(df[end_col], errors='coerce')
+                df[start_col] = pd.to_numeric(df[start_col], errors="coerce")
+                df[end_col] = pd.to_numeric(df[end_col], errors="coerce")
 
                 if df[start_col].isnull().any() or df[end_col].isnull().any():
-                    return False, f"Invalid numeric values in interval columns in node {node_id}"
+                    return (
+                        False,
+                        f"Invalid numeric values in interval columns in node {node_id}",
+                    )
 
                 df = df.sort_values(by=start_col)
                 if (df[start_col].values[1:] < df[end_col].values[:-1]).any():

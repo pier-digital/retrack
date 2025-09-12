@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from retrack import Rule, from_json, nodes, RuleExecutor
-from retrack.utils.exceptions import ExecutionException, ValidationException
+from retrack.utils.exceptions import ExecutionException
 
 
 @pytest.mark.asyncio
@@ -393,5 +393,3 @@ async def test_invalid_flows(filename, in_values, expected_error):
         ).executor
 
     assert expected_error in str(excinfo.value)
-
-
