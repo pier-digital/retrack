@@ -1,10 +1,11 @@
+from typing import Optional
 from retrack.validators.base import BaseValidator
 import pandas as pd
 import io
 
 
 class IntervalCatV0Validator(BaseValidator):
-    def validate(self, graph_data: dict, **kwargs) -> tuple[bool, str | None]:
+    def validate(self, graph_data: dict, **kwargs) -> tuple[bool, Optional[str]]:
         """Validate the graph data.
 
         Returns:

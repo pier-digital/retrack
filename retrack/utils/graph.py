@@ -70,12 +70,7 @@ def validate_with_validators(
     graph_data: dict, edges: dict, validator_registry: Registry
 ):
     for validator_name, validator in validator_registry.memory.items():
-        result = validator.validate(graph_data=graph_data, edges=edges)
-
-        if isinstance(result, tuple):
-            is_valid, error_message = result
-        else:
-            is_valid, error_message = result, None
+        is_valid, error_message = validator.validate(graph_data=graph_data, edges=edges)
 
         if not is_valid:
             error_details = f"Validator '{validator_name}' failed."
