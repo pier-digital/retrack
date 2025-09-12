@@ -1,3 +1,4 @@
+from typing import Optional
 from retrack.validators.base import BaseValidator
 
 
@@ -18,7 +19,7 @@ class NodeExistsValidator(BaseValidator):
         self.max_quantity = max_quantity
         self.min_quantity = min_quantity
 
-    def validate(self, graph_data: dict, **kwargs) -> bool:
+    def validate(self, graph_data: dict, **kwargs) -> tuple[bool, Optional[str]]:
         """Validate the graph data.
 
         Args:
@@ -32,7 +33,7 @@ class NodeExistsValidator(BaseValidator):
             node for _, node in nodes.items() if node["name"].lower() == self.node_name
         ]
         if self.max_quantity is not None and len(nodes) > self.max_quantity:
-            return False
+            return False, f"Maximum quantity of nodes exceeded: {self.max_quantity}"
         if self.min_quantity is not None and len(nodes) < self.min_quantity:
-            return False
-        return True
+            return False, f"Minimum quantity of nodes not met: {self.min_quantity}"
+        return True, None
