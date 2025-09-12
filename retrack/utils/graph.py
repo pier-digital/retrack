@@ -70,8 +70,18 @@ def validate_with_validators(
     graph_data: dict, edges: dict, validator_registry: Registry
 ):
     for validator_name, validator in validator_registry.memory.items():
-        if not validator.validate(graph_data=graph_data, edges=edges):
-            raise ValueError(f"Invalid graph data: {validator_name}")
+        result = validator.validate(graph_data=graph_data, edges=edges)
+
+        if isinstance(result, tuple):
+            is_valid, error_message = result
+        else:
+            is_valid, error_message = result, None
+
+        if not is_valid:
+            error_details = f"Validator '{validator_name}' failed."
+            if error_message:
+                error_details += f" Details: {error_message}"
+            raise ValueError(f"Invalid graph data: {error_details}")
 
 
 def check_node_name(node_name: str, node_id: str):
