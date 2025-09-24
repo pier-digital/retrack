@@ -3,7 +3,7 @@ import pytest
 import pandas as pd
 import datetime as dt
 
-from retrack.nodes.datetime import CurrentYear, DaysBetweenDates, CurrentTime
+from retrack.nodes.datetime import CurrentYear, DaysBetweenDates, Now
 
 
 @pytest.fixture
@@ -94,7 +94,7 @@ def test_days_between_dates_node_run(days_between_dates_input_data, mocker):
 
 
 @pytest.fixture
-def current_time_input_data():
+def now_input_data():
     return {
         "id": 19,
         "data": {},
@@ -103,19 +103,19 @@ def current_time_input_data():
         },
         "outputs": {"output_value": {"connections": []}},
         "position": [251.88962048090218, 1013.6680559036622],
-        "name": "CurrentTime",
+        "name": "Now",
     }
 
 
-def test_current_time_node(current_time_input_data):
-    current_time_node = CurrentTime(**current_time_input_data)
+def test_now_node(now_input_data):
+    now_node = Now(**now_input_data)
 
-    assert isinstance(current_time_node, CurrentTime)
+    assert isinstance(now_node, Now)
 
-    assert current_time_node.model_dump(by_alias=True) == {
+    assert now_node.model_dump(by_alias=True) == {
         "id": "19",
-        "name": "CurrentTime",
-        "data": {"format": None, "timezone": "America/Sao_Paulo"},
+        "name": "Now",
+        "data": {"timezone": "America/Sao_Paulo"},
         "inputs": {
             "input_void": {"connections": []},
         },
@@ -123,8 +123,8 @@ def test_current_time_node(current_time_input_data):
     }
 
 
-def test_current_time_node_run(current_time_input_data, mocker):
-    current_time_node = CurrentTime(**current_time_input_data)
+def test_now_node_run(now_input_data, mocker):
+    now_node = Now(**now_input_data)
     datetime_now = dt.datetime.strptime("2025-07-01", "%Y-%m-%d")
 
     class DateTimeMock(dt.datetime):
@@ -134,21 +134,5 @@ def test_current_time_node_run(current_time_input_data, mocker):
 
     mocker.patch("retrack.nodes.datetime.dt.datetime", DateTimeMock)
 
-    output = current_time_node.run()
+    output = now_node.run()
     assert output["output_value"] == datetime_now.isoformat()
-
-    current_time_input_data["data"] = {
-        "format": "%Y-%m-%d",
-        "timezone": "America/Sao_Paulo",
-    }
-    current_time_node = CurrentTime(**current_time_input_data)
-    output = current_time_node.run()
-    assert output["output_value"] == "2025-07-01"
-
-    current_time_input_data["data"] = {
-        "format": "%Y-%d-%m",
-        "timezone": "America/Sao_Paulo",
-    }
-    current_time_node = CurrentTime(**current_time_input_data)
-    output = current_time_node.run()
-    assert output["output_value"] == "2025-01-07"

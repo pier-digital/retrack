@@ -152,42 +152,36 @@ class HoursBetweenDates(BaseNode):
 
 
 ###############################################################
-# CurrentTime Inputs and Outputs
+# Now Inputs and Outputs
 ###############################################################
 
 
-class CurrentTimeOutputsModel(pydantic.BaseModel):
+class NowOutputsModel(pydantic.BaseModel):
     output_value: OutputConnectionModel
 
 
-class CurrentTimeInputsModel(pydantic.BaseModel):
+class NowInputsModel(pydantic.BaseModel):
     input_void: typing.Optional[InputConnectionModel] = None
 
 
-class CurrentTimeMetadataModel(pydantic.BaseModel):
-    format: typing.Optional[str] = None
+class NowMetadataModel(pydantic.BaseModel):
     timezone: typing.Optional[str] = "America/Sao_Paulo"
 
 
 ###############################################################
-# CurrentTime Node
+# Now Node
 ###############################################################
 
 
-class CurrentTime(BaseNode):
-    inputs: CurrentTimeInputsModel
-    outputs: CurrentTimeOutputsModel
-    data: CurrentTimeMetadataModel
+class Now(BaseNode):
+    inputs: NowInputsModel
+    outputs: NowOutputsModel
+    data: NowMetadataModel
 
     def run(
         self,
         input_void: typing.Optional[pd.Series] = None,
     ) -> typing.Dict[str, str]:
-        format = self.data.format
         timezone = gettz(self.data.timezone)
-        timestamp = (
-            dt.datetime.now(tz=timezone).isoformat()
-            if format is None
-            else dt.datetime.now(tz=timezone).strftime(format=format)
-        )
+        timestamp = dt.datetime.now(tz=timezone).isoformat()
         return {"output_value": timestamp}
