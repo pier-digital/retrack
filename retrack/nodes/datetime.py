@@ -94,64 +94,6 @@ class DaysBetweenDates(BaseNode):
 
 
 ###############################################################
-# HoursBetweenDates Inputs and Outputs
-###############################################################
-
-
-class HoursBetweenDatesOutputsModel(pydantic.BaseModel):
-    output_value: OutputConnectionModel
-
-
-class HoursBetweenDatesInputsModel(pydantic.BaseModel):
-    input_value_0: InputConnectionModel
-    input_value_1: typing.Optional[InputConnectionModel] = None
-
-
-class HoursBetweenDatesMetadataModel(pydantic.BaseModel):
-    format: typing.Optional[str] = "%Y-%m-%d"
-    timezone: typing.Optional[str] = "America/Sao_Paulo"
-
-
-###############################################################
-# HoursBetweenDates Node
-###############################################################
-
-
-class HoursBetweenDates(BaseNode):
-    inputs: HoursBetweenDatesInputsModel
-    outputs: HoursBetweenDatesOutputsModel
-    data: HoursBetweenDatesMetadataModel
-
-    def run(
-        self,
-        input_value_0: pd.Series,
-        input_value_1: pd.Series,
-    ) -> typing.Dict[str, pd.Series]:
-        format = self.data.format
-        timezone = gettz(self.data.timezone)
-        timezone_0 = (
-            pd.Timestamp(input_value_0.squeeze(), tz=timezone)
-            if isinstance(input_value_0.squeeze(), (dt.datetime, pd.Timestamp))
-            else pd.Timestamp(
-                dt.datetime.strptime(input_value_0.squeeze(), format), tz=timezone
-            )
-        )
-        timezone_1 = (
-            pd.Timestamp.now().normalize().tz_localize(timezone)
-            if input_value_1.squeeze() is None
-            else pd.Timestamp(input_value_1.squeeze(), tz=timezone)
-            if isinstance(input_value_1.squeeze(), (dt.datetime, pd.Timestamp))
-            else pd.Timestamp(
-                dt.datetime.strptime(input_value_1.squeeze(), format), tz=timezone
-            )
-        )
-        delta = timezone_0 - timezone_1
-        hours = abs((delta.components.hours + delta.components.days * 24))
-
-        return {"output_value": pd.Series([hours])}
-
-
-###############################################################
 # Now Inputs and Outputs
 ###############################################################
 
