@@ -3,7 +3,7 @@ import pytest
 import pandas as pd
 import datetime as dt
 
-from retrack.nodes.datetime import CurrentYear, Now
+from retrack.nodes.datetime import CurrentYear, DifferenceBetweenDates, Now
 
 
 @pytest.fixture
@@ -78,3 +78,62 @@ def test_now_node_run(now_input_data, mocker):
 
     output = now_node.run()
     assert output["output_value"] == datetime_now.isoformat()
+
+
+@pytest.fixture
+def difference_between_dates_input_data():
+    return {
+        "id": 9,
+        "data": {},
+        "inputs": {
+            "input_value_0": {"connections": []},
+            "input_value_1": {"connections": []},
+        },
+        "outputs": {"output_value": {"connections": []}},
+        "position": [1597.1904571362154, 628.6495284260166],
+        "name": "DifferenceBetweenDates",
+    }
+
+
+def test_difference_between_dates_node(difference_between_dates_input_data):
+    difference_between_dates_node = DifferenceBetweenDates(**difference_between_dates_input_data)
+
+    assert isinstance(difference_between_dates_node, DifferenceBetweenDates)
+
+    assert difference_between_dates_node.model_dump(by_alias=True) == {
+        "id": "9",
+        "name": "DifferenceBetweenDates",
+        "data": {"timezone": "America/Sao_Paulo"},
+        "inputs": {
+            "input_value_0": {"connections": []},
+            "input_value_1": {"connections": []},
+        },
+        "outputs": {"output_value": {"connections": []}},
+    }
+
+
+@pytest.mark.asyncio
+async def test_difference_between_dates_node_run(difference_between_dates_input_data, mocker):
+    difference_between_dates_node = DifferenceBetweenDates(**difference_between_dates_input_data)
+    timestamp_now = pd.Timestamp("2025-07-01").normalize()
+
+    class TimestampMock(pd.Timestamp):
+        @classmethod
+        def now(cls, tz=None):
+            return timestamp_now
+
+    mocker.patch("retrack.nodes.datetime.pd.Timestamp", TimestampMock)
+    output = difference_between_dates_node.run(
+        pd.Series(["2025-07-01"]), pd.Series(["2025-01-01"])
+    )
+    assert (output["output_value"] == pd.Series([181])).all()
+    output = difference_between_dates_node.run(pd.Series(["2025-07-01"]), pd.Series([None]))
+    assert (output["output_value"] == pd.Series([0])).all()
+    output = difference_between_dates_node.run(pd.Series(["2025-01-01"]), pd.Series([None]))
+    assert (output["output_value"] == pd.Series([181])).all()
+    output = difference_between_dates_node.run(pd.Series(["2024-12-31"]), pd.Series([None]))
+    assert (output["output_value"] == pd.Series([182])).all()
+    output = difference_between_dates_node.run(
+        pd.Series(["2024-12-31T00:00:00"]), pd.Series([None])
+    )
+    assert (output["output_value"] == pd.Series([182])).all()
