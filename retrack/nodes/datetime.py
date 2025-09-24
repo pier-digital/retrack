@@ -115,3 +115,41 @@ class Now(BaseNode):
         timezone = gettz(self.data.timezone)
         timestamp = dt.datetime.now(tz=timezone).isoformat()
         return {"output_value": timestamp}
+
+
+###############################################################
+# ToISOFormat Inputs and Outputs
+###############################################################
+
+
+class ToISOFormatOutputsModel(pydantic.BaseModel):
+    output_value: OutputConnectionModel
+
+
+class ToISOFormatInputsModel(pydantic.BaseModel):
+    input_value: InputConnectionModel
+
+
+class ToISOFormatMetadataModel(pydantic.BaseModel):
+    format: typing.Optional[str] = "%Y-%m-%d"
+    timezone: typing.Optional[str] = "America/Sao_Paulo"
+
+
+###############################################################
+# ToISOFormat Node
+###############################################################
+
+
+class ToISOFormat(BaseNode):
+    inputs: ToISOFormatInputsModel
+    outputs: ToISOFormatOutputsModel
+    data: ToISOFormatMetadataModel
+
+    def run(
+        self,
+        input_value: pd.Series,
+    ) -> typing.Dict[str, str]:
+        format = self.data.format
+        timezone = gettz(self.data.timezone)
+        date = pd.to_datetime(input_value.squeeze(), format=format).tz_localize(timezone)
+        return {"output_value": date.isoformat()}

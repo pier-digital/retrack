@@ -1,9 +1,8 @@
 import pytest
-
 import pandas as pd
 import datetime as dt
 
-from retrack.nodes.datetime import CurrentYear, DifferenceBetweenDates, Now
+from retrack.nodes.datetime import CurrentYear, DifferenceBetweenDates, Now, ToISOFormat
 
 
 @pytest.fixture
@@ -137,3 +136,53 @@ async def test_difference_between_dates_node_run(difference_between_dates_input_
         pd.Series(["2024-12-31T00:00:00"]), pd.Series([None])
     )
     assert (output["output_value"] == pd.Series([182])).all()
+
+
+@pytest.fixture
+def to_iso_format_input_data():
+    return {
+        "id": 20,
+        "data": {},
+        "inputs": {
+            "input_value": {"connections": []},
+        },
+        "outputs": {"output_value": {"connections": []}},
+        "position": [300, 400],
+        "name": "ToISOFormat",
+    }
+
+
+def test_to_iso_format_node(to_iso_format_input_data):
+    to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
+
+    assert isinstance(to_iso_format_node, ToISOFormat)
+
+    assert to_iso_format_node.model_dump(by_alias=True) == {
+        "id": "20",
+        "name": "ToISOFormat",
+        "data": {
+            "format": "%Y-%m-%d",
+            "timezone": "America/Sao_Paulo",
+        },
+        "inputs": {
+            "input_value": {"connections": []},
+        },
+        "outputs": {"output_value": {"connections": []}},
+    }
+
+
+def test_to_iso_format_node_run(to_iso_format_input_data):
+    to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
+
+    output = to_iso_format_node.run(pd.Series(["2025-09-24"]))
+    assert output["output_value"] == "2025-09-24T00:00:00-03:00"
+
+    to_iso_format_input_data["data"]["format"] = "%d/%m/%Y"
+    to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
+    output = to_iso_format_node.run(pd.Series(["24/09/2025"]))
+    assert output["output_value"] == "2025-09-24T00:00:00-03:00"
+
+    to_iso_format_input_data["data"]["format"] = None
+    to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
+    output = to_iso_format_node.run(pd.Series(["2025-09-24T15:30:00"]))
+    assert output["output_value"] == "2025-09-24T15:30:00-03:00"
