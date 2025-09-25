@@ -255,8 +255,18 @@ async def test_flows(filename, in_values, expected_out_values):
         (
             "date-difference",
             [
-                {"quoted_at": (datetime.now() - timedelta(days=4)).strftime("%Y%m%d"), "absolute": True},
-                {"quoted_at": (datetime.now() - timedelta(days=120)).strftime("%Y%m%d"), "absolute": False},
+                {
+                    "quoted_at": (datetime.now() - timedelta(days=4)).strftime(
+                        "%Y%m%d"
+                    ),
+                    "absolute": True,
+                },
+                {
+                    "quoted_at": (datetime.now() - timedelta(days=120)).strftime(
+                        "%Y%m%d"
+                    ),
+                    "absolute": False,
+                },
             ],
             [
                 {"message": "days_since_quoted", "output": 4.0},
