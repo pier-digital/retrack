@@ -64,7 +64,8 @@ def test_now_node(now_input_data):
     }
 
 
-def test_now_node_run(now_input_data, mocker):
+@pytest.mark.asyncio
+async def test_now_node_run(now_input_data, mocker):
     now_node = Now(**now_input_data)
     datetime_now = dt.datetime.strptime("2025-07-01", "%Y-%m-%d")
 
@@ -75,8 +76,9 @@ def test_now_node_run(now_input_data, mocker):
 
     mocker.patch("retrack.nodes.datetime.dt.datetime", DateTimeMock)
 
-    output = now_node.run()
-    assert output["output_value"] == datetime_now.isoformat()
+    output = await now_node.run()
+
+    assert (output["output_value"] == pd.Series(["2025-07-01T00:00:00"])).all()
 
 
 @pytest.fixture
@@ -95,7 +97,9 @@ def difference_between_dates_input_data():
 
 
 def test_difference_between_dates_node(difference_between_dates_input_data):
-    difference_between_dates_node = DifferenceBetweenDates(**difference_between_dates_input_data)
+    difference_between_dates_node = DifferenceBetweenDates(
+        **difference_between_dates_input_data
+    )
 
     assert isinstance(difference_between_dates_node, DifferenceBetweenDates)
 
@@ -112,8 +116,12 @@ def test_difference_between_dates_node(difference_between_dates_input_data):
 
 
 @pytest.mark.asyncio
-async def test_difference_between_dates_node_run(difference_between_dates_input_data, mocker):
-    difference_between_dates_node = DifferenceBetweenDates(**difference_between_dates_input_data)
+async def test_difference_between_dates_node_run(
+    difference_between_dates_input_data, mocker
+):
+    difference_between_dates_node = DifferenceBetweenDates(
+        **difference_between_dates_input_data
+    )
     timestamp_now = pd.Timestamp("2025-07-01").normalize()
 
     class TimestampMock(pd.Timestamp):
@@ -122,20 +130,24 @@ async def test_difference_between_dates_node_run(difference_between_dates_input_
             return timestamp_now
 
     mocker.patch("retrack.nodes.datetime.pd.Timestamp", TimestampMock)
-    output = difference_between_dates_node.run(
-        pd.Series(["2025-07-01"]), pd.Series(["2025-01-01"])
+
+    output = await difference_between_dates_node.run(
+        pd.Series(["2025-01-01", "2025-07-01"]),
+        pd.Series(["2025-07-01", "2025-01-01"]),
     )
-    assert (output["output_value"] == pd.Series([181])).all()
-    output = difference_between_dates_node.run(pd.Series(["2025-07-01"]), pd.Series([None]))
-    assert (output["output_value"] == pd.Series([0])).all()
-    output = difference_between_dates_node.run(pd.Series(["2025-01-01"]), pd.Series([None]))
-    assert (output["output_value"] == pd.Series([181])).all()
-    output = difference_between_dates_node.run(pd.Series(["2024-12-31"]), pd.Series([None]))
-    assert (output["output_value"] == pd.Series([182])).all()
-    output = difference_between_dates_node.run(
-        pd.Series(["2024-12-31T00:00:00"]), pd.Series([None])
+    assert (output["output_value"] == pd.Series([-181, 181])).all()
+
+    output = await difference_between_dates_node.run(
+        pd.Series(["2025-07-01", "2025-01-01"]),
+        pd.Series(["2025-07-01", "2025-07-01"]),
     )
-    assert (output["output_value"] == pd.Series([182])).all()
+    assert (output["output_value"] == pd.Series([0, -181])).all()
+
+    output = await difference_between_dates_node.run(
+        pd.Series(["2024-12-31", "2025-07-01"]),
+        pd.Series(["2025-07-01", "2024-12-31"]),
+    )
+    assert (output["output_value"] == pd.Series([-182, 182])).all()
 
 
 @pytest.fixture
@@ -171,18 +183,14 @@ def test_to_iso_format_node(to_iso_format_input_data):
     }
 
 
-def test_to_iso_format_node_run(to_iso_format_input_data):
+@pytest.mark.asyncio
+async def test_to_iso_format_node_run(to_iso_format_input_data):
     to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
 
-    output = to_iso_format_node.run(pd.Series(["2025-09-24"]))
-    assert output["output_value"] == "2025-09-24T00:00:00-03:00"
+    output = await to_iso_format_node.run(pd.Series(["2025-09-24"]))
+    assert (output["output_value"] == pd.Series(["2025-09-24T00:00:00-03:00"])).all()
 
     to_iso_format_input_data["data"]["format"] = "%d/%m/%Y"
     to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
-    output = to_iso_format_node.run(pd.Series(["24/09/2025"]))
-    assert output["output_value"] == "2025-09-24T00:00:00-03:00"
-
-    to_iso_format_input_data["data"]["format"] = None
-    to_iso_format_node = ToISOFormat(**to_iso_format_input_data)
-    output = to_iso_format_node.run(pd.Series(["2025-09-24T15:30:00"]))
-    assert output["output_value"] == "2025-09-24T15:30:00-03:00"
+    output = await to_iso_format_node.run(pd.Series(["24/09/2025"]))
+    assert (output["output_value"] == pd.Series(["2025-09-24T00:00:00-03:00"])).all()

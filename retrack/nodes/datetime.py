@@ -64,21 +64,28 @@ class DifferenceBetweenDates(BaseNode):
     outputs: DifferenceBetweenDatesOutputsModel
     data: DifferenceBetweenDatesMetadataModel
 
-    def run(
+    async def run(
         self,
         input_value_0: pd.Series,
         input_value_1: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
         timezone = gettz(self.data.timezone)
-        timezone_0 = pd.to_datetime(input_value_0.squeeze()).tz_localize(timezone)
-        timezone_1 = (
-            pd.Timestamp.now().normalize().tz_localize(timezone)
-            if input_value_1.squeeze() is None
-            else pd.to_datetime(input_value_1.squeeze()).tz_localize(timezone)
-        )
-        days = abs((timezone_0 - timezone_1).days)
 
-        return {"output_value": pd.Series([days])}
+        def replace_invalid(value):
+            if pd.isna(value):
+                return pd.Timestamp.now(tz=timezone).normalize()
+            timestamp = pd.to_datetime(value)
+            if timestamp.tzinfo is None:
+                return timestamp.tz_localize(timezone, ambiguous="NaT", nonexistent="shift_forward").normalize()
+            return timestamp.tz_convert(timezone).normalize()
+
+        timestamp_0 = input_value_0.apply(replace_invalid)
+        timestamp_1 = input_value_1.apply(replace_invalid)
+
+        differences = timestamp_0.sub(timestamp_1)
+        days = differences.dt.days
+
+        return {"output_value": days}
 
 
 ###############################################################
@@ -108,13 +115,13 @@ class Now(BaseNode):
     outputs: NowOutputsModel
     data: NowMetadataModel
 
-    def run(
+    async def run(
         self,
         input_void: typing.Optional[pd.Series] = None,
     ) -> typing.Dict[str, str]:
         timezone = gettz(self.data.timezone)
-        timestamp = dt.datetime.now(tz=timezone).isoformat()
-        return {"output_value": timestamp}
+        date = dt.datetime.now(tz=timezone).replace(microsecond=0)
+        return {"output_value": pd.Series([date.isoformat()])}
 
 
 ###############################################################
@@ -145,11 +152,20 @@ class ToISOFormat(BaseNode):
     outputs: ToISOFormatOutputsModel
     data: ToISOFormatMetadataModel
 
-    def run(
+    async def run(
         self,
         input_value: pd.Series,
-    ) -> typing.Dict[str, str]:
-        format = self.data.format
+    ) -> typing.Dict[str, pd.Series]:
+        format = self.data.format or "%Y-%m-%d"
+        format = format.replace("YYYY", "%Y").replace("MM", "%m").replace("DD", "%d")
         timezone = gettz(self.data.timezone)
-        date = pd.to_datetime(input_value.squeeze(), format=format).tz_localize(timezone)
-        return {"output_value": date.isoformat()}
+
+        def convert_to_iso(value):
+            try:
+                date = pd.to_datetime(value, format=format).tz_localize(timezone)
+                return date.isoformat()
+            except Exception as e:
+                return None
+
+        output_series = input_value.apply(convert_to_iso)
+        return {"output_value": output_series}
