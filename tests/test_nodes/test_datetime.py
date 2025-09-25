@@ -135,19 +135,19 @@ async def test_difference_between_dates_node_run(
         pd.Series(["2025-01-01", "2025-07-01"]),
         pd.Series(["2025-07-01", "2025-01-01"]),
     )
-    assert (output["output_value"] == pd.Series([-181, 181])).all()
+    assert (output["output_value"] == pd.Series([181, -181])).all()
 
     output = await difference_between_dates_node.run(
         pd.Series(["2025-07-01", "2025-01-01"]),
         pd.Series(["2025-07-01", "2025-07-01"]),
     )
-    assert (output["output_value"] == pd.Series([0, -181])).all()
+    assert (output["output_value"] == pd.Series([0, 181])).all()
 
     output = await difference_between_dates_node.run(
         pd.Series(["2024-12-31", "2025-07-01"]),
         pd.Series(["2025-07-01", "2024-12-31"]),
     )
-    assert (output["output_value"] == pd.Series([-182, 182])).all()
+    assert (output["output_value"] == pd.Series([182, -182])).all()
 
 
 @pytest.fixture

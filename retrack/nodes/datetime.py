@@ -84,7 +84,7 @@ class DifferenceBetweenDates(BaseNode):
         timestamp_0 = input_value_0.apply(replace_invalid)
         timestamp_1 = input_value_1.apply(replace_invalid)
 
-        differences = timestamp_0.sub(timestamp_1)
+        differences = timestamp_1.sub(timestamp_0)
         days = differences.dt.days
 
         return {"output_value": days}
