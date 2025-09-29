@@ -369,3 +369,43 @@ async def test_rules_with_subrules_with_conditions():
     assert out_values.to_dict(orient="records") == [
         {"message": "< ten", "output": "10"},
     ]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "filename, in_values, expected_error",
+    [
+        (
+            "missing-required-columns",
+            [{"age": 25}],
+            "Missing required columns: min_age, max_age in node 3",
+        ),
+        (
+            "invalid-numeric-values",
+            [{"age": 30}],
+            "Invalid numeric values in interval columns in node 3",
+        ),
+        (
+            "overlapping-intervals",
+            [{"age": 35}],
+            "Overlapping intervals detected in node 3",
+        ),
+        (
+            "csv-processing-error",
+            [{"age": 40}],
+            "Invalid numeric values in interval columns in node 3",
+        ),
+    ],
+)
+async def test_invalid_flows(filename, in_values, expected_error):
+    with open(f"tests/resources/invalid/{filename}.json", "r") as f:
+        graph_data = json.load(f)
+
+    with pytest.raises(ValueError) as excinfo:
+        Rule.create(
+            graph_data,
+            nodes_registry=nodes.registry(),
+            dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+        ).executor
+
+    assert expected_error in str(excinfo.value)
