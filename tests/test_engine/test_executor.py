@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 
 import pandas as pd
 import pytest
@@ -249,6 +250,21 @@ async def test_flows(filename, in_values, expected_out_values):
                 {"output": True, "message": None},
                 {"output": True, "message": None},
                 {"output": True, "message": None},
+            ],
+        ),
+        (
+            "date-difference",
+            [
+                {"quoted_at": (datetime.now() - timedelta(days=4)).strftime("%Y%m%d")},
+                {
+                    "quoted_at": (datetime.now() - timedelta(days=120)).strftime(
+                        "%Y%m%d"
+                    )
+                },
+            ],
+            [
+                {"message": "days_since_quoted", "output": 4.0},
+                {"message": "days_since_quoted", "output": 120.0},
             ],
         ),
     ],
