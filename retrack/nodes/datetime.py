@@ -73,17 +73,15 @@ class DifferenceBetweenDates(BaseNode):
 
         def replace_invalid(value):
             if pd.isna(value):
-                return pd.Timestamp.now(tz=timezone).normalize()
+                return pd.Timestamp.now(tz=timezone)
             timestamp = pd.to_datetime(value)
             if timestamp.tzinfo is None:
                 return (
                     timestamp.tz_localize(
-                        "UTC", ambiguous="NaT", nonexistent="shift_forward"
+                        timezone, ambiguous="NaT", nonexistent="shift_forward"
                     )
-                    .tz_convert(timezone)
-                    .normalize()
                 )
-            return timestamp.tz_convert(timezone).normalize()
+            return timestamp.tz_convert(timezone)
 
         timestamp_0 = input_value_0.apply(replace_invalid)
         timestamp_1 = input_value_1.apply(replace_invalid)
@@ -167,10 +165,15 @@ class ToISOFormat(BaseNode):
         timezone = gettz(self.data.timezone)
 
         def convert_to_iso(value):
-            date = pd.to_datetime(value, format=format).tz_localize(
-                timezone, nonexistent="shift_forward", ambiguous="NaT"
-            )
-            return date.isoformat()
+            timestamp = pd.to_datetime(value)
+            if timestamp.tzinfo is None:
+                return (
+                    timestamp.tz_localize(
+                        timezone, ambiguous="NaT", nonexistent="shift_forward"
+                    )
+                    .isoformat()
+                )
+            return timestamp.tz_convert(timezone).isoformat()
 
         output_series = input_value.apply(convert_to_iso)
         return {"output_value": output_series}
