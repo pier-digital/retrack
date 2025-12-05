@@ -99,8 +99,11 @@ class RuleExecutor:
         node_dict: dict,
         current_node_filter: pd.Series,
         execution: Execution,
+        parent_execution: Execution = None,
         include_context: bool = False,
         include_inputs: bool = False,
+        include_parent_execution: bool = False,
+        include_node_id: bool = False,
     ) -> dict:
         input_params = {}
 
@@ -118,6 +121,14 @@ class RuleExecutor:
         if include_context:
             input_params["context"] = execution.context
 
+        if include_parent_execution:
+            input_params["parent_execution"] = (
+                parent_execution if parent_execution else execution
+            )
+
+        if include_node_id:
+            input_params["parent_node_id"] = node_dict.get("id")
+
         if include_inputs:
             for column in execution.payload.columns:
                 input_name = f"input_{column}"
@@ -131,7 +142,9 @@ class RuleExecutor:
 
         return input_params
 
-    async def __run_node(self, node_id: str, execution: Execution):
+    async def __run_node(
+        self, node_id: str, execution: Execution, parent_execution: Execution = None
+    ):
         current_node_filter = execution.filters.get(node_id, None)
 
         self.__set_output_connection_filters(
@@ -146,13 +159,17 @@ class RuleExecutor:
         include_context = (
             node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW
         )
-        include_inputs = node.kind() == NodeKind.FLOW
+        is_node_kind_flow = node.kind() == NodeKind.FLOW
+
         input_params = self.__get_input_params(
             node.model_dump(by_alias=True),
             current_node_filter=current_node_filter,
             execution=execution,
+            parent_execution=parent_execution,
             include_context=include_context,
-            include_inputs=include_inputs,
+            include_inputs=is_node_kind_flow,
+            include_parent_execution=is_node_kind_flow,
+            include_node_id=is_node_kind_flow,
         )
 
         output = await node.run(**input_params)
@@ -227,6 +244,8 @@ class RuleExecutor:
         debug_mode: bool = False,
         raise_raw_exception: bool = False,
         context: typing.Optional[registry.Registry] = None,
+        parent_execution: typing.Optional[Execution] = None,
+        parent_node_id: typing.Optional[str] = None,
     ) -> typing.Union[
         pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]
     ]:
@@ -261,7 +280,9 @@ class RuleExecutor:
 
         for node_id in self.execution_order:
             try:
-                await self.__run_node(node_id, execution=execution)
+                await self.__run_node(
+                    node_id, execution=execution, parent_execution=parent_execution
+                )
             except Exception as e:
                 if raise_raw_exception:
                     raise e
@@ -286,6 +307,11 @@ class RuleExecutor:
 
             if execution.has_ended():
                 break
+
+        if parent_execution and parent_node_id is not None:
+            parent_execution.add_child_execution(
+                node_id=parent_node_id, execution=execution
+            )
 
         if debug_mode:
             return execution, None
