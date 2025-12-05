@@ -152,6 +152,7 @@ class RuleExecutor:
         )
 
         node = self.components_registry.get(node_id)
+        node_alias = node.alias()
 
         if node.memory_type == NodeMemoryType.CONSTANT:
             return
@@ -173,6 +174,8 @@ class RuleExecutor:
         )
 
         output = await node.run(**input_params)
+
+        execution.add_alias(node_id, node_alias)
 
         for output_name, output_value in output.items():
             if (

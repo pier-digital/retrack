@@ -99,3 +99,10 @@ class BaseNode(pydantic.BaseModel):
 
     def generate_input_nodes(self) -> typing.List["BaseNode"]:
         return []
+
+    def alias(self) -> str:
+        return (
+            getattr(getattr(self, "data", None), "alias", None)
+            or getattr(getattr(self, "data", None), "name", None)
+            or self.name
+        )

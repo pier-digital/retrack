@@ -15,12 +15,14 @@ class Execution:
         filters: dict = None,
         context: registry.Registry = None,
         child_executions: dict = None,
+        aliases: dict = None,
     ):
         self.payload = payload
         self.states = states
         self.filters = filters or {}
         self.child_executions = child_executions or {}
         self.context = context
+        self.aliases = aliases or {}
 
     def set_state_data(
         self, column: str, value: typing.Any, filter_by: typing.Any = None
@@ -40,6 +42,9 @@ class Execution:
             return self.states[column]
 
         return self.states.loc[filter_by, column]
+
+    def add_alias(self, node_id: str, alias: str):
+        self.aliases[node_id] = alias
 
     def add_child_execution(self, node_id: str, execution: "Execution"):
         if node_id not in self.child_executions:
