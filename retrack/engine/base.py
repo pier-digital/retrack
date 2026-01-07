@@ -5,6 +5,7 @@ import pandas as pd
 
 from retrack.utils import constants, registry
 from retrack.engine.schemas import ExecutionSchema
+from retrack.utils.transformers import to_normalized_dict
 
 
 class Execution:
@@ -14,11 +15,15 @@ class Execution:
         states: pd.DataFrame,
         filters: dict = None,
         context: registry.Registry = None,
+        child_executions: dict = None,
+        aliases: dict = None,
     ):
         self.payload = payload
         self.states = states
         self.filters = filters or {}
+        self.child_executions = child_executions or {}
         self.context = context
+        self.aliases = aliases or {}
 
     def set_state_data(
         self, column: str, value: typing.Any, filter_by: typing.Any = None
@@ -38,6 +43,14 @@ class Execution:
             return self.states[column]
 
         return self.states.loc[filter_by, column]
+
+    def add_alias(self, node_id: str, alias: str):
+        self.aliases[node_id] = alias
+
+    def add_child_execution(self, node_id: str, execution: "Execution"):
+        if node_id not in self.child_executions:
+            self.child_executions[node_id] = []
+        self.child_executions[node_id].append(execution)
 
     def update_filters(self, filter_value, output_connections: typing.List[str] = None):
         for output_connection_id in output_connections:
@@ -87,10 +100,50 @@ class Execution:
             "filters": {k: v.to_dict() for k, v in self.filters.items()},
             "result": self.result.to_dict(),
             "has_ended": self.has_ended(),
+            "child_executions": {
+                k: [ce.to_dict() for ce in v] for k, v in self.child_executions.items()
+            },
         }
 
     def to_model(self) -> ExecutionSchema:
         return ExecutionSchema(**self.to_dict())
+
+    def to_normalized_dict(self) -> dict:
+        inputs = to_normalized_dict(df=self.payload, key_name="name")
+
+        filtered_states = self.states.drop(
+            [
+                constants.OUTPUT_REFERENCE_COLUMN,
+                constants.OUTPUT_MESSAGE_REFERENCE_COLUMN,
+            ],
+            axis=1,
+            errors="ignore",
+        )
+        outputs = [
+            {
+                "node_id": k.split("@")[0],
+                "alias": self.aliases.get(k.split("@")[0]),
+                "values": list(v.values()),
+            }
+            for k, v in filtered_states.to_dict(orient="dict").items()
+        ]
+        child_executions = [
+            {
+                "node_id": node_id,
+                "executions": [
+                    execution.to_normalized_dict() for execution in executions
+                ],
+            }
+            for node_id, executions in getattr(self, "child_executions", {}).items()
+        ]
+        results = to_normalized_dict(df=self.result, key_name="name")
+
+        return {
+            "inputs": inputs,
+            "outputs": outputs,
+            "executions": child_executions,
+            "results": results,
+        }
 
     @classmethod
     def from_dict(cls, data: dict):
