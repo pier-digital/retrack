@@ -27,6 +27,9 @@ class ExecutionSchema(pydantic.BaseModel):
     has_ended: typing.Optional[bool] = pydantic.Field(
         None, description="If the execution has ended"
     )
+    child_executions: typing.Optional[
+        typing.Dict[str, typing.List["ExecutionSchema"]]
+    ] = pydantic.Field(None, description="The child executions of the execution")
 
 
 class ExecutionMetadata(RuleMetadata):

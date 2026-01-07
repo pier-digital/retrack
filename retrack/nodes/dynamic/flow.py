@@ -57,7 +57,9 @@ def flow_factory(
     BaseFlowV0Model = BaseDynamicNode.with_fields("FlowV0", **models)
 
     class FlowV0(BaseFlowV0Model):
-        async def run(self, **kwargs) -> typing.Dict[str, typing.Any]:
+        async def run(
+            self, parent_execution=None, parent_node_id=None, **kwargs
+        ) -> typing.Dict[str, typing.Any]:
             input_args = {}
             executor_kwargs = {}
             for name, value in kwargs.items():
@@ -70,7 +72,10 @@ def flow_factory(
                 executor_kwargs["context"] = kwargs["context"]
 
             response = await rule_instance.executor.execute(
-                pd.DataFrame(input_args), **executor_kwargs
+                pd.DataFrame(input_args),
+                parent_execution=parent_execution,
+                parent_node_id=parent_node_id,
+                **executor_kwargs,
             )
 
             return {"output_value": response["output"].values}
