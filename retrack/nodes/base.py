@@ -106,3 +106,6 @@ class BaseNode(pydantic.BaseModel):
             or getattr(getattr(self, "data", None), "name", None)
             or self.name
         )
+
+    def default(self) -> typing.Any:
+        return getattr(getattr(self, "data", None), "default", None)
