@@ -1,6 +1,7 @@
 import typing
 
 import pandas as pd
+from retrack.nodes.base import BaseNode
 
 
 def to_list(input_list):
@@ -16,6 +17,92 @@ def to_normalized_dict(df: pd.DataFrame, key_name: str = "name") -> typing.List[
         {key_name: k, "values": list(v.values())}
         for k, v in df.to_dict(orient="dict").items()
     ]
+
+
+def to_metadata(node: BaseNode) -> list:
+    """Serialize arbitrary node data into a flat list of key/value pairs."""
+    data = getattr(node, "data", None)
+    if data is None:
+        return []
+
+    if hasattr(data, "model_dump"):
+        payload = data.model_dump()
+    elif hasattr(data, "dict"):
+        payload = data.dict()
+    elif isinstance(data, dict):
+        payload = data
+    else:
+        payload = getattr(data, "__dict__", {})
+
+    return [{"key": k, "value": v} for k, v in payload.items()]
+
+
+def serialize_connections(
+    inputs_or_outputs: typing.Any,
+    node_id: str,
+    connection_type: str,
+    execution: "typing.Any",
+) -> list:
+    """Transform connection models into serialized list with values and source name.
+
+    Args:
+        inputs_or_outputs: Pydantic model or None with connection data
+        node_id: Current node ID
+        connection_type: 'input' or 'output'
+        execution: Execution instance for fetching state data
+
+    Returns:
+        List of {node_id, name, values, source}
+
+    Note: Values are stored as node_id@output_name in states.
+    For inputs: key is remote_node_id@remote_output_name
+    For outputs: key is current_node_id@current_output_name
+    """
+    if inputs_or_outputs is None or not hasattr(inputs_or_outputs, "model_dump"):
+        return []
+
+    connection_target_key = "output" if connection_type == "input" else "input"
+
+    serialized_connections = []
+    for (
+        input_or_output_name,
+        input_or_output,
+    ) in inputs_or_outputs.model_dump().items():
+        connections = input_or_output.get("connections", [])
+
+        for connection in connections:
+            remote_node_id = connection.get("node")
+            remote_name = connection.get(connection_target_key)
+
+            try:
+                current_node_filter = execution.filters.get(node_id, None)
+
+                if connection_type == "input":
+                    state_key = f"{remote_node_id}@{remote_name}"
+                else:
+                    state_key = f"{node_id}@{input_or_output_name}"
+
+                values = execution.get_state_data(
+                    state_key,
+                    constants=execution.constants,
+                    filter_by=current_node_filter,
+                ).tolist()
+            except Exception:
+                values = []
+
+            name = remote_name if connection_type == "input" else input_or_output_name
+            source = input_or_output_name if connection_type == "input" else remote_name
+
+            serialized_connections.append(
+                {
+                    "node_id": remote_node_id,
+                    "name": name,
+                    "values": values,
+                    "source": source,
+                }
+            )
+
+    return serialized_connections
 
 
 def process_node_connections(

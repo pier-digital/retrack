@@ -2,11 +2,15 @@ import typing
 
 import numpy as np
 import pandas as pd
+import json
 
 from retrack.nodes.base import BaseNode
 from retrack.utils import constants, registry
 from retrack.engine.schemas import ExecutionSchema
-from retrack.utils.transformers import to_normalized_dict, process_node_connections
+from retrack.utils.transformers import (
+    serialize_connections,
+    to_metadata,
+)
 
 
 class Execution:
@@ -112,91 +116,30 @@ class Execution:
         return ExecutionSchema(**self.to_dict())
 
     def to_normalized_dict(self) -> dict:
-        inputs = to_normalized_dict(df=self.payload, key_name="name")
-
-        nodes = []
-        flat_values = {}
-
-        for id, node in self.nodes.items():
-            current_node_filter = self.filters.get(node.id, None)
-
-            node_inputs_dict = (
-                node.inputs
-                if isinstance(node.inputs, dict)
-                else node.inputs.dict()
-                if hasattr(node.inputs, "dict")
-                else {}
-            )
-            node_inputs = process_node_connections(
-                connections_dict=node_inputs_dict,
-                get_state_data_func=self.get_state_data,
-                constants=self.constants,
-                filter_by=current_node_filter,
-                name_field="to",
-                target_field="from",
-                target_key="output",
-            )
-
-            node_outputs_dict = (
-                node.outputs
-                if isinstance(node.outputs, dict)
-                else node.outputs.dict()
-                if hasattr(node.outputs, "dict")
-                else {}
-            )
-            node_outputs = process_node_connections(
-                connections_dict=node_outputs_dict,
-                get_state_data_func=self.get_state_data,
-                constants=self.constants,
-                filter_by=current_node_filter,
-                name_field="from",
-                target_field="to",
-                target_key="input",
-                node_id=node.id,
-                use_node_id_for_values=True,
-            )
-
-            for node_input in node_inputs:
-                key = (id, node.alias(), "input", node_input["to"])
-                if key not in flat_values:
-                    flat_values[key] = []
-                flat_values[key].extend(node_input.get("values", []))
-
-            for node_output in node_outputs:
-                key = (id, node.alias(), "output", node_output["to"])
-                if key not in flat_values:
-                    flat_values[key] = []
-                flat_values[key].extend(node_output.get("values", []))
-
-            nodes.append(
+        nodes_normalized = []
+        for node in self.nodes.values():
+            nodes_normalized.append(
                 {
-                    "id": id,
-                    "type": node.name,
+                    "id": node.id,
                     "name": node.alias(),
+                    "type": node.type(),
+                    "inputs": serialize_connections(
+                        node.inputs,
+                        node_id=node.id,
+                        connection_type="input",
+                        execution=self,
+                    ),
+                    "outputs": serialize_connections(
+                        node.outputs,
+                        node_id=node.id,
+                        connection_type="output",
+                        execution=self,
+                    ),
                     "default": node.default(),
                 }
             )
 
-        values = [
-            {
-                "node_id": key[0],
-                "node_type": self.nodes[key[0]].name,
-                "node_name": self.nodes[key[0]].alias(),
-                "connection_type": key[2],
-                "connection_name": key[3],
-                "values": vals,
-            }
-            for key, vals in flat_values.items()
-        ]
-
-        results = to_normalized_dict(df=self.result, key_name="name")
-
-        return {
-            "inputs": inputs,
-            "nodes": nodes,
-            "connections": values,
-            "results": results,
-        }
+        return {"nodes": nodes_normalized}
 
     @classmethod
     def from_dict(cls, data: dict):
