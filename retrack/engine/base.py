@@ -10,6 +10,8 @@ from retrack.engine.schemas import ExecutionSchema
 from retrack.utils.transformers import (
     serialize_connections,
     explode_nodes_by_values,
+    normalize_execution_for_debug,
+    to_metadata,
 )
 
 
@@ -136,11 +138,14 @@ class Execution:
                         execution=self,
                     ),
                     "default": node.default(),
+                    "data": to_metadata(node),
                 }
             )
 
-        breakpoint()
-        return {"nodes": explode_nodes_by_values(nodes_normalized)}
+        exploded_nodes = explode_nodes_by_values(nodes_normalized)
+        normalized_records = normalize_execution_for_debug(exploded_nodes)
+
+        return normalized_records
 
     @classmethod
     def from_dict(cls, data: dict):

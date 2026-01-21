@@ -19,6 +19,26 @@ def to_normalized_dict(df: pd.DataFrame, key_name: str = "name") -> typing.List[
     ]
 
 
+def to_metadata(node: BaseNode) -> typing.List[dict]:
+    """Serialize node.data into a list of {name, value}, ignoring alias/default."""
+    data = getattr(node, "data", None)
+    if data is None:
+        return []
+
+    try:
+        data_dict = data.model_dump()
+    except Exception:
+        data_dict = getattr(data, "__dict__", {})
+
+    filtered = {
+        key: value
+        for key, value in data_dict.items()
+        if key not in {"alias", "default"}
+    }
+
+    return [{"name": key, "value": value} for key, value in filtered.items()]
+
+
 def serialize_connections(
     inputs_or_outputs: typing.Any,
     node_id: str,
@@ -57,8 +77,6 @@ def serialize_connections(
             remote_name = connection.get(connection_target_key)
 
             try:
-                current_node_filter = execution.filters.get(node_id, None)
-
                 if connection_type == "input":
                     state_key = f"{remote_node_id}@{remote_name}"
                 else:
@@ -67,8 +85,10 @@ def serialize_connections(
                 values = execution.get_state_data(
                     state_key,
                     constants=execution.constants,
-                    filter_by=current_node_filter,
+                    filter_by=None,
                 ).tolist()
+
+                values = [None if pd.isna(value) else value for value in values]
             except Exception:
                 values = []
 
@@ -130,6 +150,7 @@ def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List
                 "inputs": [],
                 "outputs": [],
                 "default": node.get("default"),
+                "data": node.get("data", []),
             }
 
             for input_conn in node.get("inputs", []):
@@ -163,6 +184,122 @@ def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List
         exploded_nodes_by_index.append(nodes_for_index)
 
     return exploded_nodes_by_index
+
+
+def normalize_execution_for_debug(
+    exploded_nodes: typing.List[typing.List[dict]],
+) -> typing.List[dict]:
+    """Transform exploded nodes into debug format with inputs, results, nodes, and connections.
+
+    Args:
+        exploded_nodes: List of lists from explode_nodes_by_values
+
+    Returns:
+        List of normalized records, one per value index
+    """
+    normalized_records = []
+
+    for nodes_at_index in exploded_nodes:
+        inputs = []
+        seen_input_names = set()
+        for node in nodes_at_index:
+            if node.get("type") == "Input":
+                node_name = node.get("name")
+                if node_name not in seen_input_names:
+                    outputs = node.get("outputs", [])
+                    if outputs:
+                        inputs.append(
+                            {
+                                "name": node_name,
+                                "value": outputs[0].get("value"),
+                            }
+                        )
+                    seen_input_names.add(node_name)
+
+        outputs = []
+        for node in nodes_at_index:
+            if node.get("type") == "Output":
+                inputs_list = node.get("inputs", [])
+                node_name = node.get("name")
+                if inputs_list:
+                    first_input = inputs_list[0]
+                    value = first_input.get("value")
+
+                    message = None
+                    for item in node.get("data", []):
+                        if item.get("name") == "message":
+                            message = item.get("value")
+                            break
+
+                    if value is not None and not (
+                        isinstance(value, float) and pd.isna(value)
+                    ):
+                        outputs.append(
+                            {
+                                "name": str(node.get("name", "")).lower(),
+                                "value": value,
+                                "message": message,
+                            }
+                        )
+
+        nodes_info = [
+            {
+                "id": node.get("id"),
+                "name": node.get("name"),
+                "type": node.get("type"),
+                "default": node.get("default"),
+            }
+            for node in nodes_at_index
+            if node.get("type") not in ("Input", "Output", "Start")
+        ]
+
+        connections = []
+        for node in nodes_at_index:
+            node_type = node.get("type")
+            if node_type in ("Input", "Output", "Start"):
+                continue
+
+            node_id = node.get("id")
+            node_name = node.get("name")
+
+            for input_conn in node.get("inputs", []):
+                value = input_conn.get("value")
+
+                connections.append(
+                    {
+                        "node_id": node_id,
+                        "node_type": node_type,
+                        "node_name": node_name,
+                        "connection_type": "input",
+                        "connection_name": input_conn.get("target_name"),
+                        "value": value,
+                    }
+                )
+
+            for output_conn in node.get("outputs", []):
+                value = output_conn.get("value")
+
+                connections.append(
+                    {
+                        "node_id": node_id,
+                        "node_type": node_type,
+                        "node_name": node_name,
+                        "connection_type": "output",
+                        "connection_name": output_conn.get("source_name"),
+                        "value": value,
+                    }
+                )
+
+        normalized_records.append(
+            {
+                "inputs": inputs,
+                "outputs": outputs,
+                "nodes": nodes_info,
+                "connections": connections,
+            }
+        )
+
+    return normalized_records
 
 
 def process_node_connections(
