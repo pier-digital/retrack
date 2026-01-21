@@ -19,24 +19,6 @@ def to_normalized_dict(df: pd.DataFrame, key_name: str = "name") -> typing.List[
     ]
 
 
-def to_metadata(node: BaseNode) -> list:
-    """Serialize arbitrary node data into a flat list of key/value pairs."""
-    data = getattr(node, "data", None)
-    if data is None:
-        return []
-
-    if hasattr(data, "model_dump"):
-        payload = data.model_dump()
-    elif hasattr(data, "dict"):
-        payload = data.dict()
-    elif isinstance(data, dict):
-        payload = data
-    else:
-        payload = getattr(data, "__dict__", {})
-
-    return [{"key": k, "value": v} for k, v in payload.items()]
-
-
 def serialize_connections(
     inputs_or_outputs: typing.Any,
     node_id: str,
@@ -90,19 +72,97 @@ def serialize_connections(
             except Exception:
                 values = []
 
-            name = remote_name if connection_type == "input" else input_or_output_name
-            source = input_or_output_name if connection_type == "input" else remote_name
+            target_name = (
+                remote_name if connection_type == "output" else input_or_output_name
+            )
+            source_name = (
+                input_or_output_name if connection_type == "output" else remote_name
+            )
 
             serialized_connections.append(
                 {
                     "node_id": remote_node_id,
-                    "name": name,
+                    "target_name": target_name,
                     "values": values,
-                    "source": source,
+                    "source_name": source_name,
                 }
             )
 
     return serialized_connections
+
+
+def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List[dict]]:
+    """Explode nodes by values array into array of arrays per value index.
+
+    For each node, finds all input/output values arrays and determines max length.
+    Returns a list of lists where each sublist contains all nodes for that value index,
+    with 'values' array replaced by 'value' (singular) containing the specific value
+    or null if missing/empty.
+
+    Args:
+        nodes: List of normalized node dictionaries
+
+    Returns:
+        List of lists: [[node1_idx0, node2_idx0, ...], [node1_idx1, node2_idx1, ...], ...]
+    """
+    if not nodes:
+        return []
+
+    max_length = 0
+    for node in nodes:
+        for connection_list in [node.get("inputs", []), node.get("outputs", [])]:
+            for connection in connection_list:
+                max_length = max(max_length, len(connection.get("values", [])))
+
+    if max_length == 0:
+        max_length = 1
+
+    exploded_nodes_by_index = []
+
+    for idx in range(max_length):
+        nodes_for_index = []
+
+        for node in nodes:
+            exploded_node = {
+                "id": node["id"],
+                "name": node["name"],
+                "type": node["type"],
+                "inputs": [],
+                "outputs": [],
+                "default": node.get("default"),
+            }
+
+            for input_conn in node.get("inputs", []):
+                values = input_conn.get("values", [])
+                value = values[idx] if idx < len(values) else None
+
+                exploded_node["inputs"].append(
+                    {
+                        "node_id": input_conn.get("node_id"),
+                        "target_name": input_conn.get("target_name"),
+                        "value": value,
+                        "source_name": input_conn.get("source_name"),
+                    }
+                )
+
+            for output_conn in node.get("outputs", []):
+                values = output_conn.get("values", [])
+                value = values[idx] if idx < len(values) else None
+
+                exploded_node["outputs"].append(
+                    {
+                        "node_id": output_conn.get("node_id"),
+                        "target_name": output_conn.get("target_name"),
+                        "value": value,
+                        "source_name": output_conn.get("source_name"),
+                    }
+                )
+
+            nodes_for_index.append(exploded_node)
+
+        exploded_nodes_by_index.append(nodes_for_index)
+
+    return exploded_nodes_by_index
 
 
 def process_node_connections(

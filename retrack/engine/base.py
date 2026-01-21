@@ -9,7 +9,7 @@ from retrack.utils import constants, registry
 from retrack.engine.schemas import ExecutionSchema
 from retrack.utils.transformers import (
     serialize_connections,
-    to_metadata,
+    explode_nodes_by_values,
 )
 
 
@@ -139,7 +139,8 @@ class Execution:
                 }
             )
 
-        return {"nodes": nodes_normalized}
+        breakpoint()
+        return {"nodes": explode_nodes_by_values(nodes_normalized)}
 
     @classmethod
     def from_dict(cls, data: dict):
