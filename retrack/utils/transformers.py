@@ -3,6 +3,25 @@ import typing
 import pandas as pd
 from retrack.nodes.base import BaseNode
 
+EXCLUDED_NODE_TYPES = {"Input", "Output", "Start"}
+VOID_TOKENS = ["void", "filter"]
+
+
+def is_excluded_node(node_type: str) -> bool:
+    return node_type in EXCLUDED_NODE_TYPES
+
+
+def is_void_connection(name: typing.Any) -> bool:
+    if name is None:
+        return False
+    lowered = str(name).lower()
+    return any(token in lowered for token in VOID_TOKENS)
+
+
+def is_valid_connection_value(value: typing.Any) -> bool:
+    """Check if connection value is valid (not None)."""
+    return value is not None
+
 
 def to_list(input_list):
     if isinstance(input_list, pd.Series):
@@ -180,11 +199,13 @@ def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List
 
 def normalize_execution_for_debug(
     exploded_nodes: typing.List[typing.List[dict]],
+    apply_filters: bool = True,
 ) -> typing.List[dict]:
     """Transform exploded nodes into debug format with inputs, results, nodes, and connections.
 
     Args:
         exploded_nodes: List of lists from explode_nodes_by_values
+        apply_filters: Whether to apply exclusion filters (node types, void connections, null values)
 
     Returns:
         List of normalized records, one per value index
@@ -242,13 +263,13 @@ def normalize_execution_for_debug(
                 "default": node.get("default"),
             }
             for node in nodes_at_index
-            if node.get("type") not in ("Input", "Output", "Start")
+            if not apply_filters or not is_excluded_node(node.get("type"))
         ]
 
         connections = []
         for node in nodes_at_index:
             node_type = node.get("type")
-            if node_type in ("Input", "Output", "Start"):
+            if apply_filters and is_excluded_node(node_type):
                 continue
 
             node_id = node.get("id")
@@ -256,6 +277,11 @@ def normalize_execution_for_debug(
 
             for input_conn in node.get("inputs", []):
                 value = input_conn.get("value")
+                conn_name = input_conn.get("target_name")
+                if apply_filters and is_void_connection(conn_name):
+                    continue
+                if apply_filters and not is_valid_connection_value(value):
+                    continue
 
                 connections.append(
                     {
@@ -263,13 +289,18 @@ def normalize_execution_for_debug(
                         "node_type": node_type,
                         "node_name": node_name,
                         "connection_type": "input",
-                        "connection_name": input_conn.get("target_name"),
+                        "connection_name": conn_name,
                         "value": value,
                     }
                 )
 
             for output_conn in node.get("outputs", []):
                 value = output_conn.get("value")
+                conn_name = output_conn.get("source_name")
+                if apply_filters and is_void_connection(conn_name):
+                    continue
+                if apply_filters and not is_valid_connection_value(value):
+                    continue
 
                 connections.append(
                     {
@@ -277,7 +308,7 @@ def normalize_execution_for_debug(
                         "node_type": node_type,
                         "node_name": node_name,
                         "connection_type": "output",
-                        "connection_name": output_conn.get("source_name"),
+                        "connection_name": conn_name,
                         "value": value,
                     }
                 )
