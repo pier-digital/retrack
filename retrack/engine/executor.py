@@ -153,8 +153,6 @@ class RuleExecutor:
 
         node = self.components_registry.get(node_id)
 
-        execution.add_node(node)
-
         if node.memory_type == NodeMemoryType.CONSTANT:
             return
 
@@ -175,6 +173,9 @@ class RuleExecutor:
         )
 
         output = await node.run(**input_params)
+
+        if not execution.has_ended():
+            execution.add_node(node)
 
         for output_name, output_value in output.items():
             if (
