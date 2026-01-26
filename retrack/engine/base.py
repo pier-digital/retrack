@@ -2,7 +2,6 @@ import typing
 
 import numpy as np
 import pandas as pd
-import json
 
 from retrack.nodes.base import BaseNode
 from retrack.utils import constants, registry
@@ -22,14 +21,12 @@ class Execution:
         states: pd.DataFrame,
         filters: dict = None,
         context: registry.Registry = None,
-        child_executions: dict = None,
         nodes: dict = None,
         constants: dict = None,
     ):
         self.payload = payload
         self.states = states
         self.filters = filters or {}
-        self.child_executions = child_executions or {}
         self.context = context
         self.nodes = nodes or {}
         self.constants = constants or {}
@@ -55,11 +52,6 @@ class Execution:
 
     def set_constants_data(self, constants: dict):
         self.constants.update(constants)
-
-    def add_child_execution(self, node_id: str, execution: "Execution"):
-        if node_id not in self.child_executions:
-            self.child_executions[node_id] = []
-        self.child_executions[node_id].append(execution)
 
     def add_node(self, node: BaseNode):
         self.nodes[node.id] = node
