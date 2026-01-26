@@ -1,0 +1,328 @@
+[
+  {
+    "inputs": [
+      {
+        "name": "number",
+        "value": "1"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output",
+        "value": "1",
+        "message": "first"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "3",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      },
+      {
+        "id": "4",
+        "name": null,
+        "type": "Check",
+        "default": null
+      },
+      {
+        "id": "5",
+        "name": null,
+        "type": "If",
+        "default": null
+      },
+      {
+        "id": "10",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      },
+      {
+        "id": "7",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      },
+      {
+        "id": "12",
+        "name": null,
+        "type": "Check",
+        "default": null
+      },
+      {
+        "id": "13",
+        "name": null,
+        "type": "If",
+        "default": null
+      },
+      {
+        "id": "14",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      }
+    ],
+    "connections": [
+      {
+        "node_id": "3",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": "1"
+      },
+      {
+        "node_id": "4",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_0",
+        "value": "1"
+      },
+      {
+        "node_id": "4",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_1",
+        "value": "1"
+      },
+      {
+        "node_id": "4",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_bool",
+        "value": true
+      },
+      {
+        "node_id": "5",
+        "node_type": "If",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_bool",
+        "value": true
+      },
+      {
+        "node_id": "10",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": "1"
+      },
+      {
+        "node_id": "7",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": null
+      },
+      {
+        "node_id": "12",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_0",
+        "value": "1"
+      },
+      {
+        "node_id": "12",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_1",
+        "value": null
+      },
+      {
+        "node_id": "12",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_bool",
+        "value": null
+      },
+      {
+        "node_id": "13",
+        "node_type": "If",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_bool",
+        "value": null
+      },
+      {
+        "node_id": "14",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": null
+      }
+    ]
+  },
+  {
+    "inputs": [
+      {
+        "name": "number",
+        "value": "2"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output",
+        "value": "2",
+        "message": "second"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "3",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      },
+      {
+        "id": "4",
+        "name": null,
+        "type": "Check",
+        "default": null
+      },
+      {
+        "id": "5",
+        "name": null,
+        "type": "If",
+        "default": null
+      },
+      {
+        "id": "10",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      },
+      {
+        "id": "7",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      },
+      {
+        "id": "12",
+        "name": null,
+        "type": "Check",
+        "default": null
+      },
+      {
+        "id": "13",
+        "name": null,
+        "type": "If",
+        "default": null
+      },
+      {
+        "id": "14",
+        "name": null,
+        "type": "Constant",
+        "default": null
+      }
+    ],
+    "connections": [
+      {
+        "node_id": "3",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": "1"
+      },
+      {
+        "node_id": "4",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_0",
+        "value": "2"
+      },
+      {
+        "node_id": "4",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_1",
+        "value": "1"
+      },
+      {
+        "node_id": "4",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_bool",
+        "value": false
+      },
+      {
+        "node_id": "5",
+        "node_type": "If",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_bool",
+        "value": false
+      },
+      {
+        "node_id": "10",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": null
+      },
+      {
+        "node_id": "7",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": "2"
+      },
+      {
+        "node_id": "12",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_0",
+        "value": "2"
+      },
+      {
+        "node_id": "12",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_value_1",
+        "value": "2"
+      },
+      {
+        "node_id": "12",
+        "node_type": "Check",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_bool",
+        "value": true
+      },
+      {
+        "node_id": "13",
+        "node_type": "If",
+        "node_name": null,
+        "connection_type": "input",
+        "connection_name": "input_bool",
+        "value": true
+      },
+      {
+        "node_id": "14",
+        "node_type": "Constant",
+        "node_name": null,
+        "connection_type": "output",
+        "connection_name": "output_value",
+        "value": "2"
+      }
+    ]
+  }
+]
