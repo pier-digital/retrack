@@ -147,7 +147,6 @@ class RuleExecutor:
             node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW
         )
         include_inputs = node.kind() == NodeKind.FLOW
-
         input_params = self.__get_input_params(
             node.model_dump(by_alias=True),
             current_node_filter=current_node_filter,
@@ -231,7 +230,6 @@ class RuleExecutor:
         debug_mode: bool = False,
         raise_raw_exception: bool = False,
         context: typing.Optional[registry.Registry] = None,
-        parent_node_id: typing.Optional[str] = None,
     ) -> typing.Union[
         pd.DataFrame, typing.Tuple[Execution, typing.Optional[Exception]]
     ]:
