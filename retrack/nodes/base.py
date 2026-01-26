@@ -101,10 +101,8 @@ class BaseNode(pydantic.BaseModel):
         return []
 
     def alias(self) -> str:
-        return (
-            getattr(getattr(self, "data", None), "alias", None)
-            or getattr(getattr(self, "data", None), "name", None)
-            or self.name
+        return getattr(getattr(self, "data", None), "alias", None) or getattr(
+            getattr(self, "data", None), "name", None
         )
 
     def type(self) -> str:

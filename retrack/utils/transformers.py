@@ -2,25 +2,19 @@ import typing
 
 import pandas as pd
 from retrack.nodes.base import BaseNode
-
-EXCLUDED_NODE_TYPES = {"Input", "Output", "Start"}
-VOID_TOKENS = ["void", "filter"]
+from retrack.utils.constants import EXCLUDED_NODE_TYPES, FILTER_SUFFIX, NULL_SUFFIX
 
 
 def is_excluded_node(node_type: str) -> bool:
     return node_type in EXCLUDED_NODE_TYPES
 
 
-def is_void_connection(name: typing.Any) -> bool:
+def is_filtered_connection(name: typing.Any) -> bool:
+    """Check if connection name contains filter or null suffix."""
     if name is None:
         return False
     lowered = str(name).lower()
-    return any(token in lowered for token in VOID_TOKENS)
-
-
-def is_valid_connection_value(value: typing.Any) -> bool:
-    """Check if connection value is valid (not None)."""
-    return value is not None
+    return FILTER_SUFFIX in lowered or NULL_SUFFIX in lowered
 
 
 def to_list(input_list):
@@ -249,7 +243,7 @@ def normalize_execution_for_debug(
                     ):
                         outputs.append(
                             {
-                                "name": str(node.get("name", "")).lower(),
+                                "name": "output",
                                 "value": value,
                                 "message": message,
                             }
@@ -278,9 +272,7 @@ def normalize_execution_for_debug(
             for input_conn in node.get("inputs", []):
                 value = input_conn.get("value")
                 conn_name = input_conn.get("target_name")
-                if apply_filters and is_void_connection(conn_name):
-                    continue
-                if apply_filters and not is_valid_connection_value(value):
+                if apply_filters and is_filtered_connection(conn_name):
                     continue
 
                 connections.append(
@@ -297,9 +289,7 @@ def normalize_execution_for_debug(
             for output_conn in node.get("outputs", []):
                 value = output_conn.get("value")
                 conn_name = output_conn.get("source_name")
-                if apply_filters and is_void_connection(conn_name):
-                    continue
-                if apply_filters and not is_valid_connection_value(value):
+                if apply_filters and is_filtered_connection(conn_name):
                     continue
 
                 connections.append(
