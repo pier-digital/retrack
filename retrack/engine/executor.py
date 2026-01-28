@@ -157,6 +157,9 @@ class RuleExecutor:
 
         output = await node.run(**input_params)
 
+        if not execution.has_ended():
+            execution.add_node(node)
+
         for output_name, output_value in output.items():
             if (
                 output_name == constants.OUTPUT_REFERENCE_COLUMN
@@ -258,6 +261,7 @@ class RuleExecutor:
             input_columns=self.input_columns,
             context=context,
         )
+        execution.set_constants_data(self.constants)
 
         for node_id in self.execution_order:
             try:
