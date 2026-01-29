@@ -261,6 +261,8 @@ def normalize_execution_for_debug(
         ]
 
         connections = []
+        seen_connections = set()
+
         for node in nodes_at_index:
             node_type = node.get("type")
             if apply_filters and is_excluded_node(node_type):
@@ -275,16 +277,19 @@ def normalize_execution_for_debug(
                 if apply_filters and is_filtered_connection(conn_name):
                     continue
 
-                connections.append(
-                    {
-                        "node_id": node_id,
-                        "node_type": node_type,
-                        "node_name": node_name,
-                        "connection_type": "input",
-                        "connection_name": conn_name,
-                        "value": value,
-                    }
-                )
+                connection_key = (node_id, conn_name, "input")
+                if connection_key not in seen_connections:
+                    seen_connections.add(connection_key)
+                    connections.append(
+                        {
+                            "node_id": node_id,
+                            "node_type": node_type,
+                            "node_name": node_name,
+                            "connection_type": "input",
+                            "connection_name": conn_name,
+                            "value": value,
+                        }
+                    )
 
             for output_conn in node.get("outputs", []):
                 value = output_conn.get("value")
@@ -292,16 +297,19 @@ def normalize_execution_for_debug(
                 if apply_filters and is_filtered_connection(conn_name):
                     continue
 
-                connections.append(
-                    {
-                        "node_id": node_id,
-                        "node_type": node_type,
-                        "node_name": node_name,
-                        "connection_type": "output",
-                        "connection_name": conn_name,
-                        "value": value,
-                    }
-                )
+                connection_key = (node_id, conn_name, "output")
+                if connection_key not in seen_connections:
+                    seen_connections.add(connection_key)
+                    connections.append(
+                        {
+                            "node_id": node_id,
+                            "node_type": node_type,
+                            "node_name": node_name,
+                            "connection_type": "output",
+                            "connection_name": conn_name,
+                            "value": value,
+                        }
+                    )
 
         normalized_records.append(
             {
