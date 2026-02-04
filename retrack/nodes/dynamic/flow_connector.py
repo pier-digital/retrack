@@ -14,7 +14,7 @@ class FlowConnectorMetadataModel(pydantic.BaseModel):
     default: typing.Optional[str] = None
 
 
-class FlowConnectorOutputModel(pydantic.BaseModel):
+class FlowConnectorOutputsModel(pydantic.BaseModel):
     output_value: OutputConnectionModel
 
 
