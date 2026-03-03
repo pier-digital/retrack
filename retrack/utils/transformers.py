@@ -48,8 +48,14 @@ def to_metadata(node: BaseNode) -> typing.List[dict]:
 
 def serialize_value(value: typing.Any) -> typing.Any:
     """Serialize primitive-like values to JSON-friendly types."""
-    if value is None or pd.isna(value):
+    if value is None:
         return None
+
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
 
     if isinstance(
         value, (pd.Timestamp, datetime.datetime, datetime.date, datetime.time)
@@ -65,11 +71,8 @@ def serialize_value(value: typing.Any) -> typing.Any:
     if isinstance(value, dict):
         return {key: serialize_value(item) for key, item in value.items()}
 
-    try:
-        if hasattr(value, "item"):
-            return serialize_value(value.item())
-    except Exception:
-        pass
+    if isinstance(value, str) and value in ("True", "False"):
+        return value == "True"
 
     return value
 
