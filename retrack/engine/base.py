@@ -8,8 +8,8 @@ from retrack.utils import constants, registry
 from retrack.engine.schemas import ExecutionSchema
 from retrack.utils.transformers import (
     serialize_connections,
-    explode_nodes_by_values,
-    normalize_execution_for_debug,
+    explode_nodes_by_values_iter,
+    normalize_execution_for_debug_iter,
     to_metadata,
 )
 
@@ -109,8 +109,9 @@ class Execution:
     def to_model(self) -> ExecutionSchema:
         return ExecutionSchema(**self.to_dict())
 
-    def to_normalized_dict(self) -> dict:
+    def to_normalized_dict(self) -> list:
         nodes_normalized = []
+        values_cache = {}
         for node in self.nodes.values():
             nodes_normalized.append(
                 {
@@ -122,22 +123,22 @@ class Execution:
                         node_id=node.id,
                         connection_type="input",
                         execution=self,
+                        values_cache=values_cache,
                     ),
                     "outputs": serialize_connections(
                         node.outputs,
                         node_id=node.id,
                         connection_type="output",
                         execution=self,
+                        values_cache=values_cache,
                     ),
                     "default": node.default(),
                     "data": to_metadata(node),
                 }
             )
 
-        exploded_nodes = explode_nodes_by_values(nodes_normalized)
-        normalized_records = normalize_execution_for_debug(exploded_nodes)
-
-        return normalized_records
+        exploded_nodes = explode_nodes_by_values_iter(nodes_normalized)
+        return list(normalize_execution_for_debug_iter(exploded_nodes))
 
     @classmethod
     def from_dict(cls, data: dict):
