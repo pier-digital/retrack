@@ -9,7 +9,7 @@ from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 class FlowConnectorMetadataModel(pydantic.BaseModel):
     name: str
-    rule: str
+    flow: str
     version: str
     default: typing.Optional[str] = None
 
