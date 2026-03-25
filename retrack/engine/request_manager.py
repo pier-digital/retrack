@@ -1,7 +1,6 @@
 import typing
 
 import pandas as pd
-import pandera
 import pydantic
 
 from retrack.nodes.base import BaseNode, NodeKind
@@ -75,7 +74,7 @@ class RequestManager:
         return self._model
 
     @property
-    def dataframe_model(self) -> pandera.DataFrameSchema:
+    def dataframe_model(self):
         return self._dataframe_model
 
     def __create_model(
@@ -117,23 +116,19 @@ class RequestManager:
             ),
         )
 
-    def __create_dataframe_model(self) -> pandera.DataFrameSchema:
-        """Create a pydantic model from the RequestManager's inputs"""
-        fields = {}
-        for input_field in self.inputs:
-            fields[input_field.data.name] = pandera.Column(
-                str,
-                nullable=input_field.data.default is not None,
-                coerce=True,
-                default=input_field.data.default,
-            )
+    def __create_dataframe_model(self) -> dict:
+        """Create a lightweight validation schema from the RequestManager's inputs.
 
-        return pandera.DataFrameSchema(
-            fields,
-            index=pandera.Index(int),
-            # strict=True,
-            coerce=True,
-        )
+        Returns:
+            dict: mapping column_name -> {"nullable": bool, "default": value}
+        """
+        schema = {}
+        for input_field in self.inputs:
+            schema[input_field.data.name] = {
+                "nullable": input_field.data.default is not None,
+                "default": input_field.data.default,
+            }
+        return schema
 
     def validate(
         self,
@@ -156,4 +151,31 @@ class RequestManager:
         if not isinstance(payload, pd.DataFrame):
             raise TypeError(f"payload must be a pandas.DataFrame, not {type(payload)}")
 
-        return self.dataframe_model.validate(payload)
+        schema = self.dataframe_model
+
+        # Check required columns exist
+        missing = set(schema.keys()) - set(payload.columns)
+        if missing:
+            raise ValueError(
+                f"Missing columns: {missing}"
+            )
+
+        result = payload.copy()
+
+        for col_name, col_schema in schema.items():
+            series = result[col_name]
+
+            # Handle nulls
+            null_mask = series.isna() | series.isin([None, "None", "", "null"])
+            if null_mask.any():
+                if not col_schema["nullable"]:
+                    raise ValueError(
+                        f"Column '{col_name}' contains null values but is not nullable"
+                    )
+                if col_schema["default"] is not None:
+                    series = series.where(~null_mask, col_schema["default"])
+
+            # Coerce to str
+            result[col_name] = series.astype(str)
+
+        return result

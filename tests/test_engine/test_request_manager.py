@@ -1,5 +1,4 @@
 import pandas as pd
-import pandera
 import pydantic
 import pytest
 
@@ -41,7 +40,7 @@ def test_validate_payload_with_valid_payload(valid_input_dict_before_validation)
 
     assert issubclass(rm.model, pydantic.BaseModel)
 
-    assert isinstance(rm.dataframe_model, pandera.api.pandas.container.DataFrameSchema)
+    assert isinstance(rm.dataframe_model, dict)
 
     payload = rm.model(example="test")
 
