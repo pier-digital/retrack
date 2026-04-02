@@ -100,6 +100,7 @@ class RuleExecutor:
         current_node_filter: pd.Series,
         execution: Execution,
         include_context: bool = False,
+        include_parent_execution: bool = False,
         include_inputs: bool = False,
         parent_execution: Execution = None
     ) -> dict:
@@ -119,11 +120,12 @@ class RuleExecutor:
         if include_context:
             input_params["context"] = execution.context
 
-        input_params["parent_execution"] = (
-            parent_execution if parent_execution else execution
-        )
+        if include_parent_execution:
+            input_params["parent_execution"] = (
+                parent_execution if parent_execution else execution
+            )
 
-        input_params["parent_node_id"] = node_dict.get("id")
+            input_params["parent_node_id"] = node_dict.get("id")
 
         if include_inputs:
             for column in execution.payload.columns:
@@ -155,6 +157,9 @@ class RuleExecutor:
         include_context = (
             node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW
         )
+        include_parent_execution = (
+            node.kind() == NodeKind.CONNECTOR or node.kind() == NodeKind.FLOW
+        )
         include_inputs = node.kind() == NodeKind.FLOW
         input_params = self.__get_input_params(
             node.model_dump(by_alias=True),
@@ -162,6 +167,7 @@ class RuleExecutor:
             execution=execution,
             parent_execution=parent_execution,
             include_context=include_context,
+            include_parent_execution=include_parent_execution,
             include_inputs=include_inputs,
         )
 
