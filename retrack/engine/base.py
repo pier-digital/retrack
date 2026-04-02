@@ -29,7 +29,7 @@ class Execution:
         self.states = states
         self.filters = filters or {}
         self.context = context
-        self.child_executions or {}
+        self.child_executions = child_executions or {}
         self.nodes = nodes or {}
         self.constants = constants or {}
 
