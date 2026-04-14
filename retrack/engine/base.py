@@ -111,9 +111,6 @@ class Execution:
             "filters": {k: v.to_dict() for k, v in self.filters.items()},
             "result": self.result.to_dict(),
             "has_ended": self.has_ended(),
-            "child_executions": {
-                k: [ce.to_dict() for ce in v] for k, v in self.child_executions.items()
-            },
         }
 
     def to_model(self) -> ExecutionSchema:
