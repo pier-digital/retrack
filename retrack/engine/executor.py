@@ -121,9 +121,7 @@ class RuleExecutor:
             input_params["context"] = execution.context
 
         if include_parent_execution:
-            input_params["parent_execution"] = (
-                parent_execution if parent_execution else execution
-            )
+            input_params["parent_execution"] = execution
 
             input_params["parent_node_id"] = node_dict.get("id")
 
