@@ -3,6 +3,7 @@ from retrack.validators.base import BaseValidator
 from retrack.validators.check_is_dag import CheckIsDAG
 from retrack.validators.node_exists import NodeExistsValidator
 from retrack.validators.node_validator import IntervalCatV0Validator
+from retrack.validators.unique_node_name import UniqueNodeNameValidator
 
 
 def registry() -> Registry:
@@ -13,6 +14,7 @@ def registry() -> Registry:
     )
     _registry.register("check_is_dag", CheckIsDAG())
     _registry.register("interval_cat_v0", IntervalCatV0Validator())
+    _registry.register("unique_node_name", UniqueNodeNameValidator())
     return _registry
 
 

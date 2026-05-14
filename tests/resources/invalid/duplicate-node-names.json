@@ -1,0 +1,370 @@
+{
+  "id": "demo@0.1.0",
+  "nodes": {
+    "64de388213a30001": {
+      "id": "64de388213a30001",
+      "name": "Start",
+      "data": {},
+      "outputs": {
+        "output_up_void": {
+          "connections": [
+            {
+              "node": "43294d550df7b5ec",
+              "input": "input_void"
+            }
+          ]
+        },
+        "output_down_void": {
+          "connections": [
+            {
+              "node": "430edbcc30da4325",
+              "input": "input_void"
+            }
+          ]
+        }
+      },
+      "inputs": {}
+    },
+    "43294d550df7b5ec": {
+      "id": "43294d550df7b5ec",
+      "name": "Input",
+      "data": {
+        "name": "number",
+        "default": ""
+      },
+      "outputs": {
+        "output_value": {
+          "connections": [
+            {
+              "node": "3e3e3c467f618f64",
+              "input": "input_number"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": "64de388213a30001",
+              "output": "output_up_void"
+            }
+          ]
+        }
+      }
+    },
+    "dcab49930d0ed13f": {
+      "id": "dcab49930d0ed13f",
+      "name": "If",
+      "data": {},
+      "outputs": {
+        "output_then_filter": {
+          "connections": [
+            {
+              "node": "03aef1138a7508d6",
+              "input": "input_void"
+            }
+          ]
+        },
+        "output_else_filter": {
+          "connections": [
+            {
+              "node": "e72726ed9612c416",
+              "input": "input_void"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_bool": {
+          "connections": [
+            {
+              "node": "dad6ef6c48978e77",
+              "output": "output_bool"
+            }
+          ]
+        }
+      }
+    },
+    "3e3e3c467f618f64": {
+      "id": "3e3e3c467f618f64",
+      "name": "FlowV0",
+      "data": {
+        "value": "{\"id\":\"demo@0.1.0\",\"nodes\":{\"bbf11385f3999284\":{\"id\":\"bbf11385f3999284\",\"name\":\"Start\",\"data\":{},\"outputs\":{\"output_up_void\":{\"connections\":[{\"node\":\"571b4c64308b772c\",\"input\":\"input_void\"}]},\"output_down_void\":{\"connections\":[{\"node\":\"85732e121f80e263\",\"input\":\"input_void\"}]}},\"inputs\":{}},\"72f88dfc53235c5f\":{\"id\":\"72f88dfc53235c5f\",\"name\":\"Output\",\"data\":{\"message\":\"\"},\"outputs\":{},\"inputs\":{\"input_value\":{\"connections\":[{\"node\":\"0801f173504b8abe\",\"output\":\"output_bool\"}]}}},\"571b4c64308b772c\":{\"id\":\"571b4c64308b772c\",\"name\":\"Input\",\"data\":{\"name\":\"number\",\"default\":\"\"},\"outputs\":{\"output_value\":{\"connections\":[{\"node\":\"0801f173504b8abe\",\"input\":\"input_value_0\"}]}},\"inputs\":{\"input_void\":{\"connections\":[{\"node\":\"bbf11385f3999284\",\"output\":\"output_up_void\"}]}}},\"85732e121f80e263\":{\"id\":\"85732e121f80e263\",\"name\":\"Constant\",\"data\":{\"value\":\"1\"},\"outputs\":{\"output_value\":{\"connections\":[{\"node\":\"0801f173504b8abe\",\"input\":\"input_value_1\"}]}},\"inputs\":{\"input_void\":{\"connections\":[{\"node\":\"bbf11385f3999284\",\"output\":\"output_down_void\"}]}}},\"0801f173504b8abe\":{\"id\":\"0801f173504b8abe\",\"name\":\"Check\",\"data\":{\"operator\":\"==\"},\"outputs\":{\"output_bool\":{\"connections\":[{\"node\":\"72f88dfc53235c5f\",\"input\":\"input_value\"}]}},\"inputs\":{\"input_value_0\":{\"connections\":[{\"node\":\"571b4c64308b772c\",\"output\":\"output_value\"}]},\"input_value_1\":{\"connections\":[{\"node\":\"85732e121f80e263\",\"output\":\"output_value\"}]}}}},\"version\":\"dd326f76aa.2026-01-28\"}",
+        "name": "is_equal"
+      },
+      "outputs": {
+        "output_value": {
+          "connections": [
+            {
+              "node": "dad6ef6c48978e77",
+              "input": "input_value_0"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_number": {
+          "connections": [
+            {
+              "node": "43294d550df7b5ec",
+              "output": "output_value"
+            }
+          ]
+        }
+      }
+    },
+    "430edbcc30da4325": {
+      "id": "430edbcc30da4325",
+      "name": "Bool",
+      "data": {
+        "value": true
+      },
+      "outputs": {
+        "output_bool": {
+          "connections": [
+            {
+              "node": "dad6ef6c48978e77",
+              "input": "input_value_1"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": "64de388213a30001",
+              "output": "output_down_void"
+            }
+          ]
+        }
+      }
+    },
+    "dad6ef6c48978e77": {
+      "id": "dad6ef6c48978e77",
+      "name": "Check",
+      "data": {
+        "operator": "=="
+      },
+      "outputs": {
+        "output_bool": {
+          "connections": [
+            {
+              "node": "dcab49930d0ed13f",
+              "input": "input_bool"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_value_0": {
+          "connections": [
+            {
+              "node": "3e3e3c467f618f64",
+              "output": "output_value"
+            }
+          ]
+        },
+        "input_value_1": {
+          "connections": [
+            {
+              "node": "430edbcc30da4325",
+              "output": "output_bool"
+            }
+          ]
+        }
+      }
+    },
+    "03aef1138a7508d6": {
+      "id": "03aef1138a7508d6",
+      "name": "Bool",
+      "data": {
+        "value": true
+      },
+      "outputs": {
+        "output_bool": {
+          "connections": [
+            {
+              "node": "fdf9292649a66368",
+              "input": "input_value"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": "dcab49930d0ed13f",
+              "output": "output_then_filter"
+            }
+          ]
+        }
+      }
+    },
+    "fdf9292649a66368": {
+      "id": "fdf9292649a66368",
+      "name": "Output",
+      "data": {
+        "message": "is_equal"
+      },
+      "outputs": {},
+      "inputs": {
+        "input_value": {
+          "connections": [
+            {
+              "node": "03aef1138a7508d6",
+              "output": "output_bool"
+            }
+          ]
+        }
+      }
+    },
+    "e72726ed9612c416": {
+      "id": "e72726ed9612c416",
+      "name": "Input",
+      "data": {
+        "name": "number",
+        "default": ""
+      },
+      "outputs": {
+        "output_value": {
+          "connections": [
+            {
+              "node": "760d4b5cfa5920f9",
+              "input": "input_void"
+            },
+            {
+              "node": "22cb5788ed6296b9",
+              "input": "input_number"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": "dcab49930d0ed13f",
+              "output": "output_else_filter"
+            }
+          ]
+        }
+      }
+    },
+    "760d4b5cfa5920f9": {
+      "id": "760d4b5cfa5920f9",
+      "name": "Bool",
+      "data": {
+        "value": false
+      },
+      "outputs": {
+        "output_bool": {
+          "connections": [
+            {
+              "node": "98353c19e6bf031a",
+              "input": "input_value_1"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": "e72726ed9612c416",
+              "output": "output_value"
+            }
+          ]
+        }
+      }
+    },
+    "22cb5788ed6296b9": {
+      "id": "22cb5788ed6296b9",
+      "name": "FlowV0",
+      "data": {
+        "value": "{\"id\":\"demo@0.1.0\",\"nodes\":{\"bbf11385f3999284\":{\"id\":\"bbf11385f3999284\",\"name\":\"Start\",\"data\":{},\"outputs\":{\"output_up_void\":{\"connections\":[{\"node\":\"571b4c64308b772c\",\"input\":\"input_void\"}]},\"output_down_void\":{\"connections\":[{\"node\":\"85732e121f80e263\",\"input\":\"input_void\"}]}},\"inputs\":{}},\"72f88dfc53235c5f\":{\"id\":\"72f88dfc53235c5f\",\"name\":\"Output\",\"data\":{\"message\":\"\"},\"outputs\":{},\"inputs\":{\"input_value\":{\"connections\":[{\"node\":\"0801f173504b8abe\",\"output\":\"output_bool\"}]}}},\"571b4c64308b772c\":{\"id\":\"571b4c64308b772c\",\"name\":\"Input\",\"data\":{\"name\":\"number\",\"default\":\"\"},\"outputs\":{\"output_value\":{\"connections\":[{\"node\":\"0801f173504b8abe\",\"input\":\"input_value_0\"}]}},\"inputs\":{\"input_void\":{\"connections\":[{\"node\":\"bbf11385f3999284\",\"output\":\"output_up_void\"}]}}},\"85732e121f80e263\":{\"id\":\"85732e121f80e263\",\"name\":\"Constant\",\"data\":{\"value\":\"1\"},\"outputs\":{\"output_value\":{\"connections\":[{\"node\":\"0801f173504b8abe\",\"input\":\"input_value_1\"}]}},\"inputs\":{\"input_void\":{\"connections\":[{\"node\":\"bbf11385f3999284\",\"output\":\"output_down_void\"}]}}},\"0801f173504b8abe\":{\"id\":\"0801f173504b8abe\",\"name\":\"Check\",\"data\":{\"operator\":\"==\"},\"outputs\":{\"output_bool\":{\"connections\":[{\"node\":\"72f88dfc53235c5f\",\"input\":\"input_value\"}]}},\"inputs\":{\"input_value_0\":{\"connections\":[{\"node\":\"571b4c64308b772c\",\"output\":\"output_value\"}]},\"input_value_1\":{\"connections\":[{\"node\":\"85732e121f80e263\",\"output\":\"output_value\"}]}}}},\"version\":\"dd326f76aa.2026-01-28\"}",
+        "name": "is_equal"
+      },
+      "outputs": {
+        "output_value": {
+          "connections": [
+            {
+              "node": "98353c19e6bf031a",
+              "input": "input_value_0"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_number": {
+          "connections": [
+            {
+              "node": "e72726ed9612c416",
+              "output": "output_value"
+            }
+          ]
+        }
+      }
+    },
+    "98353c19e6bf031a": {
+      "id": "98353c19e6bf031a",
+      "name": "Check",
+      "data": {
+        "operator": "=="
+      },
+      "outputs": {
+        "output_bool": {
+          "connections": [
+            {
+              "node": "61dc887d263e1f92",
+              "input": "input_void"
+            }
+          ]
+        }
+      },
+      "inputs": {
+        "input_value_0": {
+          "connections": [
+            {
+              "node": "22cb5788ed6296b9",
+              "output": "output_value"
+            }
+          ]
+        },
+        "input_value_1": {
+          "connections": [
+            {
+              "node": "760d4b5cfa5920f9",
+              "output": "output_bool"
+            }
+          ]
+        }
+      }
+    },
+    "61dc887d263e1f92": {
+      "id": "61dc887d263e1f92",
+      "name": "Constant",
+      "data": {
+        "value": "is_not_equal"
+      },
+      "outputs": {
+        "output_value": {
+          "connections": []
+        }
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": "98353c19e6bf031a",
+              "output": "output_bool"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "version": "5d292ee38d.2026-01-28"
+}

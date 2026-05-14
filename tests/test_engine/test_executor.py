@@ -395,6 +395,11 @@ async def test_rules_with_subrules_with_conditions():
             [{"age": 40}],
             "Invalid numeric values in interval columns in node 3",
         ),
+        (
+            "duplicate-node-names",
+            [{"number": 1}],
+            "Duplicate node names found: 'is_equal' (nodes: 3e3e3c467f618f64, 22cb5788ed6296b9)",
+        ),
     ],
 )
 async def test_invalid_flows(filename, in_values, expected_error):
