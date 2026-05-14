@@ -21,6 +21,7 @@ class Execution:
         states: pd.DataFrame,
         filters: dict = None,
         context: registry.Registry = None,
+        child_executions = None,
         nodes: dict = None,
         constants: dict = None,
     ):
@@ -28,6 +29,7 @@ class Execution:
         self.states = states
         self.filters = filters or {}
         self.context = context
+        self.child_executions = child_executions or {}
         self.nodes = nodes or {}
         self.constants = constants or {}
 
@@ -55,6 +57,11 @@ class Execution:
 
     def add_node(self, node: BaseNode):
         self.nodes[node.id] = node
+
+    def add_child_execution(self, node_id: str, execution: "Execution"):
+        if node_id not in self.child_executions:
+            self.child_executions[node_id] = []
+        self.child_executions[node_id].append(execution)
 
     def update_filters(self, filter_value, output_connections: typing.List[str] = None):
         for output_connection_id in output_connections:
