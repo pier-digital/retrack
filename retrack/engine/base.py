@@ -102,7 +102,7 @@ class Execution:
         ]
 
     def has_ended(self) -> bool:
-        return self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().sum() == 0
+        return not self.states[constants.OUTPUT_REFERENCE_COLUMN].isna().any()
 
     def to_dict(self) -> dict:
         return {
