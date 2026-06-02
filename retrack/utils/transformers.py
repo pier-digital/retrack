@@ -284,8 +284,10 @@ def normalize_execution_for_debug_iter(
                 for inp in inputs_list:
                     key = inp.get("target_name")
                     value = inp.get("value")
-                    if key and value is not None and not (
-                        isinstance(value, float) and pd.isna(value)
+                    if (
+                        key
+                        and value is not None
+                        and not (isinstance(value, float) and pd.isna(value))
                     ):
                         outputs.append(
                             {

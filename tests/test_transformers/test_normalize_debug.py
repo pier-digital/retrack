@@ -1,7 +1,3 @@
-import math
-
-import pytest
-
 from retrack.utils.transformers import normalize_execution_for_debug_iter
 
 
@@ -22,24 +18,40 @@ def _normalize(nodes_at_index):
 
 
 # ---------------------------------------------------------------------------
-# Output legado
+# node Output
 # ---------------------------------------------------------------------------
 
 
 def test_output_single_value():
     node = _make_node(
         "Output",
-        inputs=[{"node_id": "n0", "target_name": "input_value", "value": 3028, "source_name": "output"}],
+        inputs=[
+            {
+                "node_id": "n0",
+                "target_name": "input_value",
+                "value": 3028,
+                "source_name": "output",
+            }
+        ],
         data=[{"name": "message", "value": "basic"}],
     )
     result = _normalize([node])
-    assert result[0]["outputs"] == [{"name": "output", "value": 3028, "message": "basic"}]
+    assert result[0]["outputs"] == [
+        {"name": "output", "value": 3028, "message": "basic"}
+    ]
 
 
 def test_output_message_none():
     node = _make_node(
         "Output",
-        inputs=[{"node_id": "n0", "target_name": "input_value", "value": 1.5, "source_name": "output"}],
+        inputs=[
+            {
+                "node_id": "n0",
+                "target_name": "input_value",
+                "value": 1.5,
+                "source_name": "output",
+            }
+        ],
         data=[{"name": "message", "value": None}],
     )
     result = _normalize([node])
@@ -49,7 +61,14 @@ def test_output_message_none():
 def test_output_filters_none_value():
     node = _make_node(
         "Output",
-        inputs=[{"node_id": "n0", "target_name": "input_value", "value": None, "source_name": "output"}],
+        inputs=[
+            {
+                "node_id": "n0",
+                "target_name": "input_value",
+                "value": None,
+                "source_name": "output",
+            }
+        ],
         data=[],
     )
     result = _normalize([node])
@@ -59,7 +78,14 @@ def test_output_filters_none_value():
 def test_output_filters_nan_value():
     node = _make_node(
         "Output",
-        inputs=[{"node_id": "n0", "target_name": "input_value", "value": float("nan"), "source_name": "output"}],
+        inputs=[
+            {
+                "node_id": "n0",
+                "target_name": "input_value",
+                "value": float("nan"),
+                "source_name": "output",
+            }
+        ],
         data=[],
     )
     result = _normalize([node])
@@ -73,7 +99,7 @@ def test_output_empty_inputs():
 
 
 # ---------------------------------------------------------------------------
-# MultipleOutputs
+# node MultipleOutputs
 # ---------------------------------------------------------------------------
 
 
@@ -81,16 +107,31 @@ def test_multiple_outputs_expands_all_keys():
     node = _make_node(
         "MultipleOutputs",
         inputs=[
-            {"node_id": "a", "target_name": "basic_7",  "value": 3028,  "source_name": "output"},
-            {"node_id": "b", "target_name": "basic_15", "value": 7194,  "source_name": "output"},
-            {"node_id": "c", "target_name": "basic_30", "value": 15720, "source_name": "output"},
+            {
+                "node_id": "a",
+                "target_name": "basic_7",
+                "value": 3028,
+                "source_name": "output",
+            },
+            {
+                "node_id": "b",
+                "target_name": "basic_15",
+                "value": 7194,
+                "source_name": "output",
+            },
+            {
+                "node_id": "c",
+                "target_name": "basic_30",
+                "value": 15720,
+                "source_name": "output",
+            },
         ],
         data=[{"name": "message", "value": "cobertura"}],
     )
     result = _normalize([node])
     assert result[0]["outputs"] == [
-        {"name": "basic_7",  "value": 3028,  "message": "cobertura"},
-        {"name": "basic_15", "value": 7194,  "message": "cobertura"},
+        {"name": "basic_7", "value": 3028, "message": "cobertura"},
+        {"name": "basic_15", "value": 7194, "message": "cobertura"},
         {"name": "basic_30", "value": 15720, "message": "cobertura"},
     ]
 
@@ -125,9 +166,24 @@ def test_multiple_outputs_filters_none_value():
     node = _make_node(
         "MultipleOutputs",
         inputs=[
-            {"node_id": "a", "target_name": "k1", "value": 100,  "source_name": "output"},
-            {"node_id": "b", "target_name": "k2", "value": None,  "source_name": "output"},
-            {"node_id": "c", "target_name": "k3", "value": 200,  "source_name": "output"},
+            {
+                "node_id": "a",
+                "target_name": "k1",
+                "value": 100,
+                "source_name": "output",
+            },
+            {
+                "node_id": "b",
+                "target_name": "k2",
+                "value": None,
+                "source_name": "output",
+            },
+            {
+                "node_id": "c",
+                "target_name": "k3",
+                "value": 200,
+                "source_name": "output",
+            },
         ],
         data=[],
     )
@@ -139,8 +195,13 @@ def test_multiple_outputs_filters_nan_value():
     node = _make_node(
         "MultipleOutputs",
         inputs=[
-            {"node_id": "a", "target_name": "k1", "value": float("nan"), "source_name": "output"},
-            {"node_id": "b", "target_name": "k2", "value": 42,           "source_name": "output"},
+            {
+                "node_id": "a",
+                "target_name": "k1",
+                "value": float("nan"),
+                "source_name": "output",
+            },
+            {"node_id": "b", "target_name": "k2", "value": 42, "source_name": "output"},
         ],
         data=[],
     )
@@ -151,7 +212,14 @@ def test_multiple_outputs_filters_nan_value():
 def test_multiple_outputs_single_key():
     node = _make_node(
         "MultipleOutputs",
-        inputs=[{"node_id": "a", "target_name": "only_key", "value": 7, "source_name": "output"}],
+        inputs=[
+            {
+                "node_id": "a",
+                "target_name": "only_key",
+                "value": 7,
+                "source_name": "output",
+            }
+        ],
         data=[{"name": "message", "value": "solo"}],
     )
     result = _normalize([node])
@@ -179,12 +247,17 @@ def test_multiple_outputs_empty_inputs():
 
 
 # ---------------------------------------------------------------------------
-# Retrocompatibilidade — nós não-terminais são ignorados
+# backward compatibility
 # ---------------------------------------------------------------------------
 
 
 def test_non_terminal_nodes_ignored():
-    other = _make_node("Check", inputs=[{"node_id": "x", "target_name": "v", "value": 99, "source_name": "output"}])
+    other = _make_node(
+        "Check",
+        inputs=[
+            {"node_id": "x", "target_name": "v", "value": 99, "source_name": "output"}
+        ],
+    )
     result = _normalize([other])
     assert result[0]["outputs"] == []
 
@@ -192,7 +265,14 @@ def test_non_terminal_nodes_ignored():
 def test_output_and_non_terminal_together():
     output_node = _make_node(
         "Output",
-        inputs=[{"node_id": "a", "target_name": "input_value", "value": 5, "source_name": "output"}],
+        inputs=[
+            {
+                "node_id": "a",
+                "target_name": "input_value",
+                "value": 5,
+                "source_name": "output",
+            }
+        ],
         data=[{"name": "message", "value": "ok"}],
     )
     other = _make_node("Math", inputs=[])
