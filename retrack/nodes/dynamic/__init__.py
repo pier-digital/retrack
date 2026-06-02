@@ -4,6 +4,7 @@ from retrack.nodes.dynamic.flow import flow_factory
 from retrack.nodes.dynamic.flow_connector import flow_connector_factory
 from retrack.nodes.dynamic.conditional_connector import conditional_connector_factory
 from retrack.nodes.dynamic.glm import glm_factory
+from retrack.nodes.dynamic.multiple_outputs import multiple_outputs_factory
 from retrack.utils.registry import Registry
 
 
@@ -21,6 +22,7 @@ def registry() -> Registry:
     _registry.register("ModelConnector", conditional_connector_factory)
     _registry.register("FeatureConnector", conditional_connector_factory)
     _registry.register("GLM", glm_factory)
+    _registry.register("MultipleOutputs", multiple_outputs_factory)
 
     return _registry
 

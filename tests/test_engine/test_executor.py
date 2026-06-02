@@ -283,6 +283,94 @@ def test_create_from_json_with_invalid_type():
 
 
 @pytest.mark.asyncio
+async def test_multiple_outputs_single_row():
+    with open("tests/resources/multiple-outputs.json", "r") as f:
+        graph_data = json.load(f)
+
+    executor = Rule.create(
+        graph_data,
+        nodes_registry=nodes.registry(),
+        dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+    ).executor
+
+    # RequestManager coerces raw payload values to str — values piped directly
+    # from Input nodes arrive as strings in MultipleOutputs.
+    result = await executor.execute(pd.DataFrame([{"value_a": "3028", "value_b": "7194", "value_c": "15720"}]))
+
+    assert isinstance(result, pd.DataFrame)
+    records = result.to_dict(orient="records")
+    assert len(records) == 1
+    assert records[0]["message"] == "cobertura"
+    output = records[0]["output"]
+    assert isinstance(output, list)
+    assert len(output) == 3
+    assert output[0]["key"] == "basic_7"
+    assert output[1]["key"] == "basic_15"
+    assert output[2]["key"] == "basic_30"
+    assert output[0]["value"] == "3028"
+    assert output[1]["value"] == "7194"
+    assert output[2]["value"] == "15720"
+
+
+@pytest.mark.asyncio
+async def test_multiple_outputs_batch():
+    with open("tests/resources/multiple-outputs.json", "r") as f:
+        graph_data = json.load(f)
+
+    executor = Rule.create(
+        graph_data,
+        nodes_registry=nodes.registry(),
+        dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+    ).executor
+
+    payload = pd.DataFrame([
+        {"value_a": "100", "value_b": "200", "value_c": "300"},
+        {"value_a": "10",  "value_b": "20",  "value_c": "30"},
+    ])
+    result = await executor.execute(payload)
+
+    assert isinstance(result, pd.DataFrame)
+    assert len(result) == 2
+
+    records = result.to_dict(orient="records")
+
+    assert records[0]["output"][0] == {"key": "basic_7", "value": "100"}
+    assert records[0]["output"][1] == {"key": "basic_15", "value": "200"}
+    assert records[0]["output"][2] == {"key": "basic_30", "value": "300"}
+    assert records[0]["message"] == "cobertura"
+
+    assert records[1]["output"][0] == {"key": "basic_7", "value": "10"}
+    assert records[1]["output"][1] == {"key": "basic_15", "value": "20"}
+    assert records[1]["output"][2] == {"key": "basic_30", "value": "30"}
+    assert records[1]["message"] == "cobertura"
+
+
+def test_multiple_outputs_rejects_mixed_terminal_nodes():
+    """Rule.create must reject a graph mixing Output and MultipleOutputs."""
+    import json as _json
+    with open("tests/resources/multiple-outputs.json", "r") as f:
+        graph_data = _json.load(f)
+
+    # inject a conflicting Output node
+    graph_data["nodes"]["99"] = {
+        "id": 99,
+        "name": "Output",
+        "data": {"message": None},
+        "inputs": {
+            "input_value": {"connections": [{"node": 2, "output": "output_value", "data": {}}]}
+        },
+        "outputs": {},
+    }
+
+    with pytest.raises(ValueError, match="mix"):
+        Rule.create(
+            graph_data,
+            nodes_registry=nodes.registry(),
+            dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
+        )
+
+
+@pytest.mark.asyncio
 async def test_subflow_with_connector():
     _input_df = pd.DataFrame(
         {
