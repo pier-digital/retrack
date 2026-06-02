@@ -293,9 +293,9 @@ async def test_multiple_outputs_single_row():
         dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
     ).executor
 
-    # RequestManager coerces raw payload values to str — values piped directly
-    # from Input nodes arrive as strings in MultipleOutputs.
-    result = await executor.execute(pd.DataFrame([{"value_a": "3028", "value_b": "7194", "value_c": "15720"}]))
+    result = await executor.execute(
+        pd.DataFrame([{"value_a": "3028", "value_b": "7194", "value_c": "15720"}])
+    )
 
     assert isinstance(result, pd.DataFrame)
     records = result.to_dict(orient="records")
@@ -323,10 +323,12 @@ async def test_multiple_outputs_batch():
         dynamic_nodes_registry=nodes.dynamic_nodes_registry(),
     ).executor
 
-    payload = pd.DataFrame([
-        {"value_a": "100", "value_b": "200", "value_c": "300"},
-        {"value_a": "10",  "value_b": "20",  "value_c": "30"},
-    ])
+    payload = pd.DataFrame(
+        [
+            {"value_a": "100", "value_b": "200", "value_c": "300"},
+            {"value_a": "10", "value_b": "20", "value_c": "30"},
+        ]
+    )
     result = await executor.execute(payload)
 
     assert isinstance(result, pd.DataFrame)
@@ -348,6 +350,7 @@ async def test_multiple_outputs_batch():
 def test_multiple_outputs_rejects_mixed_terminal_nodes():
     """Rule.create must reject a graph mixing Output and MultipleOutputs."""
     import json as _json
+
     with open("tests/resources/multiple-outputs.json", "r") as f:
         graph_data = _json.load(f)
 
@@ -357,7 +360,9 @@ def test_multiple_outputs_rejects_mixed_terminal_nodes():
         "name": "Output",
         "data": {"message": None},
         "inputs": {
-            "input_value": {"connections": [{"node": 2, "output": "output_value", "data": {}}]}
+            "input_value": {
+                "connections": [{"node": 2, "output": "output_value", "data": {}}]
+            }
         },
         "outputs": {},
     }

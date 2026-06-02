@@ -15,8 +15,7 @@ class SingleTerminalNodeValidator(BaseValidator):
         nodes = graph_data.get("nodes", {})
 
         has_output = any(
-            node.get("name", "").lower() == "output"
-            for _, node in nodes.items()
+            node.get("name", "").lower() == "output" for _, node in nodes.items()
         )
         has_multiple_outputs = any(
             node.get("name", "").lower() == "multipleoutputs"

@@ -40,7 +40,9 @@ def test_accepts_single_multiple_outputs_node(validator):
 
 
 def test_accepts_multiple_multiple_outputs_nodes(validator):
-    is_valid, msg = validator.validate(_graph(["Start", "MultipleOutputs", "MultipleOutputs"]))
+    is_valid, msg = validator.validate(
+        _graph(["Start", "MultipleOutputs", "MultipleOutputs"])
+    )
     assert is_valid is True
     assert msg is None
 
@@ -77,13 +79,27 @@ def test_rejects_mix_with_many_output_nodes(validator):
 
 
 def test_case_insensitive_output(validator):
-    graph = {"nodes": {"0": {"id": 0, "name": "output", "data": {}, "inputs": {}, "outputs": {}}}}
+    graph = {
+        "nodes": {
+            "0": {"id": 0, "name": "output", "data": {}, "inputs": {}, "outputs": {}}
+        }
+    }
     is_valid, _ = validator.validate(graph)
     assert is_valid is True
 
 
 def test_case_insensitive_multiple_outputs(validator):
-    graph = {"nodes": {"0": {"id": 0, "name": "multipleoutputs", "data": {}, "inputs": {}, "outputs": {}}}}
+    graph = {
+        "nodes": {
+            "0": {
+                "id": 0,
+                "name": "multipleoutputs",
+                "data": {},
+                "inputs": {},
+                "outputs": {},
+            }
+        }
+    }
     is_valid, _ = validator.validate(graph)
     assert is_valid is True
 

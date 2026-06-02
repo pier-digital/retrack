@@ -3,7 +3,11 @@ import typing
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, NodeKind, OptionalCastedToNoneStringType
+from retrack.nodes.base import (
+    InputConnectionModel,
+    NodeKind,
+    OptionalCastedToNoneStringType,
+)
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 from retrack.utils import constants
 

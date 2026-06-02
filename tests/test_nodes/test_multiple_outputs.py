@@ -56,9 +56,15 @@ def node_metadata():
             "message": "cobertura",
         },
         "inputs": {
-            "basic_7":  {"connections": [{"node": 2, "output": "output_value", "data": {}}]},
-            "basic_15": {"connections": [{"node": 3, "output": "output_value", "data": {}}]},
-            "basic_30": {"connections": [{"node": 4, "output": "output_value", "data": {}}]},
+            "basic_7": {
+                "connections": [{"node": 2, "output": "output_value", "data": {}}]
+            },
+            "basic_15": {
+                "connections": [{"node": 3, "output": "output_value", "data": {}}]
+            },
+            "basic_30": {
+                "connections": [{"node": 4, "output": "output_value", "data": {}}]
+            },
         },
         "name": "MultipleOutputs",
     }
@@ -167,7 +173,9 @@ async def test_run_single_key():
         "id": 99,
         "data": {"headers_map": ["only_key"], "message": None},
         "inputs": {
-            "only_key": {"connections": [{"node": 1, "output": "output_value", "data": {}}]},
+            "only_key": {
+                "connections": [{"node": 1, "output": "output_value", "data": {}}]
+            },
         },
         "name": "MultipleOutputs",
     }
@@ -183,7 +191,6 @@ async def test_run_single_key():
 @pytest.mark.asyncio
 async def test_run_output_column_is_not_nan(node_metadata):
     """has_ended() depends on output not being NaN after run."""
-    import numpy as np
 
     factory = dynamic_nodes_registry().get("MultipleOutputs")
     NodeClass = factory(**node_metadata)
@@ -196,4 +203,6 @@ async def test_run_output_column_is_not_nan(node_metadata):
     )
 
     output_series = result[constants.OUTPUT_REFERENCE_COLUMN]
-    assert not output_series.isna().any(), "output must not be NaN so has_ended() returns True"
+    assert not output_series.isna().any(), (
+        "output must not be NaN so has_ended() returns True"
+    )
