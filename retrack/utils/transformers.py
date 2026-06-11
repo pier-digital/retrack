@@ -7,6 +7,9 @@ from retrack.nodes.base import BaseNode
 from retrack.utils.constants import EXCLUDED_NODE_TYPES, FILTER_SUFFIX, NULL_SUFFIX
 
 
+_TERMINAL_NODE_TYPES = frozenset({"Output", "MultipleOutputs"})
+
+
 def is_excluded_node(node_type: str) -> bool:
     return node_type in EXCLUDED_NODE_TYPES
 
@@ -251,25 +254,44 @@ def normalize_execution_for_debug_iter(
 
         outputs = []
         for node in nodes_at_index:
-            if node.get("type") == "Output":
-                inputs_list = node.get("inputs", [])
-                node_name = node.get("name")
-                if inputs_list:
-                    first_input = inputs_list[0]
-                    value = first_input.get("value")
+            node_type = node.get("type")
+            if node_type not in _TERMINAL_NODE_TYPES:
+                continue
 
-                    message = None
-                    for item in node.get("data", []):
-                        if item.get("name") == "message":
-                            message = item.get("value")
-                            break
+            inputs_list = node.get("inputs", [])
+            message = None
+            for item in node.get("data", []):
+                if item.get("name") == "message":
+                    message = item.get("value")
+                    break
 
-                    if value is not None and not (
-                        isinstance(value, float) and pd.isna(value)
+            if node_type == "Output":
+                if not inputs_list:
+                    continue
+                value = inputs_list[0].get("value")
+                if value is not None and not (
+                    isinstance(value, float) and pd.isna(value)
+                ):
+                    outputs.append(
+                        {
+                            "name": "output",
+                            "value": value,
+                            "message": message,
+                        }
+                    )
+
+            elif node_type == "MultipleOutputs":
+                for inp in inputs_list:
+                    key = inp.get("target_name")
+                    value = inp.get("value")
+                    if (
+                        key
+                        and value is not None
+                        and not (isinstance(value, float) and pd.isna(value))
                     ):
                         outputs.append(
                             {
-                                "name": "output",
+                                "name": key,
                                 "value": value,
                                 "message": message,
                             }
