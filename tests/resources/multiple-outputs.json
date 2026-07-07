@@ -1,0 +1,82 @@
+{
+	"nodes": {
+		"1": {
+			"id": 1,
+			"data": {},
+			"inputs": {},
+			"outputs": {
+				"output_up_void": {
+					"connections": [
+						{"node": 2, "input": "input_void", "data": {}},
+						{"node": 4, "input": "input_void", "data": {}}
+					]
+				},
+				"output_down_void": {
+					"connections": [
+						{"node": 3, "input": "input_void", "data": {}}
+					]
+				}
+			},
+			"name": "Start"
+		},
+		"2": {
+			"id": 2,
+			"data": {"name": "value_a", "default": null},
+			"inputs": {
+				"input_void": {
+					"connections": [{"node": 1, "output": "output_up_void", "data": {}}]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [{"node": 10, "input": "basic_7", "data": {}}]
+				}
+			},
+			"name": "Input"
+		},
+		"3": {
+			"id": 3,
+			"data": {"name": "value_b", "default": null},
+			"inputs": {
+				"input_void": {
+					"connections": [{"node": 1, "output": "output_down_void", "data": {}}]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [{"node": 10, "input": "basic_15", "data": {}}]
+				}
+			},
+			"name": "Input"
+		},
+		"4": {
+			"id": 4,
+			"data": {"name": "value_c", "default": null},
+			"inputs": {
+				"input_void": {
+					"connections": [{"node": 1, "output": "output_up_void", "data": {}}]
+				}
+			},
+			"outputs": {
+				"output_value": {
+					"connections": [{"node": 10, "input": "basic_30", "data": {}}]
+				}
+			},
+			"name": "Input"
+		},
+		"10": {
+			"id": 10,
+			"data": {
+				"headers_map": ["basic_7", "basic_15", "basic_30"],
+				"message": "cobertura"
+			},
+			"inputs": {
+				"basic_7":  {"connections": [{"node": 2, "output": "output_value", "data": {}}]},
+				"basic_15": {"connections": [{"node": 3, "output": "output_value", "data": {}}]},
+				"basic_30": {"connections": [{"node": 4, "output": "output_value", "data": {}}]}
+			},
+			"outputs": {},
+			"name": "MultipleOutputs"
+		}
+	}
+}
