@@ -21,7 +21,7 @@ class Execution:
         states: pd.DataFrame,
         filters: dict = None,
         context: registry.Registry = None,
-        child_executions = None,
+        child_executions=None,
         nodes: dict = None,
         constants: dict = None,
     ):

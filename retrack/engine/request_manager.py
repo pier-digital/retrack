@@ -156,9 +156,7 @@ class RequestManager:
         # Check required columns exist
         missing = set(schema.keys()) - set(payload.columns)
         if missing:
-            raise ValueError(
-                f"Missing columns: {missing}"
-            )
+            raise ValueError(f"Missing columns: {missing}")
 
         result = payload.copy()
 
