@@ -21,7 +21,7 @@ pandera = "~0.20"
 pytest-asyncio = "^1.1.0"
 pytest = "*"
 pytest-cov = "*"
-ruff = "*"
+ruff = "~0.15.22"
 pytest-mock = "*"
 
 [tool.pytest.ini_options]
