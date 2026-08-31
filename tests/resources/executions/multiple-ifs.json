@@ -11,6 +11,11 @@
         "name": "output",
         "value": "1",
         "message": "first"
+      },
+      {
+        "name": "message",
+        "value": "first",
+        "message": "first"
       }
     ],
     "nodes": [
@@ -173,6 +178,11 @@
       {
         "name": "output",
         "value": "2",
+        "message": "second"
+      },
+      {
+        "name": "message",
+        "value": "second",
         "message": "second"
       }
     ],

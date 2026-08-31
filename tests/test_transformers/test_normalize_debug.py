@@ -37,7 +37,8 @@ def test_output_single_value():
     )
     result = _normalize([node])
     assert result[0]["outputs"] == [
-        {"name": "output", "value": 3028, "message": "basic"}
+        {"name": "output", "value": 3028, "message": "basic"},
+        {"name": "message", "value": "basic", "message": "basic"},
     ]
 
 
@@ -92,6 +93,55 @@ def test_output_filters_nan_value():
     assert result[0]["outputs"] == []
 
 
+def test_output_without_value_does_not_emit_message():
+    node = _make_node(
+        "Output",
+        inputs=[
+            {
+                "node_id": "n0",
+                "target_name": "input_value",
+                "value": None,
+                "source_name": "output",
+            }
+        ],
+        data=[{"name": "message", "value": "not executed"}],
+    )
+    result = _normalize([node])
+    assert result[0]["outputs"] == []
+
+
+def test_only_executed_output_node_emits_message():
+    executed = _make_node(
+        "Output",
+        inputs=[
+            {
+                "node_id": "a",
+                "target_name": "input_value",
+                "value": 10,
+                "source_name": "output",
+            }
+        ],
+        data=[{"name": "message", "value": "taken"}],
+    )
+    skipped = _make_node(
+        "Output",
+        inputs=[
+            {
+                "node_id": "b",
+                "target_name": "input_value",
+                "value": None,
+                "source_name": "output",
+            }
+        ],
+        data=[{"name": "message", "value": "not taken"}],
+    )
+    result = _normalize([executed, skipped])
+    assert result[0]["outputs"] == [
+        {"name": "output", "value": 10, "message": "taken"},
+        {"name": "message", "value": "taken", "message": "taken"},
+    ]
+
+
 def test_output_empty_inputs():
     node = _make_node("Output", inputs=[], data=[{"name": "message", "value": "x"}])
     result = _normalize([node])
@@ -133,6 +183,7 @@ def test_multiple_outputs_expands_all_keys():
         {"name": "basic_7", "value": 3028, "message": "cobertura"},
         {"name": "basic_15", "value": 7194, "message": "cobertura"},
         {"name": "basic_30", "value": 15720, "message": "cobertura"},
+        {"name": "message", "value": "cobertura", "message": "cobertura"},
     ]
 
 
@@ -147,7 +198,8 @@ def test_multiple_outputs_replicates_message_on_all_entries():
     )
     result = _normalize([node])
     messages = [e["message"] for e in result[0]["outputs"]]
-    assert messages == ["msg", "msg"]
+    assert messages == ["msg", "msg", "msg"]
+    assert [e["name"] for e in result[0]["outputs"]] == ["k1", "k2", "message"]
 
 
 def test_multiple_outputs_message_none():
@@ -223,7 +275,10 @@ def test_multiple_outputs_single_key():
         data=[{"name": "message", "value": "solo"}],
     )
     result = _normalize([node])
-    assert result[0]["outputs"] == [{"name": "only_key", "value": 7, "message": "solo"}]
+    assert result[0]["outputs"] == [
+        {"name": "only_key", "value": 7, "message": "solo"},
+        {"name": "message", "value": "solo", "message": "solo"},
+    ]
 
 
 def test_multiple_outputs_preserves_order():
@@ -277,4 +332,7 @@ def test_output_and_non_terminal_together():
     )
     other = _make_node("Math", inputs=[])
     result = _normalize([output_node, other])
-    assert result[0]["outputs"] == [{"name": "output", "value": 5, "message": "ok"}]
+    assert result[0]["outputs"] == [
+        {"name": "output", "value": 5, "message": "ok"},
+        {"name": "message", "value": "ok", "message": "ok"},
+    ]

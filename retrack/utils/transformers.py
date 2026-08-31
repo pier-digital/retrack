@@ -265,6 +265,8 @@ def normalize_execution_for_debug_iter(
                     message = item.get("value")
                     break
 
+            outputs_before = len(outputs)
+
             if node_type == "Output":
                 if not inputs_list:
                     continue
@@ -296,6 +298,15 @@ def normalize_execution_for_debug_iter(
                                 "message": message,
                             }
                         )
+
+            if message is not None and len(outputs) > outputs_before:
+                outputs.append(
+                    {
+                        "name": "message",
+                        "value": message,
+                        "message": message,
+                    }
+                )
 
         nodes_info = [
             {
