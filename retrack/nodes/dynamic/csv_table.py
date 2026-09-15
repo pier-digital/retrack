@@ -14,6 +14,7 @@ class CSVTableV0MetadataModel(pydantic.BaseModel):
     headers_map: typing.List[str]
     separator: typing.Optional[str] = ","
     default: typing.Optional[str] = None
+    name: typing.Optional[str] = None
 
     def df(self) -> pd.DataFrame:
         rows = [values.split(self.separator) for values in self.value[1:]]

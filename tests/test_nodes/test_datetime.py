@@ -186,6 +186,20 @@ async def test_difference_between_dates_node_run(
     assert (output["output_value"] == pd.Series([30, -30])).all()
 
 
+@pytest.mark.asyncio
+async def test_difference_between_dates_node_run_with_empty_series(
+    difference_between_dates_input_data,
+):
+    difference_between_dates_node = DifferenceBetweenDates(
+        **difference_between_dates_input_data
+    )
+
+    output = await difference_between_dates_node.run(pd.Series(), pd.Series())
+
+    assert isinstance(output["output_value"], pd.Series)
+    assert output["output_value"].empty
+
+
 @pytest.fixture
 def to_iso_format_input_data():
     return {

@@ -1,5 +1,4 @@
 import pandas as pd
-import pandera
 import pydantic
 import pytest
 
@@ -41,7 +40,7 @@ def test_validate_payload_with_valid_payload(valid_input_dict_before_validation)
 
     assert issubclass(rm.model, pydantic.BaseModel)
 
-    assert isinstance(rm.dataframe_model, pandera.api.pandas.container.DataFrameSchema)
+    assert isinstance(rm.dataframe_model, dict)
 
     payload = rm.model(example="test")
 
@@ -63,3 +62,29 @@ def test_validate_dict_with_none_value(valid_input_dict_before_validation):
     assert issubclass(rm.model, pydantic.BaseModel)
     assert rm.model(example=None) == rm.model(example="Hello World")
     assert rm.model() == rm.model(example="Hello World")
+
+
+def test_validate_dataframe_replaces_sentinel_strings_with_default(
+    valid_input_dict_before_validation,
+):
+    """Sentinel strings count as null in the DataFrame path, matching StrFieldValidator."""
+    rm = RequestManager([Input(**valid_input_dict_before_validation)])
+
+    result = rm.validate(
+        pd.DataFrame([{"example": v} for v in ["None", "", "null", None]])
+    )
+
+    assert result["example"].tolist() == ["Hello World"] * 4
+
+
+def test_validate_dataframe_rejects_sentinel_strings_when_not_nullable(
+    valid_input_dict_before_validation,
+):
+    """Without a default the input is not nullable, so sentinel strings must raise."""
+    rm = RequestManager(
+        [Input(**{**valid_input_dict_before_validation, "data": {"name": "example"}})]
+    )
+
+    for value in ["None", "", "null", None]:
+        with pytest.raises(ValueError, match="not nullable"):
+            rm.validate(pd.DataFrame([{"example": value}]))

@@ -20,6 +20,7 @@ from retrack.nodes.base import (
 
 class ConstantMetadataModel(pydantic.BaseModel):
     value: str
+    name: typing.Optional[str] = None
 
 
 class ListMetadataModel(pydantic.BaseModel):

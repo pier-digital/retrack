@@ -87,6 +87,10 @@ class DifferenceBetweenDates(BaseNode):
         timestamp_1 = input_value_1.apply(replace_invalid)
 
         differences = timestamp_1.sub(timestamp_0)
+
+        if differences.empty:
+            return {"output_value": pd.Series()}
+        
         days = differences.dt.days
 
         return {"output_value": days}

@@ -1,8 +1,13 @@
 import typing
 
+import datetime
+
 import pandas as pd
 from retrack.nodes.base import BaseNode
 from retrack.utils.constants import EXCLUDED_NODE_TYPES, FILTER_SUFFIX, NULL_SUFFIX
+
+
+_TERMINAL_NODE_TYPES = frozenset({"Output", "MultipleOutputs"})
 
 
 def is_excluded_node(node_type: str) -> bool:
@@ -44,11 +49,43 @@ def to_metadata(node: BaseNode) -> typing.List[dict]:
     return [{"name": key, "value": value} for key, value in filtered.items()]
 
 
+def serialize_value(value: typing.Any) -> typing.Any:
+    """Serialize primitive-like values to JSON-friendly types."""
+    if value is None:
+        return None
+
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+
+    if isinstance(
+        value, (pd.Timestamp, datetime.datetime, datetime.date, datetime.time)
+    ):
+        return value.isoformat()
+
+    if isinstance(value, datetime.timedelta):
+        return value.total_seconds()
+
+    if isinstance(value, (list, tuple)):
+        return [serialize_value(item) for item in value]
+
+    if isinstance(value, dict):
+        return {key: serialize_value(item) for key, item in value.items()}
+
+    if isinstance(value, str) and value in ("True", "False"):
+        return value == "True"
+
+    return value
+
+
 def serialize_connections(
     inputs_or_outputs: typing.Any,
     node_id: str,
     connection_type: str,
     execution: "typing.Any",
+    values_cache: typing.Optional[dict] = None,
 ) -> list:
     """Transform connection models into serialized list with values and source name.
 
@@ -71,6 +108,8 @@ def serialize_connections(
     connection_target_key = "output" if connection_type == "input" else "input"
 
     serialized_connections = []
+    if values_cache is None:
+        values_cache = {}
     for (
         input_or_output_name,
         input_or_output,
@@ -87,13 +126,17 @@ def serialize_connections(
                 else:
                     state_key = f"{node_id}@{input_or_output_name}"
 
-                values = execution.get_state_data(
-                    state_key,
-                    constants=execution.constants,
-                    filter_by=None,
-                ).tolist()
-
-                values = [None if pd.isna(value) else value for value in values]
+                if state_key in values_cache:
+                    values = values_cache[state_key]
+                else:
+                    raw_values = execution.get_state_data(
+                        state_key,
+                        constants=execution.constants,
+                        filter_by=None,
+                    )
+                    values = raw_values.tolist()
+                    values = [serialize_value(value) for value in values]
+                    values_cache[state_key] = values
             except Exception:
                 values = []
 
@@ -116,22 +159,17 @@ def serialize_connections(
     return serialized_connections
 
 
-def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List[dict]]:
-    """Explode nodes by values array into array of arrays per value index.
+def explode_nodes_by_values_iter(
+    nodes: typing.List[dict],
+) -> typing.Iterator[typing.List[dict]]:
+    """Yield nodes per value index, without materializing all indexes.
 
     For each node, finds all input/output values arrays and determines max length.
-    Returns a list of lists where each sublist contains all nodes for that value index,
-    with 'values' array replaced by 'value' (singular) containing the specific value
-    or null if missing/empty.
-
-    Args:
-        nodes: List of normalized node dictionaries
-
-    Returns:
-        List of lists: [[node1_idx0, node2_idx0, ...], [node1_idx1, node2_idx1, ...], ...]
+    Yields one list per index where each node has 'value' (singular) extracted from
+    the original 'values' array.
     """
     if not nodes:
-        return []
+        return
 
     max_length = 0
     for node in nodes:
@@ -141,8 +179,6 @@ def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List
 
     if max_length == 0:
         max_length = 1
-
-    exploded_nodes_by_index = []
 
     for idx in range(max_length):
         nodes_for_index = []
@@ -186,26 +222,19 @@ def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List
 
             nodes_for_index.append(exploded_node)
 
-        exploded_nodes_by_index.append(nodes_for_index)
-
-    return exploded_nodes_by_index
+        yield nodes_for_index
 
 
-def normalize_execution_for_debug(
-    exploded_nodes: typing.List[typing.List[dict]],
+def explode_nodes_by_values(nodes: typing.List[dict]) -> typing.List[typing.List[dict]]:
+    """Explode nodes by values array into array of arrays per value index."""
+    return list(explode_nodes_by_values_iter(nodes))
+
+
+def normalize_execution_for_debug_iter(
+    exploded_nodes: typing.Iterable[typing.List[dict]],
     apply_filters: bool = True,
-) -> typing.List[dict]:
-    """Transform exploded nodes into debug format with inputs, results, nodes, and connections.
-
-    Args:
-        exploded_nodes: List of lists from explode_nodes_by_values
-        apply_filters: Whether to apply exclusion filters (node types, void connections, null values)
-
-    Returns:
-        List of normalized records, one per value index
-    """
-    normalized_records = []
-
+) -> typing.Iterator[dict]:
+    """Yield normalized records in debug format, one per value index."""
     for nodes_at_index in exploded_nodes:
         inputs = []
         seen_input_names = set()
@@ -225,29 +254,59 @@ def normalize_execution_for_debug(
 
         outputs = []
         for node in nodes_at_index:
-            if node.get("type") == "Output":
-                inputs_list = node.get("inputs", [])
-                node_name = node.get("name")
-                if inputs_list:
-                    first_input = inputs_list[0]
-                    value = first_input.get("value")
+            node_type = node.get("type")
+            if node_type not in _TERMINAL_NODE_TYPES:
+                continue
 
-                    message = None
-                    for item in node.get("data", []):
-                        if item.get("name") == "message":
-                            message = item.get("value")
-                            break
+            inputs_list = node.get("inputs", [])
+            message = None
+            for item in node.get("data", []):
+                if item.get("name") == "message":
+                    message = item.get("value")
+                    break
 
-                    if value is not None and not (
-                        isinstance(value, float) and pd.isna(value)
+            outputs_before = len(outputs)
+
+            if node_type == "Output":
+                if not inputs_list:
+                    continue
+                value = inputs_list[0].get("value")
+                if value is not None and not (
+                    isinstance(value, float) and pd.isna(value)
+                ):
+                    outputs.append(
+                        {
+                            "name": "output",
+                            "value": value,
+                            "message": message,
+                        }
+                    )
+
+            elif node_type == "MultipleOutputs":
+                for inp in inputs_list:
+                    key = inp.get("target_name")
+                    value = inp.get("value")
+                    if (
+                        key
+                        and value is not None
+                        and not (isinstance(value, float) and pd.isna(value))
                     ):
                         outputs.append(
                             {
-                                "name": "output",
+                                "name": key,
                                 "value": value,
                                 "message": message,
                             }
                         )
+
+            if message is not None and len(outputs) > outputs_before:
+                outputs.append(
+                    {
+                        "name": "message",
+                        "value": message,
+                        "message": message,
+                    }
+                )
 
         nodes_info = [
             {
@@ -261,6 +320,8 @@ def normalize_execution_for_debug(
         ]
 
         connections = []
+        seen_connections = set()
+
         for node in nodes_at_index:
             node_type = node.get("type")
             if apply_filters and is_excluded_node(node_type):
@@ -275,16 +336,19 @@ def normalize_execution_for_debug(
                 if apply_filters and is_filtered_connection(conn_name):
                     continue
 
-                connections.append(
-                    {
-                        "node_id": node_id,
-                        "node_type": node_type,
-                        "node_name": node_name,
-                        "connection_type": "input",
-                        "connection_name": conn_name,
-                        "value": value,
-                    }
-                )
+                connection_key = (node_id, conn_name, "input")
+                if connection_key not in seen_connections:
+                    seen_connections.add(connection_key)
+                    connections.append(
+                        {
+                            "node_id": node_id,
+                            "node_type": node_type,
+                            "node_name": node_name,
+                            "connection_type": "input",
+                            "connection_name": conn_name,
+                            "value": value,
+                        }
+                    )
 
             for output_conn in node.get("outputs", []):
                 value = output_conn.get("value")
@@ -292,24 +356,36 @@ def normalize_execution_for_debug(
                 if apply_filters and is_filtered_connection(conn_name):
                     continue
 
-                connections.append(
-                    {
-                        "node_id": node_id,
-                        "node_type": node_type,
-                        "node_name": node_name,
-                        "connection_type": "output",
-                        "connection_name": conn_name,
-                        "value": value,
-                    }
-                )
+                connection_key = (node_id, conn_name, "output")
+                if connection_key not in seen_connections:
+                    seen_connections.add(connection_key)
+                    connections.append(
+                        {
+                            "node_id": node_id,
+                            "node_type": node_type,
+                            "node_name": node_name,
+                            "connection_type": "output",
+                            "connection_name": conn_name,
+                            "value": value,
+                        }
+                    )
 
-        normalized_records.append(
-            {
-                "inputs": inputs,
-                "outputs": outputs,
-                "nodes": nodes_info,
-                "connections": connections,
-            }
+        yield {
+            "inputs": inputs,
+            "outputs": outputs,
+            "nodes": nodes_info,
+            "connections": connections,
+        }
+
+
+def normalize_execution_for_debug(
+    exploded_nodes: typing.List[typing.List[dict]],
+    apply_filters: bool = True,
+) -> typing.List[dict]:
+    """Transform exploded nodes into debug format with inputs, results, nodes, and connections."""
+    return list(
+        normalize_execution_for_debug_iter(
+            exploded_nodes,
+            apply_filters=apply_filters,
         )
-
-    return normalized_records
+    )
