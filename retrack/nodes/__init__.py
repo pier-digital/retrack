@@ -18,6 +18,14 @@ from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
+from retrack.nodes.string_ops import (
+    Concat,
+    Length,
+    Replace,
+    SubString,
+    Trim,
+    UpperCase,
+)
 from retrack.nodes.substring import IsSubStringOf
 from retrack.nodes.getchar import GetChar
 from retrack.utils.registry import Registry
@@ -62,6 +70,12 @@ def registry() -> Registry:
     _registry.register("ToBool", ToBool)
     _registry.register("ToNumber", ToNumber)
     _registry.register("ToString", ToString)
+    _registry.register("UpperCase", UpperCase)
+    _registry.register("Trim", Trim)
+    _registry.register("Length", Length)
+    _registry.register("Replace", Replace)
+    _registry.register("Concat", Concat)
+    _registry.register("SubString", SubString)
 
     return _registry
 
