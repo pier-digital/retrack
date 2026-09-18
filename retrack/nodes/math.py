@@ -1,6 +1,7 @@
 import enum
 import typing
 
+import numpy as np
 import pandas as pd
 import pydantic
 
@@ -16,6 +17,8 @@ class MathOperator(str, enum.Enum):
     SUB = "-"
     DIVISION = "/"
     MULTIPLY = "*"
+    POWER = "**"
+    MODULO = "%"
 
 
 class MathMetadataModel(pydantic.BaseModel):
@@ -71,6 +74,16 @@ class Math(BaseNode):
                 "output_value": input_value_0.astype(float)
                 / input_value_1.astype(float)
             }
+        elif self.data.operator == MathOperator.POWER:
+            return {
+                "output_value": input_value_0.astype(float)
+                ** input_value_1.astype(float)
+            }
+        elif self.data.operator == MathOperator.MODULO:
+            return {
+                "output_value": input_value_0.astype(float)
+                % input_value_1.astype(float)
+            }
         else:
             raise ValueError("Unknown operator")
 
@@ -109,3 +122,77 @@ class Round(BaseNode):
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
         return {"output_value": input_value.astype(float).round(0).astype(int)}
+
+
+###############################################################
+# Floor Node
+###############################################################
+
+
+class Floor(BaseNode):
+    inputs: AbsoluteValueInputsModel
+    outputs: MathOutputsModel
+
+    async def run(
+        self,
+        input_value: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        return {"output_value": np.floor(input_value.astype(float)).astype(int)}
+
+
+###############################################################
+# Ceil Node
+###############################################################
+
+
+class Ceil(BaseNode):
+    inputs: AbsoluteValueInputsModel
+    outputs: MathOutputsModel
+
+    async def run(
+        self,
+        input_value: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        return {"output_value": np.ceil(input_value.astype(float)).astype(int)}
+
+
+###############################################################
+# Min Node
+###############################################################
+
+
+class Min(BaseNode):
+    inputs: MathInputsModel
+    outputs: MathOutputsModel
+
+    async def run(
+        self,
+        input_value_0: pd.Series,
+        input_value_1: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        return {
+            "output_value": np.minimum(
+                input_value_0.astype(float), input_value_1.astype(float)
+            )
+        }
+
+
+###############################################################
+# Max Node
+###############################################################
+
+
+class Max(BaseNode):
+    inputs: MathInputsModel
+    outputs: MathOutputsModel
+
+    async def run(
+        self,
+        input_value_0: pd.Series,
+        input_value_1: pd.Series,
+    ) -> typing.Dict[str, pd.Series]:
+        return {
+            "output_value": np.maximum(
+                input_value_0.astype(float), input_value_1.astype(float)
+            )
+        }
