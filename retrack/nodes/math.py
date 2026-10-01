@@ -8,6 +8,41 @@ import pydantic
 from retrack.nodes.base import BaseNode, InputConnectionModel, OutputConnectionModel
 
 ###############################################################
+# Helpers
+###############################################################
+
+MAX_INVALID_SAMPLES = 5
+
+
+def _to_float(node: BaseNode, input_value: pd.Series) -> pd.Series:
+    nulls = input_value.isna()
+    if nulls.any():
+        raise ValueError(
+            f"{node.name} node {node.id}: received {int(nulls.sum())} null value(s)"
+        )
+
+    converted = pd.to_numeric(input_value, errors="coerce").astype(float)
+    invalid = converted.isna() | ~np.isfinite(converted)
+    if invalid.any():
+        raise ValueError(
+            f"{node.name} node {node.id}: could not convert "
+            f"{input_value[invalid].head(MAX_INVALID_SAMPLES).tolist()} to number"
+        )
+
+    return converted
+
+
+def _check_finite(node: BaseNode, output: pd.Series) -> pd.Series:
+    invalid = ~np.isfinite(output)
+    if invalid.any():
+        raise ValueError(
+            f"{node.name} node {node.id}: operator {node.data.operator.value} "
+            f"produced {int(invalid.sum())} non-finite value(s) (NaN or infinity)"
+        )
+    return output
+
+
+###############################################################
 # Math Metadata Models
 ###############################################################
 
@@ -75,15 +110,11 @@ class Math(BaseNode):
                 / input_value_1.astype(float)
             }
         elif self.data.operator == MathOperator.POWER:
-            return {
-                "output_value": input_value_0.astype(float)
-                ** input_value_1.astype(float)
-            }
+            output = _to_float(self, input_value_0) ** _to_float(self, input_value_1)
+            return {"output_value": _check_finite(self, output)}
         elif self.data.operator == MathOperator.MODULO:
-            return {
-                "output_value": input_value_0.astype(float)
-                % input_value_1.astype(float)
-            }
+            output = _to_float(self, input_value_0) % _to_float(self, input_value_1)
+            return {"output_value": _check_finite(self, output)}
         else:
             raise ValueError("Unknown operator")
 
@@ -137,7 +168,7 @@ class Floor(BaseNode):
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
-        return {"output_value": np.floor(input_value.astype(float)).astype(int)}
+        return {"output_value": np.floor(_to_float(self, input_value)).astype(int)}
 
 
 ###############################################################
@@ -153,7 +184,7 @@ class Ceil(BaseNode):
         self,
         input_value: pd.Series,
     ) -> typing.Dict[str, pd.Series]:
-        return {"output_value": np.ceil(input_value.astype(float)).astype(int)}
+        return {"output_value": np.ceil(_to_float(self, input_value)).astype(int)}
 
 
 ###############################################################
@@ -172,7 +203,7 @@ class Min(BaseNode):
     ) -> typing.Dict[str, pd.Series]:
         return {
             "output_value": np.minimum(
-                input_value_0.astype(float), input_value_1.astype(float)
+                _to_float(self, input_value_0), _to_float(self, input_value_1)
             )
         }
 
@@ -193,6 +224,6 @@ class Max(BaseNode):
     ) -> typing.Dict[str, pd.Series]:
         return {
             "output_value": np.maximum(
-                input_value_0.astype(float), input_value_1.astype(float)
+                _to_float(self, input_value_0), _to_float(self, input_value_1)
             )
         }
