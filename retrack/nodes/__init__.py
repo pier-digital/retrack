@@ -3,6 +3,7 @@ from retrack.nodes.check import Check
 from retrack.nodes.connectors import BaseConnector
 from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
+from retrack.nodes.convert import ToBool, ToNumber, ToString
 from retrack.nodes.datetime import CurrentYear, DifferenceBetweenDates, Now, ToISOFormat
 from retrack.nodes.dynamic import BaseDynamicNode
 from retrack.nodes.dynamic import registry as dynamic_nodes_registry
@@ -12,11 +13,19 @@ from retrack.nodes.inputs import Input
 from retrack.nodes.logic import And, Not, Or
 from retrack.nodes.lowercase import LowerCase
 from retrack.nodes.match import If
-from retrack.nodes.math import AbsoluteValue, Math, Round
+from retrack.nodes.math import AbsoluteValue, Ceil, Floor, Math, Max, Min, Round
 from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
 from retrack.nodes.startswithany import StartsWithAny
+from retrack.nodes.string_ops import (
+    Concat,
+    Length,
+    Replace,
+    SubString,
+    Trim,
+    UpperCase,
+)
 from retrack.nodes.substring import IsSubStringOf
 from retrack.nodes.getchar import GetChar
 from retrack.utils.registry import Registry
@@ -45,6 +54,10 @@ def registry() -> Registry:
     _registry.register("Math", Math)
     _registry.register("Round", Round)
     _registry.register("AbsoluteValue", AbsoluteValue)
+    _registry.register("Floor", Floor)
+    _registry.register("Ceil", Ceil)
+    _registry.register("Min", Min)
+    _registry.register("Max", Max)
     _registry.register("StartsWith", StartsWith)
     _registry.register("EndsWith", EndsWith)
     _registry.register("StartsWithAny", StartsWithAny)
@@ -58,6 +71,15 @@ def registry() -> Registry:
     _registry.register("LowerCase", LowerCase)
     _registry.register("IsSubStringOf", IsSubStringOf)
     _registry.register("GetChar", GetChar)
+    _registry.register("ToBool", ToBool)
+    _registry.register("ToNumber", ToNumber)
+    _registry.register("ToString", ToString)
+    _registry.register("UpperCase", UpperCase)
+    _registry.register("Trim", Trim)
+    _registry.register("Length", Length)
+    _registry.register("Replace", Replace)
+    _registry.register("Concat", Concat)
+    _registry.register("SubString", SubString)
 
     return _registry
 
