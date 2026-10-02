@@ -32,7 +32,7 @@ class RequestManager:
 
     @property
     def input_names(self) -> typing.List[str]:
-        return [input.data.name for input in self.inputs]
+        return list(self._columns.keys())
 
     @inputs.setter
     def inputs(self, inputs: typing.List[BaseNode]):
@@ -55,12 +55,18 @@ class RequestManager:
                     f"inputs[{i}] must be an InputModel, not {type(inputs[i])}"
                 )
 
-            if inputs[i].data.name not in formated_inputs:
-                formated_inputs[inputs[i].data.name] = inputs[i]
-            elif inputs[i].data.default is not None:
-                formated_inputs[inputs[i].data.name] = inputs[i]
+            for column in inputs[i].payload_columns().values():
+                if column not in formated_inputs:
+                    formated_inputs[column] = inputs[i]
+                elif inputs[i].data.default is not None:
+                    formated_inputs[column] = inputs[i]
 
-        self._inputs = formated_inputs.values()
+        self._columns = {
+            column: node.data.default for column, node in formated_inputs.items()
+        }
+        self._inputs = list(
+            {id(node): node for node in formated_inputs.values()}.values()
+        )
 
         if len(self.inputs) > 0:
             self._model = self.__create_model()
@@ -89,21 +95,15 @@ class RequestManager:
             typing.Type[pydantic.BaseModel]: The pydantic model
         """
         fields = {}
-        for input_field in self.inputs:
-            fields[input_field.data.name] = (
+        for column, default in self._columns.items():
+            fields[column] = (
                 typing.Annotated[
-                    str if input_field.data.default is None else typing.Optional[str],
-                    pydantic.BeforeValidator(
-                        StrFieldValidator(input_field.data.default)
-                    ),
+                    str if default is None else typing.Optional[str],
+                    pydantic.BeforeValidator(StrFieldValidator(default)),
                 ],
                 pydantic.Field(
-                    default=Ellipsis
-                    if input_field.data.default is None
-                    else input_field.data.default,
-                    json_schema_extra={
-                        "optional": input_field.data.default is not None
-                    },
+                    default=Ellipsis if default is None else default,
+                    json_schema_extra={"optional": default is not None},
                     validate_default=False,
                 ),
             )
@@ -123,10 +123,10 @@ class RequestManager:
             dict: mapping column_name -> {"nullable": bool, "default": value}
         """
         schema = {}
-        for input_field in self.inputs:
-            schema[input_field.data.name] = {
-                "nullable": input_field.data.default is not None,
-                "default": input_field.data.default,
+        for column, default in self._columns.items():
+            schema[column] = {
+                "nullable": default is not None,
+                "default": default,
             }
         return schema
 
