@@ -13,7 +13,7 @@ from retrack.nodes.inputs import Input
 from retrack.nodes.logic import And, Not, Or
 from retrack.nodes.lowercase import LowerCase
 from retrack.nodes.match import If
-from retrack.nodes.math import AbsoluteValue, Math, Round
+from retrack.nodes.math import AbsoluteValue, Ceil, Floor, Math, Max, Min, Round
 from retrack.nodes.outputs import Output
 from retrack.nodes.start import Start
 from retrack.nodes.startswith import StartsWith
@@ -54,6 +54,10 @@ def registry() -> Registry:
     _registry.register("Math", Math)
     _registry.register("Round", Round)
     _registry.register("AbsoluteValue", AbsoluteValue)
+    _registry.register("Floor", Floor)
+    _registry.register("Ceil", Ceil)
+    _registry.register("Min", Min)
+    _registry.register("Max", Max)
     _registry.register("StartsWith", StartsWith)
     _registry.register("EndsWith", EndsWith)
     _registry.register("StartsWithAny", StartsWithAny)
