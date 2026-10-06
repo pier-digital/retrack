@@ -3,6 +3,7 @@ from retrack.nodes.check import Check
 from retrack.nodes.connectors import BaseConnector
 from retrack.nodes.constants import Bool, Constant, IntervalCatV0, List
 from retrack.nodes.contains import Contains
+from retrack.nodes.convert import ToBool, ToNumber, ToString
 from retrack.nodes.datetime import CurrentYear, DifferenceBetweenDates, Now, ToISOFormat
 from retrack.nodes.dynamic import BaseDynamicNode
 from retrack.nodes.dynamic import registry as dynamic_nodes_registry
@@ -72,6 +73,9 @@ def registry() -> Registry:
     _registry.register("Replace", Replace)
     _registry.register("Concat", Concat)
     _registry.register("SubString", SubString)
+    _registry.register("ToBool", ToBool)
+    _registry.register("ToNumber", ToNumber)
+    _registry.register("ToString", ToString)
 
     return _registry
 
