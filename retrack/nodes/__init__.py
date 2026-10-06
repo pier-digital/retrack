@@ -71,15 +71,15 @@ def registry() -> Registry:
     _registry.register("LowerCase", LowerCase)
     _registry.register("IsSubStringOf", IsSubStringOf)
     _registry.register("GetChar", GetChar)
-    _registry.register("ToBool", ToBool)
-    _registry.register("ToNumber", ToNumber)
-    _registry.register("ToString", ToString)
     _registry.register("UpperCase", UpperCase)
     _registry.register("Trim", Trim)
     _registry.register("Length", Length)
     _registry.register("Replace", Replace)
     _registry.register("Concat", Concat)
     _registry.register("SubString", SubString)
+    _registry.register("ToBool", ToBool)
+    _registry.register("ToNumber", ToNumber)
+    _registry.register("ToString", ToString)
 
     return _registry
 
