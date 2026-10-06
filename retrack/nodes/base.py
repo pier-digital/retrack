@@ -3,6 +3,8 @@ import typing
 
 import pydantic
 
+from retrack.utils import constants
+
 ###############################################################
 # Node Kind
 ###############################################################
@@ -104,6 +106,10 @@ class BaseNode(pydantic.BaseModel):
         return getattr(getattr(self, "data", None), "alias", None) or getattr(
             getattr(self, "data", None), "name", None
         )
+
+    def payload_columns(self) -> typing.Dict[str, str]:
+        """Map each output connector to the payload column that feeds it when the node is used as an input."""
+        return {constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME: self.data.name}
 
     def type(self) -> str:
         return self.name
