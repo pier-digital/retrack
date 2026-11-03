@@ -201,8 +201,9 @@ class RuleExecutor:
             input_nodes (typing.List[BaseNode]): The input nodes to be used.
         """
         self._input_columns = {
-            f"{node.id}@{constants.INPUT_OUTPUT_VALUE_CONNECTOR_NAME}": node.data.name
+            f"{node.id}@{output_name}": column
             for node in input_nodes
+            for output_name, column in node.payload_columns().items()
         }
 
         self._request_manager = RequestManager(input_nodes)
