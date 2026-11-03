@@ -1,0 +1,142 @@
+{
+  "nodes": {
+    "1": {
+      "id": 1,
+      "name": "Start",
+      "data": {},
+      "inputs": {},
+      "outputs": {
+        "output_up_void": {
+          "connections": [
+            {
+              "node": 2,
+              "input": "input_void",
+              "data": {}
+            }
+          ]
+        },
+        "output_down_void": {
+          "connections": [
+            {
+              "node": 5,
+              "input": "input_void",
+              "data": {}
+            }
+          ]
+        }
+      }
+    },
+    "2": {
+      "id": 2,
+      "name": "Input",
+      "data": {
+        "name": "value",
+        "default": null
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": 1,
+              "output": "output_up_void",
+              "data": {}
+            }
+          ]
+        }
+      },
+      "outputs": {
+        "output_value": {
+          "connections": [
+            {
+              "node": 5,
+              "input": "input_value_0",
+              "data": {}
+            }
+          ]
+        }
+      }
+    },
+    "5": {
+      "id": 5,
+      "name": "FlowConnector",
+      "data": {
+        "name": "child_values",
+        "flow": "child-flow",
+        "version": "latest",
+        "default": null
+      },
+      "inputs": {
+        "input_void": {
+          "connections": [
+            {
+              "node": 1,
+              "output": "output_down_void",
+              "data": {}
+            }
+          ]
+        },
+        "input_value_0": {
+          "connections": [
+            {
+              "node": 2,
+              "output": "output_value",
+              "data": {}
+            }
+          ]
+        }
+      },
+      "outputs": {
+        "first_output@a1b2c3d4": {
+          "connections": [
+            {
+              "node": 10,
+              "input": "first_output",
+              "data": {}
+            }
+          ]
+        },
+        "second_output@a1b2c3d4": {
+          "connections": [
+            {
+              "node": 10,
+              "input": "second_output",
+              "data": {}
+            }
+          ]
+        }
+      }
+    },
+    "10": {
+      "id": 10,
+      "name": "MultipleOutputs",
+      "data": {
+        "headers_map": [
+          "first_output",
+          "second_output"
+        ],
+        "message": null
+      },
+      "inputs": {
+        "first_output": {
+          "connections": [
+            {
+              "node": 5,
+              "output": "first_output@a1b2c3d4",
+              "data": {}
+            }
+          ]
+        },
+        "second_output": {
+          "connections": [
+            {
+              "node": 5,
+              "output": "second_output@a1b2c3d4",
+              "data": {}
+            }
+          ]
+        }
+      },
+      "outputs": {}
+    }
+  }
+}
