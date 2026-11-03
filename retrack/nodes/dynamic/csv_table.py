@@ -70,7 +70,23 @@ def csv_table_factory(
 
             response_df = pd.DataFrame(response_df)
             response_df = response_df.astype(str)
-            response_df = response_df.merge(csv_df, how="left", on=input_columns)
+            response_df = response_df.merge(
+                csv_df, how="left", on=input_columns, indicator=True
+            )
+
+            unmatched_mask = response_df["_merge"] == "left_only"
+            if self.data.default is None and unmatched_mask.any():
+                unmatched = (
+                    response_df.loc[unmatched_mask, input_columns]
+                    .drop_duplicates()
+                    .to_dict(orient="records")
+                )
+                raise ValueError(
+                    f"No matching row for {unmatched[:5]} in CSVTableV0 node "
+                    f"{self.id} and no default was supplied"
+                )
+
+            response_df = response_df.drop(columns="_merge")
 
             if self.data.default:
                 response_df[self.data.target] = response_df[self.data.target].fillna(

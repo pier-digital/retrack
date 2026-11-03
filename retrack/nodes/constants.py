@@ -157,6 +157,14 @@ class IntervalCatV0(BaseConstant):
         out = np.full(values.shape, np.nan, dtype=object)
 
         found_mask = idx != -1
+
+        if self.data.default is None and not found_mask.all():
+            unmatched = input_value.iloc[np.where(~found_mask)[0]].unique().tolist()
+            raise ValueError(
+                f"Values {unmatched[:5]} are not inside any interval in "
+                f"IntervalCatV0 node {self.id} and no default was supplied"
+            )
+
         if found_mask.any():
             mapped = cats[idx[found_mask]]
             out[found_mask] = mapped

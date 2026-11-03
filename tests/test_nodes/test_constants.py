@@ -55,7 +55,7 @@ async def test_interval_cat_v0_run(interval_cat_dict):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("default", ["", None])
-async def test_interval_cat_v0_empty_default_behaves_like_null(
+async def test_interval_cat_v0_raises_when_out_of_interval_without_default(
     interval_cat_dict, default
 ):
     interval_cat_dict["data"]["value"] = [
@@ -67,7 +67,34 @@ async def test_interval_cat_v0_empty_default_behaves_like_null(
 
     assert interval_cat.data.default is None
 
+    with pytest.raises(ValueError, match="not inside any interval"):
+        await interval_cat.run(input_value=pd.Series([100, 5000]))
+
+
+@pytest.mark.asyncio
+async def test_interval_cat_v0_without_default_all_values_in_interval(
+    interval_cat_dict,
+):
+    interval_cat_dict["data"]["value"] = [
+        "score_minimo,score_maximo,score_cat",
+        "0,451,low",
+    ]
+    interval_cat_dict["data"]["default"] = None
+    interval_cat = IntervalCatV0(**interval_cat_dict)
+
+    output = await interval_cat.run(input_value=pd.Series([0, 100, 450]))
+
+    assert output["output_value"].tolist() == ["low", "low", "low"]
+
+
+@pytest.mark.asyncio
+async def test_interval_cat_v0_uses_default_when_out_of_interval(interval_cat_dict):
+    interval_cat_dict["data"]["value"] = [
+        "score_minimo,score_maximo,score_cat",
+        "0,451,low",
+    ]
+    interval_cat = IntervalCatV0(**interval_cat_dict)
+
     output = await interval_cat.run(input_value=pd.Series([100, 5000]))
 
-    assert output["output_value"].iloc[0] == "low"
-    assert pd.isna(output["output_value"].iloc[1])
+    assert output["output_value"].tolist() == ["low", "-1"]

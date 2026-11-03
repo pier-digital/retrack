@@ -98,7 +98,9 @@ async def test_csv_table_run(csv_table_metadata):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("default", ["", None])
-async def test_csv_table_empty_default_behaves_like_null(csv_table_metadata, default):
+async def test_csv_table_raises_when_no_matching_row_without_default(
+    csv_table_metadata, default
+):
     csv_table_metadata["data"]["default"] = default
     csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
     CSVTableV0 = csv_table_factory(**csv_table_metadata)
@@ -114,7 +116,24 @@ async def test_csv_table_empty_default_behaves_like_null(csv_table_metadata, def
         "input_value_2": pd.Series(["420", "463"]),
     }
 
+    with pytest.raises(ValueError, match="No matching row"):
+        await model.run(**payload)
+
+
+@pytest.mark.asyncio
+async def test_csv_table_without_default_all_rows_match(csv_table_metadata):
+    csv_table_metadata["data"]["default"] = None
+    csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
+    CSVTableV0 = csv_table_factory(**csv_table_metadata)
+
+    model = CSVTableV0(**csv_table_metadata)
+
+    payload = {
+        "input_value_0": pd.Series(["MAY", "JUN"]),
+        "input_value_1": pd.Series(["363", "435"]),
+        "input_value_2": pd.Series(["420", "472"]),
+    }
+
     response = await model.run(**payload)
 
-    assert response["output_value"].iloc[0] == "472"
-    assert pd.isna(response["output_value"].iloc[1])
+    assert response["output_value"].tolist() == ["472", "535"]
