@@ -3,7 +3,11 @@ import typing
 from retrack.nodes.base import NodeKind
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    InputConnectionModel,
+    OptionalCastedToNoneStringType,
+    OutputConnectionModel,
+)
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 
@@ -11,7 +15,7 @@ class ConditionalConnectorMetadataModel(pydantic.BaseModel):
     name: str
     source: str
     resource: str
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
     headers: typing.List[str]
     headers_map: typing.List[str]
 

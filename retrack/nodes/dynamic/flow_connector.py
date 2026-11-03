@@ -3,7 +3,11 @@ import typing
 from retrack.nodes.base import NodeKind
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    InputConnectionModel,
+    OptionalCastedToNoneStringType,
+    OutputConnectionModel,
+)
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 
@@ -11,7 +15,7 @@ class FlowConnectorMetadataModel(pydantic.BaseModel):
     name: str
     flow: str
     version: str
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
 
 
 class FlowConnectorOutputsModel(pydantic.BaseModel):

@@ -5,7 +5,11 @@ import pandas as pd
 import numpy as np
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    InputConnectionModel,
+    OptionalCastedToNoneStringType,
+    OutputConnectionModel,
+)
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 
@@ -21,7 +25,7 @@ LINK_FUNCS = {
 class GLMMetadataModel(pydantic.BaseModel):
     value: str
     name: typing.Optional[str] = None
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
     link: typing.Optional[str] = "log"
     headers_map: typing.Dict[str, int]
 

@@ -119,3 +119,15 @@ async def test_glm_run_with_missing_weight(glm_metadata):
         }
 
         _ = await model.run(**payload)
+
+
+@pytest.mark.parametrize("default", ["", None])
+def test_glm_empty_default_behaves_like_null(glm_metadata, default):
+    glm_metadata["data"]["default"] = default
+    glm_factory = dynamic_nodes_registry().get("GLM")
+    GLM = glm_factory(**glm_metadata)
+
+    model = GLM(**glm_metadata)
+
+    assert model.data.default is None
+    assert model.default() is None

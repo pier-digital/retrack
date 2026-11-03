@@ -51,3 +51,23 @@ async def test_interval_cat_v0_run(interval_cat_dict):
 
     expected_output = pd.Series([0, 0, 0, 451, 900, 1000, 1000])
     assert (output["output_value"].astype(str) == expected_output.astype(str)).all()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("default", ["", None])
+async def test_interval_cat_v0_empty_default_behaves_like_null(
+    interval_cat_dict, default
+):
+    interval_cat_dict["data"]["value"] = [
+        "score_minimo,score_maximo,score_cat",
+        "0,451,low",
+    ]
+    interval_cat_dict["data"]["default"] = default
+    interval_cat = IntervalCatV0(**interval_cat_dict)
+
+    assert interval_cat.data.default is None
+
+    output = await interval_cat.run(input_value=pd.Series([100, 5000]))
+
+    assert output["output_value"].iloc[0] == "low"
+    assert pd.isna(output["output_value"].iloc[1])

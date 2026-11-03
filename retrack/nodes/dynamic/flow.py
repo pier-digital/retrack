@@ -4,7 +4,12 @@ import typing
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, NodeKind, OutputConnectionModel
+from retrack.nodes.base import (
+    InputConnectionModel,
+    NodeKind,
+    OptionalCastedToNoneStringType,
+    OutputConnectionModel,
+)
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 from retrack.utils.registry import Registry
 
@@ -12,7 +17,7 @@ from retrack.utils.registry import Registry
 class FlowV0MetadataModel(pydantic.BaseModel):
     value: str
     name: typing.Optional[str] = None
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
 
     def parsed_value(self) -> typing.Dict[str, typing.Any]:
         return json.loads(self.value)

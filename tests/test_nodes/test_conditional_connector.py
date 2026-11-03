@@ -52,3 +52,19 @@ def test_create_model_from_factory(conditional_connector_metadata):
     assert hasattr(model, "kind")
 
     assert model.kind() == NodeKind.CONNECTOR
+
+
+@pytest.mark.parametrize("default", ["", None])
+def test_conditional_connector_empty_default_behaves_like_null(
+    conditional_connector_metadata, default
+):
+    conditional_connector_metadata["data"]["default"] = default
+    conditional_connector_factory = dynamic_nodes_registry().get("ConditionalConnector")
+    ConditionalConnector = conditional_connector_factory(
+        **conditional_connector_metadata
+    )
+
+    model = ConditionalConnector(**conditional_connector_metadata)
+
+    assert model.data.default is None
+    assert model.default() is None

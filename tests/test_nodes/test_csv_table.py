@@ -94,3 +94,27 @@ async def test_csv_table_run(csv_table_metadata):
 
     response = await model.run(**payload)
     assert response["output_value"].equals(expected)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("default", ["", None])
+async def test_csv_table_empty_default_behaves_like_null(csv_table_metadata, default):
+    csv_table_metadata["data"]["default"] = default
+    csv_table_factory = dynamic_nodes_registry().get("CSVTableV0")
+    CSVTableV0 = csv_table_factory(**csv_table_metadata)
+
+    model = CSVTableV0(**csv_table_metadata)
+
+    assert model.data.default is None
+    assert model.default() is None
+
+    payload = {
+        "input_value_0": pd.Series(["MAY", "SEP"]),
+        "input_value_1": pd.Series(["363", "-1"]),
+        "input_value_2": pd.Series(["420", "463"]),
+    }
+
+    response = await model.run(**payload)
+
+    assert response["output_value"].iloc[0] == "472"
+    assert pd.isna(response["output_value"].iloc[1])

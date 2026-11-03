@@ -11,6 +11,7 @@ from retrack.nodes.base import (
     NodeKind,
     NodeMemoryType,
     OutputConnectionModel,
+    OptionalCastedToNoneStringType,
 )
 
 #######################################################
@@ -50,7 +51,7 @@ class IntervalCatMetadataModel(pydantic.BaseModel):
     category_column: str
     headers: typing.List[str]
     separator: typing.Optional[str] = pydantic.Field(",")
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
 
     def df(self) -> pd.DataFrame:
         csv_str = "\n".join(self.value[1:])

@@ -3,7 +3,11 @@ import typing
 import pandas as pd
 import pydantic
 
-from retrack.nodes.base import InputConnectionModel, OutputConnectionModel
+from retrack.nodes.base import (
+    InputConnectionModel,
+    OptionalCastedToNoneStringType,
+    OutputConnectionModel,
+)
 from retrack.nodes.dynamic.base import BaseDynamicIOModel, BaseDynamicNode
 
 
@@ -13,7 +17,7 @@ class CSVTableV0MetadataModel(pydantic.BaseModel):
     headers: typing.List[str]
     headers_map: typing.List[str]
     separator: typing.Optional[str] = ","
-    default: typing.Optional[str] = None
+    default: OptionalCastedToNoneStringType = None
     name: typing.Optional[str] = None
 
     def df(self) -> pd.DataFrame:
